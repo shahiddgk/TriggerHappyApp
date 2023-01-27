@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 class AppColors {
- static const Color backgroundColor =  Color(0xFFDDDDDD);
+ static const Color backgroundColor =  Color(0xFFD3D3D3);
  static const Color totalQuestionColor =  Color(0xFFe08f53);
  static const Color textWhiteColor =  Color(0xFF000000);
  static const Color selectedAnswerColor =  Color(0xFF08C729);

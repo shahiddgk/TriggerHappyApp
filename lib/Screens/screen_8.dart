@@ -29,15 +29,41 @@ class _Screen8State extends State<Screen8> {
 
   String name = "";
   String id = "";
+  String answerNo6 = "";
+  String answerText6 = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
+  bool isAnswerLoading = false;
   List selectedAnswer = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   @override
   void initState() {
     _getUserData();
+    _getAnswerData();
     // TODO: implement initState
     super.initState();
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo6 = _sharedPreferences.getString("answerNo5")!;
+      answerText6 = _sharedPreferences.getString("answerText5")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo5", "5");
+    _sharedPreferences.setString("answerText5", selectedAnswer.toString());
   }
 
   _getUserData() async {
@@ -79,15 +105,22 @@ class _Screen8State extends State<Screen8> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        color: AppColors.backgroundColor,
-        child: PriviousNextButtonWidget((){
-          _submitAnswer(_fieldController.text);
-        },(){
-          // widget.answersList.removeAt(widget.answersList.length-1);
-          // print(widget.answersList);
-          Navigator.of(context).pop();
-        },true),
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer(_fieldController.text);
+        // },
+        child: Container(
+          color: AppColors.backgroundColor,
+          child: PriviousNextButtonWidget((){
+            setAnswerText();
+            _submitAnswer(_fieldController.text);
+          },(){
+            // widget.answersList.removeAt(widget.answersList.length-1);
+            // print(widget.answersList);
+            Navigator.of(context).pop();
+          },true),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -98,34 +131,43 @@ class _Screen8State extends State<Screen8> {
           key: _formKey,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              alignment: Alignment.center,
+             // ignoring: isAnswerLoading,
               children: [
-                //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    LogoScreen(),
-                  //  QuestionTextWidget("Tell me...."),
-                    Align(alignment:Alignment.topLeft,
-                        child: QuestionTextWidget(widget.questionListResponse[5].title)),
-                    // QuestionTextWidget("or"),
-                    // Align(
-                    //     alignment: Alignment.topLeft,
-                    //     child: QuestionTextWidget(widget.questionListResponse[5].subTitle)),
+                    //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        LogoScreen(),
+                        //  QuestionTextWidget("Tell me...."),
+                        Align(alignment:Alignment.topLeft,
+                            child: QuestionTextWidget(widget.questionListResponse[5].title)),
+                        // QuestionTextWidget("or"),
+                        // Align(
+                        //     alignment: Alignment.topLeft,
+                        //     child: QuestionTextWidget(widget.questionListResponse[5].subTitle)),
 
-                    AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[5].textLength.toString())),
+                        AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[5].textLength.toString())),
+                      ],
+                    ),
+                    // Align(alignment: Alignment.bottomCenter,
+                    //   child: Align(
+                    //       alignment: Alignment.bottomCenter,
+                    //       child: PriviousNextButtonWidget((){
+                    //         _submitAnswer(_fieldController.text);
+                    //       })
+                    //   ),)
                   ],
                 ),
-                // Align(alignment: Alignment.bottomCenter,
-                //   child: Align(
-                //       alignment: Alignment.bottomCenter,
-                //       child: PriviousNextButtonWidget((){
-                //         _submitAnswer(_fieldController.text);
-                //       })
-                //   ),)
+                Align(alignment: Alignment.center,
+                  child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+                )
               ],
             ),
           ),
@@ -136,17 +178,25 @@ class _Screen8State extends State<Screen8> {
 
   void _submitAnswer(String text) {
     selectedAnswer.clear();
+
     if(_formKey.currentState!.validate()) {
       setState(() {
+        isAnswerLoading = true;
         selectedAnswer.add(text);
       });
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[5].id.toString(),options: "[]", userId: id,text: text )).then((value) {
         print("Answer Response");
         print(value);
 
+        setState(() {
+          isAnswerLoading = false;
+        });
         Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Screen9(widget.questionListResponse)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(widget.answersList);

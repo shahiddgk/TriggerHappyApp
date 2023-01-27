@@ -31,15 +31,41 @@ class _Screen4State extends State<Screen4> {
   String _groupValue ="";
   String name = "";
   String id = "";
+  String answerNo = "";
+  String answerText = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
+  bool isAnswerLoading = false;
   List selectedAnswer = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   @override
   void initState() {
     _getUserData();
+    _getAnswerData();
     // TODO: implement initState
     super.initState();
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo = _sharedPreferences.getString("answerNo1")!;
+      answerText = _sharedPreferences.getString("answerText1")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo1", "1");
+    _sharedPreferences.setString("answerText1", selectedAnswer.toString());
   }
 
   _getUserData() async {
@@ -82,62 +108,76 @@ class _Screen4State extends State<Screen4> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        color: AppColors.backgroundColor,
-        child: PriviousNextButtonWidget((){
-            _submitAnswer();
-        },(){
-          setState(() {
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer();
+        // },
+        child: Container(
+          color: AppColors.backgroundColor,
+          child: PriviousNextButtonWidget((){
+              setAnswerText();
+              _submitAnswer();
+          },(){
+            setState(() {
 
-            Navigator.of(context).pop();
-          });
-        },true),
+              Navigator.of(context).pop();
+            });
+          },true),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+         alignment: Alignment.center,
           children: [
-            //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
             Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LogoScreen(),
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: QuestionTextWidget(widget.questionListResponse[1].title)),
-                ListView.builder(
-                  physics:const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                    itemCount: widget.questionListResponse[1].options.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index){
-                      return OptionMcqAnswer(
-                        RadioListTile<String>(
-                          tileColor: AppColors.textWhiteColor,
-                          activeColor: AppColors.PrimaryColor,
-                          value: widget.questionListResponse[1].options[index],
-                          title: Text(widget.questionListResponse[1].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
-                          groupValue: _groupValue,
-                          onChanged:  (newValue) {
-                            selectedAnswer.clear();
-                            setState(() {
-                              selectedAnswer.add(widget.questionListResponse[1].options[index]);
+                //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LogoScreen(),
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: QuestionTextWidget(widget.questionListResponse[1].title)),
+                    ListView.builder(
+                        physics:const NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemCount: widget.questionListResponse[1].options.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index){
+                          return OptionMcqAnswer(
+                            RadioListTile<String>(
+                              tileColor: AppColors.textWhiteColor,
+                              activeColor: AppColors.PrimaryColor,
+                              value: widget.questionListResponse[1].options[index],
+                              title: Text(widget.questionListResponse[1].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
+                              groupValue: _groupValue,
+                              onChanged:  (newValue) {
+                                selectedAnswer.clear();
+                                setState(() {
+                                  selectedAnswer.add(widget.questionListResponse[1].options[index]);
 
-                              _groupValue = newValue.toString();
-                            });
-                          },
-                        ),);
-                    }),
+                                  _groupValue = newValue.toString();
+                                });
+                              },
+                            ),);
+                        }),
 
+                  ],
+                ),
               ],
             ),
-
+            Align(alignment: Alignment.center,
+              child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+            )
           ],
         ),
       ),
@@ -147,18 +187,28 @@ class _Screen4State extends State<Screen4> {
   void _submitAnswer() {
     print(selectedAnswer);
 
+
     if(selectedAnswer.isNotEmpty) {
+      setState(() {
+        isAnswerLoading = true;
+      });
       // answersList.add({
       //   questionListResponse[0].id: selectedAnswer
       // });
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[1].id.toString(),options: selectedAnswer.toString(), userId: id,text: "" )).then((value) {
         print("Answer Response");
         print(value);
+        setState(() {
+          isAnswerLoading = false;
+        });
 
         Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => Screen5(widget.questionListResponse,2,6)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(answersList);

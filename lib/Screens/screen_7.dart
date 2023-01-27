@@ -35,9 +35,14 @@ class _Screen7State extends State<Screen7> {
 
   String name = "";
   String id = "";
+  String answerNo5 = "";
+  String answerText5 = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
   bool _isDataLoading = true;
+  bool isAnswerLoading = false;
   List answersList = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   _getUserData() async {
@@ -74,8 +79,28 @@ class _Screen7State extends State<Screen7> {
     // TODO: implement initState
     super.initState();
     _getUserData();
-
+    _getAnswerData();
     setListOptions();
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo5 = _sharedPreferences.getString("answerNo4")!;
+      answerText5 = _sharedPreferences.getString("answerText4")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo4", "4");
+    _sharedPreferences.setString("answerText4", selectedAnswer.toString());
   }
 
   @override
@@ -109,21 +134,28 @@ class _Screen7State extends State<Screen7> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        height: MediaQuery.of(context).size.height/10,
-        width: MediaQuery.of(context).size.width,
-        color: AppColors.backgroundColor,
-        child: Align(
-            alignment: Alignment.bottomCenter,
-            child: PriviousNextButtonWidget((){
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer();
+        // },
+        child: Container(
+          height: MediaQuery.of(context).size.height/10,
+          width: MediaQuery.of(context).size.width,
+          color: AppColors.backgroundColor,
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: PriviousNextButtonWidget((){
+                setAnswerText();
               _submitAnswer();
-            },(){
+              },(){
 
-              // widget.answersList.removeAt(widget.answersList.length-1);
-              // print(widget.answersList);
-              Navigator.of(context).pop();
+                // widget.answersList.removeAt(widget.answersList.length-1);
+                // print(widget.answersList);
+                Navigator.of(context).pop();
 
-            },true)
+              },true)
+          ),
         ),
       ),
       body: Container(
@@ -137,57 +169,67 @@ class _Screen7State extends State<Screen7> {
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
+              Stack(
+                alignment: Alignment.center,
+            //    ignoring: isAnswerLoading,
                 children: [
-                  LogoScreen(),
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                        padding: EdgeInsets.only(top: 1),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      LogoScreen(),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                            padding: EdgeInsets.only(top: 1),
+                            width: MediaQuery.of(context).size.width,
+                            child: QuestionTextWidget(widget.questionListResponse[4].title)),
+                      ),
+                      // Align(
+                      //   alignment: Alignment.topLeft,
+                      //   child: Container(
+                      //       padding: EdgeInsets.only(top: 1),
+                      //       width: MediaQuery.of(context).size.width,
+                      //       child: QuestionTextWidget(widget.questionListResponse[4].subTitle)),
+                      // ),
+
+                      !_isDataLoading ?  Container(
+                        height: MediaQuery.of(context).size.height/1.58,
                         width: MediaQuery.of(context).size.width,
-                        child: QuestionTextWidget(widget.questionListResponse[4].title)),
+                        child: GridView.count(
+                          padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
+                          crossAxisCount: ResponsiveWrapper.of(context).isMobile || ResponsiveWrapper.of(context).isPhone ? 3 : 2,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 2.0,
+                          childAspectRatio: itemHeight/itemWidth,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          children: List.generate(answersList.length, (index) {
+                            return OptionMcqAnswer(
+                              RadioListTile<String>(
+                                tileColor: AppColors.textWhiteColor,
+                                activeColor: AppColors.PrimaryColor,
+                                value: widget.questionListResponse[4].options[index],
+                                title: Text(widget.questionListResponse[4].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
+                                groupValue: _groupValue,
+                                onChanged:  (newValue) {
+                                  selectedAnswer.clear();
+                                  setState(() {
+                                    selectedAnswer.add(widget.questionListResponse[4].options[index]);
+
+                                    _groupValue = newValue.toString();
+                                  });
+                                },
+                              ),);
+                          }),
+                        ),
+                      ) : Container(),
+
+                    ],
                   ),
-                  // Align(
-                  //   alignment: Alignment.topLeft,
-                  //   child: Container(
-                  //       padding: EdgeInsets.only(top: 1),
-                  //       width: MediaQuery.of(context).size.width,
-                  //       child: QuestionTextWidget(widget.questionListResponse[4].subTitle)),
-                  // ),
-
-                  !_isDataLoading ?  Container(
-                    height: MediaQuery.of(context).size.height/1.58,
-                    width: MediaQuery.of(context).size.width,
-                    child: GridView.count(
-                      padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
-                      crossAxisCount: ResponsiveWrapper.of(context).isMobile || ResponsiveWrapper.of(context).isPhone ? 3 : 2,
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 2.0,
-                      childAspectRatio: itemHeight/itemWidth,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      children: List.generate(answersList.length, (index) {
-                        return OptionMcqAnswer(
-                          RadioListTile<String>(
-                            tileColor: AppColors.textWhiteColor,
-                            activeColor: AppColors.PrimaryColor,
-                            value: widget.questionListResponse[4].options[index],
-                            title: Text(widget.questionListResponse[4].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
-                            groupValue: _groupValue,
-                            onChanged:  (newValue) {
-                              selectedAnswer.clear();
-                              setState(() {
-                                selectedAnswer.add(widget.questionListResponse[4].options[index]);
-
-                                _groupValue = newValue.toString();
-                              });
-                            },
-                          ),);
-                      }),
-                    ),
-                  ) : Container()
+                  Align(alignment: Alignment.center,
+                    child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+                  )
                 ],
               ),
 
@@ -215,20 +257,29 @@ class _Screen7State extends State<Screen7> {
   }
 
   void _submitAnswer() {
+
     print(selectedAnswer);
 
     if(selectedAnswer.isNotEmpty) {
+      setState(() {
+        isAnswerLoading = true;
+      });
       // answersList.add({
       //   questionListResponse[0].id: selectedAnswer
       // });
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[4].id.toString(),options: selectedAnswer.toString(), userId: id,text: "" )).then((value) {
         print("Answer Response");
         print(value);
-
+        setState(() {
+          isAnswerLoading = false;
+        });
         Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => Screen8(widget.questionListResponse)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(answersList);

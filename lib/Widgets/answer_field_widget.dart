@@ -19,6 +19,7 @@ class _AnswerFieldWidgetState extends State<AnswerFieldWidget> {
     return OptionMcqAnswer(
         TextFormField(
         controller: widget._fieldController,
+          textInputAction: TextInputAction.done,
         validator: (value) {
           if(value!.isEmpty) {
             return "write something here";

@@ -32,7 +32,12 @@ class _Screen15State extends State<Screen15> {
   List selectedAnswer = [];
   String name = "";
   String id = "";
+  String answerNo = "";
+  String answerText = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
+  bool isAnswerLoading = false;
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   _getUserData() async {
@@ -53,6 +58,27 @@ class _Screen15State extends State<Screen15> {
     // TODO: implement initState
     super.initState();
     _getUserData();
+    _getAnswerData();
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo = _sharedPreferences.getString("answerNo15")!;
+      answerText = _sharedPreferences.getString("answerText15")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo15", "15");
+    _sharedPreferences.setString("answerText15", selectedAnswer.toString());
   }
 
   @override
@@ -81,132 +107,149 @@ class _Screen15State extends State<Screen15> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        color: AppColors.backgroundColor,
-        child:  PriviousNextButtonWidget((){
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer();
+        // },
+        child: Container(
+          color: AppColors.backgroundColor,
+          child:  PriviousNextButtonWidget((){
+            setAnswerText();
           _submitAnswer();
-        },(){
-          // widget.answersList.removeAt(widget.answersList.length-1);
-          // print(widget.answersList);
-          Navigator.of(context).pop();
-        },true),
+          },(){
+            // widget.answersList.removeAt(widget.answersList.length-1);
+            // print(widget.answersList);
+            Navigator.of(context).pop();
+          },true),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,
-        child:  Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                LogoScreen(),
+        child:  Stack(
+          alignment: Alignment.center,
+         // ignoring: isAnswerLoading,
+         children: [
+           Column(
+             mainAxisAlignment: MainAxisAlignment.start,
+             crossAxisAlignment: CrossAxisAlignment.center,
+             children: [
+               //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
+               Column(
+                 crossAxisAlignment: CrossAxisAlignment.center,
+                 mainAxisAlignment: MainAxisAlignment.start,
+                 children: [
+                   LogoScreen(),
 
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: QuestionTextWidget(widget.questionListResponse[10].title)),
-                ListView.builder(
-                    physics:const NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemCount: widget.questionListResponse[10].options.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index){
-                      return OptionMcqAnswer(
-                        RadioListTile<String>(
-                          tileColor: AppColors.textWhiteColor,
-                          activeColor: AppColors.PrimaryColor,
-                          value: widget.questionListResponse[10].options[index],
-                          title: Text(widget.questionListResponse[10].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
-                          groupValue: _groupValue,
-                          onChanged:  (newValue) {
-                            selectedAnswer.clear();
-                            setState(() {
-                              selectedAnswer.add(widget.questionListResponse[10].options[index]);
+                   Align(
+                       alignment: Alignment.topLeft,
+                       child: QuestionTextWidget(widget.questionListResponse[10].title)),
+                   ListView.builder(
+                       physics:const NeverScrollableScrollPhysics(),
+                       scrollDirection: Axis.vertical,
+                       itemCount: widget.questionListResponse[10].options.length,
+                       shrinkWrap: true,
+                       itemBuilder: (context, index){
+                         return OptionMcqAnswer(
+                           RadioListTile<String>(
+                             tileColor: AppColors.textWhiteColor,
+                             activeColor: AppColors.PrimaryColor,
+                             value: widget.questionListResponse[10].options[index],
+                             title: Text(widget.questionListResponse[10].options[index],style: TextStyle(color: AppColors.textWhiteColor)),
+                             groupValue: _groupValue,
+                             onChanged:  (newValue) {
+                               selectedAnswer.clear();
+                               setState(() {
+                                 selectedAnswer.add(widget.questionListResponse[10].options[index]);
 
-                            //  print(widget.answersList);
-                              _groupValue = newValue.toString();
-                            });
-                          },
-                        ),);
-                    }),
-                // OptionMcqAnswer(
-                //   RadioListTile(
-                //     tileColor: AppColors.textWhiteColor,
-                //     activeColor: AppColors.textWhiteColor,
-                //     value: 2,
-                //     title: const Text("2 = Same",style: TextStyle(color: AppColors.textWhiteColor)),
-                //     groupValue: _groupValue,
-                //     onChanged:  (int? newValue) {
-                //       setState(() {
-                //         _groupValue = newValue!;
-                //       });
-                //     },
-                //   ),),
-                // OptionMcqAnswer(
-                //   RadioListTile(
-                //     tileColor: AppColors.textWhiteColor,
-                //     activeColor: AppColors.textWhiteColor,
-                //     value: 3,
-                //     title: const Text("3 = Mixed Emotion",style: TextStyle(color: AppColors.textWhiteColor)),
-                //     groupValue: _groupValue,
-                //     onChanged:  (int? newValue) {
-                //       setState(() {
-                //         _groupValue = newValue!;
-                //       });
-                //     },
-                //   ),),
-                // OptionMcqAnswer(
-                //   RadioListTile(
-                //     tileColor: AppColors.textWhiteColor,
-                //     activeColor: AppColors.textWhiteColor,
-                //     value: 4,
-                //     title: const Text("4 = Better",style: TextStyle(color: AppColors.textWhiteColor)),
-                //     groupValue: _groupValue,
-                //     onChanged:  (int? newValue) {
-                //       setState(() {
-                //         _groupValue = newValue!;
-                //       });
-                //     },
-                //   ),),
-                // OptionMcqAnswer(
-                //   RadioListTile(
-                //     tileColor: AppColors.textWhiteColor,
-                //     activeColor: AppColors.textWhiteColor,
-                //     value: 5,
-                //     title: const Text("5 = Awesome",style: TextStyle(color: AppColors.textWhiteColor)),
-                //     groupValue: _groupValue,
-                //     onChanged:  (int? newValue) {
-                //       setState(() {
-                //         _groupValue = newValue!;
-                //       });
-                //     },
-                //   ),),
-              ],
-            ),
+                                 //  print(widget.answersList);
+                                 _groupValue = newValue.toString();
+                               });
+                             },
+                           ),);
+                       }),
+                   // OptionMcqAnswer(
+                   //   RadioListTile(
+                   //     tileColor: AppColors.textWhiteColor,
+                   //     activeColor: AppColors.textWhiteColor,
+                   //     value: 2,
+                   //     title: const Text("2 = Same",style: TextStyle(color: AppColors.textWhiteColor)),
+                   //     groupValue: _groupValue,
+                   //     onChanged:  (int? newValue) {
+                   //       setState(() {
+                   //         _groupValue = newValue!;
+                   //       });
+                   //     },
+                   //   ),),
+                   // OptionMcqAnswer(
+                   //   RadioListTile(
+                   //     tileColor: AppColors.textWhiteColor,
+                   //     activeColor: AppColors.textWhiteColor,
+                   //     value: 3,
+                   //     title: const Text("3 = Mixed Emotion",style: TextStyle(color: AppColors.textWhiteColor)),
+                   //     groupValue: _groupValue,
+                   //     onChanged:  (int? newValue) {
+                   //       setState(() {
+                   //         _groupValue = newValue!;
+                   //       });
+                   //     },
+                   //   ),),
+                   // OptionMcqAnswer(
+                   //   RadioListTile(
+                   //     tileColor: AppColors.textWhiteColor,
+                   //     activeColor: AppColors.textWhiteColor,
+                   //     value: 4,
+                   //     title: const Text("4 = Better",style: TextStyle(color: AppColors.textWhiteColor)),
+                   //     groupValue: _groupValue,
+                   //     onChanged:  (int? newValue) {
+                   //       setState(() {
+                   //         _groupValue = newValue!;
+                   //       });
+                   //     },
+                   //   ),),
+                   // OptionMcqAnswer(
+                   //   RadioListTile(
+                   //     tileColor: AppColors.textWhiteColor,
+                   //     activeColor: AppColors.textWhiteColor,
+                   //     value: 5,
+                   //     title: const Text("5 = Awesome",style: TextStyle(color: AppColors.textWhiteColor)),
+                   //     groupValue: _groupValue,
+                   //     onChanged:  (int? newValue) {
+                   //       setState(() {
+                   //         _groupValue = newValue!;
+                   //       });
+                   //     },
+                   //   ),),
+                 ],
+               ),
 
-            // PriviousNextButtonWidget((){
-            //   if(_groupValue == -1) {
-            //     showToast(
-            //         "Please Select any option", shapeBorder: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(10.0)
-            //     ),
-            //         context: context,
-            //         fullWidth: true,
-            //         alignment: Alignment.topCenter,
-            //         duration: Duration(seconds: 3),
-            //         backgroundColor: Colors.red
-            //     );
-            //   } else {
-            //     Navigator.of(context).push(
-            //         MaterialPageRoute(builder: (context) => Screen16(_groupValue)));
-            //   }
-            // })
-          ],
+               // PriviousNextButtonWidget((){
+               //   if(_groupValue == -1) {
+               //     showToast(
+               //         "Please Select any option", shapeBorder: RoundedRectangleBorder(
+               //         borderRadius: BorderRadius.circular(10.0)
+               //     ),
+               //         context: context,
+               //         fullWidth: true,
+               //         alignment: Alignment.topCenter,
+               //         duration: Duration(seconds: 3),
+               //         backgroundColor: Colors.red
+               //     );
+               //   } else {
+               //     Navigator.of(context).push(
+               //         MaterialPageRoute(builder: (context) => Screen16(_groupValue)));
+               //   }
+               // })
+
+             ],
+           ),
+           Align(alignment: Alignment.center,
+             child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+           )
+         ],
         ),
       ),
     );
@@ -215,6 +258,9 @@ class _Screen15State extends State<Screen15> {
     print(selectedAnswer);
 
     if(selectedAnswer.isNotEmpty) {
+      setState(() {
+        isAnswerLoading = true;
+      });
       // answersList.add({
       //   questionListResponse[0].id: selectedAnswer
       // });
@@ -222,10 +268,16 @@ class _Screen15State extends State<Screen15> {
         print("Answer Response");
         print(value);
         print("All answer List");
+        setState(() {
+          isAnswerLoading = false;
+        });
         Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => Screen16(_groupValue)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(answersList);

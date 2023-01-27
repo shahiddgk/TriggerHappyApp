@@ -34,16 +34,42 @@ class _Screen5State extends State<Screen5> {
 
   String name = "";
   String id = "";
+  String answerNo3 = "";
+  String answerText3 = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
+  bool isAnswerLoading = false;
   List selectedAnswer = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
 
   @override
   void initState() {
     _getUserData();
+    _getAnswerData();
     // TODO: implement initState
     super.initState();
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo3 = _sharedPreferences.getString("answerNo${widget.index}")!;
+      answerText3 = _sharedPreferences.getString("answerText${widget.index}")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo${widget.index}", "${widget.index}");
+    _sharedPreferences.setString("answerText${widget.index}", selectedAnswer.toString());
   }
 
   _getUserData() async {
@@ -85,13 +111,20 @@ class _Screen5State extends State<Screen5> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        color: AppColors.backgroundColor,
-        child: PriviousNextButtonWidget((){
-          _submitAnswer(_fieldController.text);
-        },(){
-          Navigator.of(context).pop();
-        },true),
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer(_fieldController.text);
+        // },
+        child: Container(
+          color: AppColors.backgroundColor,
+          child: PriviousNextButtonWidget((){
+            setAnswerText();
+            _submitAnswer(_fieldController.text);
+          },(){
+            Navigator.of(context).pop();
+          },true),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -100,16 +133,32 @@ class _Screen5State extends State<Screen5> {
         color: AppColors.backgroundColor,
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              LogoScreen(),
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: QuestionTextWidget(widget.questionListResponse[widget.index].title)),
-              AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[widget.index].textLength.toString())),
-            ],
+          child: Stack(
+            alignment: Alignment.center,
+           // ignoring: isAnswerLoading,
+           children: [
+             Column(
+               crossAxisAlignment: CrossAxisAlignment.center,
+               mainAxisAlignment: MainAxisAlignment.start,
+               children: [
+                 Column(
+                   mainAxisAlignment: MainAxisAlignment.start,
+                   crossAxisAlignment: CrossAxisAlignment.center,
+                   children: [
+                     LogoScreen(),
+                     Align(
+                         alignment: Alignment.topLeft,
+                         child: QuestionTextWidget(widget.questionListResponse[widget.index].title)),
+                     AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[widget.index].textLength.toString())),
+                   ],
+                 ),
+
+               ],
+             ),
+             Align(alignment: Alignment.center,
+               child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+             )
+           ],
           ),
         ),
       ),
@@ -118,8 +167,10 @@ class _Screen5State extends State<Screen5> {
 
   void _submitAnswer(String text) {
     selectedAnswer.clear();
+
     if(_formKey.currentState!.validate()) {
       setState(() {
+        isAnswerLoading = true;
         selectedAnswer.add(text);
         // widget.answersList.add({
         //   widget.questionListResponse[widget.index].id: selectedAnswer
@@ -128,6 +179,10 @@ class _Screen5State extends State<Screen5> {
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[widget.index].id.toString(),options: "[]", userId: id,text: text )).then((value) {
         print("Answer Response");
         print(value);
+
+        setState(() {
+          isAnswerLoading = false;
+        });
 
         if(widget.screen == 6) {
           // setState(() {
@@ -178,6 +233,10 @@ class _Screen5State extends State<Screen5> {
         }
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
+
         print(e);
       });
     }

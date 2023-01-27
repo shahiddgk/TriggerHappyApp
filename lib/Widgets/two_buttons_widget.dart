@@ -31,22 +31,32 @@ class _PriviousNextButtonWidgetState extends State<PriviousNextButtonWidget> {
               children: [
                 Visibility(
                   visible: widget.visibility,
-                  child: Expanded(child: Container(
-                    margin:const EdgeInsets.symmetric(horizontal: 3),
-                    child: OptionMcqAnswer(
-                        TextButton(
-                          onPressed: () {
-                            widget.onTapPrivious();
-                        }, child: const Text("Previous",style: TextStyle(color: AppColors.textWhiteColor)),)
+                  child: Expanded(child: GestureDetector(
+                    onTap: () {
+                      widget.onTapPrivious();
+                    },
+                    child: Container(
+                      margin:const EdgeInsets.symmetric(horizontal: 3),
+                      child: OptionMcqAnswer(
+                          TextButton(
+                            onPressed: () {
+                              widget.onTapPrivious();
+                          }, child: const Text("Previous",style: TextStyle(color: AppColors.textWhiteColor)),)
+                      ),
                     ),
                   )),
                 ),
                 Expanded(
-                    child: Container(
-                      margin:const EdgeInsets.symmetric(horizontal: 3),
-                      child: OptionMcqAnswer(
-                      TextButton(onPressed: () { widget.onTapNext(); }, child: const Text("Next",style: TextStyle(color: AppColors.textWhiteColor)),)
+                    child: GestureDetector(
+                      onTap: () {
+                        widget.onTapNext();
+                      },
+                      child: Container(
+                        margin:const EdgeInsets.symmetric(horizontal: 3),
+                        child: OptionMcqAnswer(
+                        TextButton(onPressed: () { widget.onTapNext(); }, child: const Text("Next",style: TextStyle(color: AppColors.textWhiteColor)),)
                 ),
+                      ),
                     )),
               ],
             )

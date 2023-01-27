@@ -39,6 +39,7 @@ class _Screen10State extends State<Screen10> {
   String name = "";
   String id = "";
   bool _isUserDataLoading = true;
+  bool isAnswerLoading = false;
   List selectedAnswer = [];
   final GoogleSignIn googleSignIn = GoogleSignIn();
   late Timer _timer;
@@ -109,30 +110,35 @@ class _Screen10State extends State<Screen10> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-          color: AppColors.backgroundColor,
-          child: PriviousNextButtonWidget((){
-            if(_start == 0) {
-              // print(widget.answersList);
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => Screen5(
-                      widget.questionListResponse,8,
-                      12)));
-            } else {
-              showToast(
-                  "Wait for timer to complete", shapeBorder: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-              ),
-                  context: context,
-                  fullWidth: true,
-                  alignment: Alignment.topCenter,
-                  duration: Duration(seconds: 3),
-                  backgroundColor: Colors.red
-              );
-            }
-          },(){
-            Navigator.of(context).pop();
-          },true)
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //
+        // },
+        child: Container(
+            color: AppColors.backgroundColor,
+            child: PriviousNextButtonWidget((){
+              if(_start == 0) {
+                // print(widget.answersList);
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => Screen5(
+                        widget.questionListResponse,8,
+                        12)));
+              } else {
+                showToast(
+                    "Wait for timer to complete", shapeBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                    context: context,
+                    fullWidth: true,
+                    alignment: Alignment.topCenter,
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Colors.red
+                );
+              }
+            },(){
+              Navigator.of(context).pop();
+            },true)
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -143,48 +149,54 @@ class _Screen10State extends State<Screen10> {
           key: _formKey,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    LogoScreen(),
+            child: IgnorePointer(
+              ignoring: isAnswerLoading,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      LogoScreen(),
 
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: QuestionTextWidget(widget.questionListResponse[7].title)),
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: QuestionTextWidget(widget.questionListResponse[7].title)),
 
-                    // Align(
-                    //     alignment: Alignment.topLeft,
-                    //     child: QuestionTextWidget(widget.questionListResponse[7].subTitle)),
+                      // Align(
+                      //     alignment: Alignment.topLeft,
+                      //     child: QuestionTextWidget(widget.questionListResponse[7].subTitle)),
 
-                    Container(
-                      height: MediaQuery.of(context).size.height/2,
-                      width: MediaQuery.of(context).size.width/2,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.PrimaryColor,width: 5),
-                        // borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: _start == 0 ?const Text("Well done!",style: TextStyle(fontSize: 25,color: AppColors.textWhiteColor),) :Text("$_start",style: const TextStyle(fontSize: 25,color: AppColors.textWhiteColor),),
-                    )
+                      Container(
+                        height: MediaQuery.of(context).size.height/2,
+                        width: MediaQuery.of(context).size.width/2,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.PrimaryColor,width: 5),
+                          // borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: _start == 0 ?const Text("Well done!",style: TextStyle(fontSize: 25,color: AppColors.textWhiteColor),) :Text("$_start",style: const TextStyle(fontSize: 25,color: AppColors.textWhiteColor),),
+                      )
 
-                  //  AnswerFiedlWithPrefixText(_fieldController1,"I am not sure "),
-                  ],
-                ),
-                // Align(alignment: Alignment.bottomCenter,
-                //   child: Align(
-                //       alignment: Alignment.bottomCenter,
-                //       child: PriviousNextButtonWidget((){
-                //         _submitAnswer(_fieldController.text);
-                //       })
-                //   ),)
-              ],
+                    //  AnswerFiedlWithPrefixText(_fieldController1,"I am not sure "),
+                    ],
+                  ),
+                  // Align(alignment: Alignment.bottomCenter,
+                  //   child: Align(
+                  //       alignment: Alignment.bottomCenter,
+                  //       child: PriviousNextButtonWidget((){
+                  //         _submitAnswer(_fieldController.text);
+                  //       })
+                  //   ),)
+                  Align(alignment: Alignment.center,
+                    child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+                  )
+                ],
+              ),
             ),
           ),
         ),

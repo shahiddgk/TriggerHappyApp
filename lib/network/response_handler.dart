@@ -25,6 +25,7 @@ class ResponseHandler {
       final response = await http.post(url, body: params, headers: head).timeout(Duration(seconds: 45));
       responseJson = json.decode(response.body.toString());
       print(responseJson);
+      if(responseJson['status']!= 200) throw FetchDataException(responseJson['message'].toString());
       return responseJson;
     } on TimeoutException {
       throw FetchDataException("Slow internet connection");
@@ -70,8 +71,8 @@ class ResponseHandler {
     try {
       final response = await http.get(url, headers: head).timeout(Duration(seconds: 45));
       responseJson = json.decode(response.body.toString());
-     // print(responseJson);
-
+      print(responseJson);
+      if(responseJson['status']!= 200) throw FetchDataException(responseJson['message'].toString());
       return responseJson;
     } on TimeoutException {
       throw FetchDataException("Slow internet connection");

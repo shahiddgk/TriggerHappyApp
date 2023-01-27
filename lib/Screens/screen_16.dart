@@ -79,6 +79,7 @@ class _Screen16State extends State<Screen16> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+          const  Padding(padding: EdgeInsets.only(top: 40)),
             LogoScreen(),
            // QuestionTextWidget(widget.number),
             QuestionTextWidget(widget.number=="Worse" ?
@@ -94,14 +95,23 @@ class _Screen16State extends State<Screen16> {
                   height: 10,
                 ),
                 //QuestionTextWidget("Good luck"),
-                OptionMcqAnswer(
-                   TextButton(onPressed: () {
-                     Navigator.pushAndRemoveUntil(
-                         context,
-                         MaterialPageRoute(builder: (BuildContext context) => Screen3()),
-                             (Route<dynamic> route) => false
-                     );
-                   }, child: const Text("Let's do this again",style: TextStyle(color: AppColors.textWhiteColor)),)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+                            (Route<dynamic> route) => false
+                    );
+                  },
+                  child: OptionMcqAnswer(
+                     TextButton(onPressed: () {
+                       // Navigator.pushAndRemoveUntil(
+                       //     context,
+                       //     MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+                       //         (Route<dynamic> route) => false
+                       // );
+                     }, child: const Text("Let's do this again",style: TextStyle(color: AppColors.textWhiteColor)),)
+                  ),
                 )
           ],
         ),

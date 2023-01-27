@@ -34,9 +34,14 @@ class _Screen6State extends State<Screen6> {
   List selectedAnswer = [];
   String name = "";
   String id = "";
+  String answerNo4 = "";
+  String answerText4 = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
   bool _isDataLoading = true;
+  bool isAnswerLoading = false;
   List answersList = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   String a1 = "0";
@@ -75,9 +80,29 @@ class _Screen6State extends State<Screen6> {
     // TODO: implement initState
     super.initState();
     setListOptions();
-
+    _getAnswerData();
     _getUserData();
 
+  }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo4 = _sharedPreferences.getString("answerNo3")!;
+      answerText4 = _sharedPreferences.getString("answerText3")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo3", "3");
+    _sharedPreferences.setString("answerText3", selectedAnswer.toString());
   }
 
   @override
@@ -111,20 +136,27 @@ class _Screen6State extends State<Screen6> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        height: MediaQuery.of(context).size.height/10,
-        width: MediaQuery.of(context).size.width,
-        color: AppColors.backgroundColor,
-        child: Align(
-            alignment: Alignment.bottomCenter,
-            child: PriviousNextButtonWidget((){
-              _submitAnswer();
-            },(){
-              // widget.answersList.removeAt(widget.answersList.length-1);
-              // print(widget.answersList);
-              Navigator.of(context).pop();
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer();
+        // },
+        child: Container(
+          height: MediaQuery.of(context).size.height/10,
+          width: MediaQuery.of(context).size.width,
+          color: AppColors.backgroundColor,
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: PriviousNextButtonWidget((){
+                setAnswerText();
+                _submitAnswer();
+              },(){
+                // widget.answersList.removeAt(widget.answersList.length-1);
+                // print(widget.answersList);
+                Navigator.of(context).pop();
 
-            },true)
+              },true)
+          ),
         ),
       ),
       body: Container(
@@ -135,118 +167,133 @@ class _Screen6State extends State<Screen6> {
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           //scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: Stack(
+            alignment: Alignment.center,
+         //   ignoring: isAnswerLoading,
             children: [
-              LogoScreen(),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                    padding: EdgeInsets.only(top: 10),
-                    width: MediaQuery.of(context).size.width,
-                    child: QuestionTextWidget(widget.questionListResponse[3].title)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      LogoScreen(),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                            padding: EdgeInsets.only(top: 10),
+                            width: MediaQuery.of(context).size.width,
+                            child: QuestionTextWidget(widget.questionListResponse[3].title)),
+                      ),
+
+                      !_isDataLoading ? Container(
+                        height: MediaQuery.of(context).size.height/1.66,
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height,top: 5),
+                        child: GridView.count(
+                          padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
+                          crossAxisCount: ResponsiveWrapper.of(context).isMobile || ResponsiveWrapper.of(context).isPhone ? 4 : 2,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 2.0,
+                          childAspectRatio: itemHeight/itemWidth,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          children: List.generate(answersList.length, (index) {
+                            return GestureDetector(
+                              onTap: () {
+                                print("item Clicked");
+                                print(a1);
+
+                                if(answersList[index]["selected"] == "0") {
+
+                                  if(a1 == "0" && selectedAnswer.length < 3) {
+                                    setState(() {
+                                      a1 = "1";
+                                    });
+                                    answersList[index]["selected"] = "1";
+                                    addAnswersToList(answersList[index]['answer']);
+
+                                  } else if(a1 == "1" && selectedAnswer.length < 3) {
+                                    setState(() {
+                                      a1 = "2";
+                                    });
+                                    answersList[index]["selected"] = "2";
+                                    addAnswersToList(answersList[index]['answer']);
+                                  } else if(a1 == "2" && selectedAnswer.length < 3) {
+                                    setState(() {
+                                      a1 = "3";
+                                    });
+                                    answersList[index]["selected"] = "3";
+                                    addAnswersToList(answersList[index]['answer']);
+                                  } else {
+                                    for(int i = 0 ; i<answersList.length; i++) {
+                                      setState(() {
+                                        a1 = "0";
+                                        answersList[i]['selected'] = "0";
+                                        selectedAnswer.clear();
+                                      });
+                                    }
+                                  }
+
+                                } else {
+
+                                  if(answersList[index]['selected'] == "1") {
+                                    setState(() {
+                                      a1 = "0";
+                                      answersList[index]['selected'] = "0";
+                                      removeAnswerFromList(answersList[index]['answer']);
+                                    });
+
+                                  } else if(answersList[index]['selected'] == "2") {
+                                    setState(() {
+                                      a1 = "1";
+                                      answersList[index]['selected'] = "0";
+                                      removeAnswerFromList(answersList[index]['answer']);
+                                    });
+
+                                  } else if(answersList[index]['selected'] == "3") {
+                                    setState(() {
+                                      a1 = "2";
+
+                                      answersList[index]['selected'] = "0";
+                                      removeAnswerFromList(answersList[index]['answer']);
+                                    });
+                                  }
+                                }
+
+                              },
+                              child: OptionMcqAnswer(( Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: AppColors.PrimaryColor,width: 2)
+                                    ),
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    width: 20,
+                                    child:answersList[index]["selected"] == "0" ? Text("") : Text(answersList[index]["selected"],style: TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold)),
+                                  ),
+                                  Text(answersList[index]['answer'],style: TextStyle(color: AppColors.textWhiteColor)),
+                                ],
+                              ))),
+                            );
+
+
+                          }),
+                        ),
+                      ) : Container(),
+
+                    ],
+                  ),
+                ],
               ),
-
-              !_isDataLoading ? Container(
-                height: MediaQuery.of(context).size.height/1.66,
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height,top: 5),
-                child: GridView.count(
-                  padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
-                  crossAxisCount: ResponsiveWrapper.of(context).isMobile || ResponsiveWrapper.of(context).isPhone ? 4 : 2,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 2.0,
-                  childAspectRatio: itemHeight/itemWidth,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  children: List.generate(answersList.length, (index) {
-                    return GestureDetector(
-                      onTap: () {
-                        print("item Clicked");
-                        print(a1);
-
-                            if(answersList[index]["selected"] == "0") {
-
-                              if(a1 == "0" && selectedAnswer.length < 3) {
-                                setState(() {
-                                  a1 = "1";
-                                });
-                                answersList[index]["selected"] = "1";
-                                addAnswersToList(answersList[index]['answer']);
-
-                              } else if(a1 == "1" && selectedAnswer.length < 3) {
-                                setState(() {
-                                  a1 = "2";
-                                });
-                                answersList[index]["selected"] = "2";
-                                addAnswersToList(answersList[index]['answer']);
-                              } else if(a1 == "2" && selectedAnswer.length < 3) {
-                                setState(() {
-                                  a1 = "3";
-                                });
-                                answersList[index]["selected"] = "3";
-                                addAnswersToList(answersList[index]['answer']);
-                              } else {
-                                for(int i = 0 ; i<answersList.length; i++) {
-                                setState(() {
-                                     a1 = "0";
-                                     answersList[i]['selected'] = "0";
-                                     selectedAnswer.clear();
-                                });
-                                }
-                              }
-
-                            } else {
-
-                                if(answersList[index]['selected'] == "1") {
-                                  setState(() {
-                                    a1 = "0";
-                                    answersList[index]['selected'] = "0";
-                                    removeAnswerFromList(answersList[index]['answer']);
-                                  });
-
-                                } else if(answersList[index]['selected'] == "2") {
-                                  setState(() {
-                                    a1 = "1";
-                                    answersList[index]['selected'] = "0";
-                                    removeAnswerFromList(answersList[index]['answer']);
-                                  });
-
-                                } else if(answersList[index]['selected'] == "3") {
-                                  setState(() {
-                                    a1 = "2";
-
-                                    answersList[index]['selected'] = "0";
-                                    removeAnswerFromList(answersList[index]['answer']);
-                                  });
-                                }
-                              }
-
-                      },
-                      child: OptionMcqAnswer(( Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.PrimaryColor,width: 2)
-                            ),
-                            alignment: Alignment.center,
-                            height: 20,
-                            width: 20,
-                            child:answersList[index]["selected"] == "0" ? Text("") : Text(answersList[index]["selected"],style: TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold)),
-                          ),
-                         Text(answersList[index]['answer'],style: TextStyle(color: AppColors.textWhiteColor)),
-                        ],
-                      ))),
-                    );
-
-
-                  }),
-                ),
-              ) : Container(),
-
+              Align(alignment: Alignment.center,
+                child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+              )
             ],
           ),
         ),
@@ -276,17 +323,26 @@ class _Screen6State extends State<Screen6> {
     print(selectedAnswer);
 
     if(selectedAnswer.isNotEmpty) {
+      setState(() {
+        isAnswerLoading = true;
+      });
       // answersList.add({
       //   questionListResponse[0].id: selectedAnswer
       // });
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[3].id.toString(),options: selectedAnswer.toString(), userId: id,text: "" )).then((value) {
         print("Answer Response");
         print(value);
+        setState(() {
+          isAnswerLoading = false;
+        });
 
         Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => Screen7(widget.questionListResponse)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(answersList);

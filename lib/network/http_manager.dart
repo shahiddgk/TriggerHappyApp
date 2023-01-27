@@ -81,4 +81,16 @@ class HTTPManager {
     return response;
 
   }
+
+  Future<dynamic> deleteUser(String userId) async {
+
+    String url = "${ApplicationURLs.API_DELETE}?user_id=$userId";
+    print(url);
+
+    final response =
+    await _handler.get(Uri.parse(url),false);
+   // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    print(response.toString());
+    return response;
+  }
 }

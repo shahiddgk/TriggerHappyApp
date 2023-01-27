@@ -30,16 +30,43 @@ class _Screen9State extends State<Screen9> {
 
   String name = "";
   String id = "";
+  String answerNo7 = "";
+  String answerText7 = "";
   bool _isUserDataLoading = true;
+  bool _isAnswerDataLoading = true;
+  bool isAnswerLoading = false;
   List selectedAnswer = [];
+  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   @override
   void initState() {
     _getUserData();
+    _getAnswerData();
     // TODO: implement initState
     super.initState();
   }
+
+  _getAnswerData() async {
+    setState(() {
+      _isAnswerDataLoading = true;
+    });
+    _sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      answerNo7 = _sharedPreferences.getString("answerNo6")!;
+      answerText7 = _sharedPreferences.getString("answerText6")!;
+      _isAnswerDataLoading = false;
+    });
+
+  }
+
+  setAnswerText() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    _sharedPreferences.setString("answerNo6", "6");
+    _sharedPreferences.setString("answerText6", selectedAnswer.toString());
+  }
+
 
   _getUserData() async {
     setState(() {
@@ -80,17 +107,24 @@ class _Screen9State extends State<Screen9> {
           }, icon: Icon(Icons.logout,color: AppColors.textWhiteColor,))
         ],
       ),
-      bottomNavigationBar: Container(
-        color: AppColors.backgroundColor,
-        child: PriviousNextButtonWidget((){
-          _submitAnswer(_fieldController.text);
-        },(){
+      bottomNavigationBar: GestureDetector(
+        // onTap: () {
+        //   setAnswerText();
+        //   _submitAnswer(_fieldController.text);
+        // },
+        child: Container(
+          color: AppColors.backgroundColor,
+          child: PriviousNextButtonWidget((){
+            setAnswerText();
+            _submitAnswer(_fieldController.text);
+          },(){
 
-          // widget.answersList.removeAt(widget.answersList.length-1);
-          // print(widget.answersList);
-          Navigator.of(context).pop();
+            // widget.answersList.removeAt(widget.answersList.length-1);
+            // print(widget.answersList);
+            Navigator.of(context).pop();
 
-        },true),
+          },true),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -99,34 +133,42 @@ class _Screen9State extends State<Screen9> {
         color: AppColors.backgroundColor,
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  LogoScreen(),
-                  Align(
-                      alignment: Alignment.topLeft,
-                      child: QuestionTextWidget(widget.questionListResponse[6].title)),
-                  // Align(
-                  //     alignment: Alignment.topLeft,
-                  //     child: QuestionTextWidget(widget.questionListResponse[6].subTitle)),
+          child: Stack(
+            alignment: Alignment.center,
+          //  ignoring: isAnswerLoading,
+           children: [
+             Column(
+               mainAxisAlignment: MainAxisAlignment.start,
+               crossAxisAlignment: CrossAxisAlignment.center,
+               children: [
+                 //Text("QUESTION 1 OF 24",style: TextStyle(color: Colors.deepOrangeAccent),),
+                 Column(
+                   mainAxisAlignment: MainAxisAlignment.start,
+                   crossAxisAlignment: CrossAxisAlignment.center,
+                   children: [
+                     LogoScreen(),
+                     Align(
+                         alignment: Alignment.topLeft,
+                         child: QuestionTextWidget(widget.questionListResponse[6].title)),
+                     // Align(
+                     //     alignment: Alignment.topLeft,
+                     //     child: QuestionTextWidget(widget.questionListResponse[6].subTitle)),
 
-                  AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[6].textLength.toString())),
-                ],
-              ),
-              // Align(alignment: Alignment.bottomCenter,
-              //   child: Align(
-              //       alignment: Alignment.bottomCenter,
-              //       child: PriviousNextButtonWidget((){
-              //         _submitAnswer(_fieldController.text);
-              //       })
-              //   ),)
-            ],
+                     AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[6].textLength.toString())),
+                   ],
+                 ),
+                 // Align(alignment: Alignment.bottomCenter,
+                 //   child: Align(
+                 //       alignment: Alignment.bottomCenter,
+                 //       child: PriviousNextButtonWidget((){
+                 //         _submitAnswer(_fieldController.text);
+                 //       })
+                 //   ),)
+               ],
+             ),
+             Align(alignment: Alignment.center,
+               child: isAnswerLoading ? const CircularProgressIndicator(): Container(),
+             )],
           ),
         ),
       ),
@@ -135,17 +177,24 @@ class _Screen9State extends State<Screen9> {
 
   void _submitAnswer(String text) {
     selectedAnswer.clear();
+
     if(_formKey.currentState!.validate()) {
       setState(() {
+        isAnswerLoading = true;
         selectedAnswer.add(text);
       });
       HTTPManager().userAnswer(AnswerRequestModel(questionId:widget.questionListResponse[6].id.toString(),options: "[]", userId: id,text: text )).then((value) {
         print("Answer Response");
         print(value);
-
+        setState(() {
+          isAnswerLoading = false;
+        });
         Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Screen10(widget.questionListResponse)));
 
       }).catchError((e){
+        setState(() {
+          isAnswerLoading = false;
+        });
         print(e);
       });
       //print(widget.answersList);

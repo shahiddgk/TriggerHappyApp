@@ -30,7 +30,7 @@ class _EmailFieldState extends State<EmailField> {
             hintStyle: TextStyle(color: Colors.grey[800]),
             hintText: "Type your email",
             fillColor: AppColors.hoverColor),
-        validator: (email)=> EmailValidator.validate(email!) ? null :"Please enter a valid email"
+        validator: (email)=> EmailValidator.validate(email!.trim()) ? null :"Please enter a valid email"
     );
   }
 }
