@@ -3,6 +3,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 
+import 'constants.dart';
+
 class EmailField extends StatefulWidget {
   EmailField(this._textEditingController,{Key? key}) : super(key: key);
 
@@ -18,6 +20,7 @@ class _EmailFieldState extends State<EmailField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: const TextStyle(fontSize: AppConstants.defaultFontSize),
         controller: widget._textEditingController,
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(vertical: 5),

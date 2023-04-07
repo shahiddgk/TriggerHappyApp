@@ -30,8 +30,8 @@ class _CheckBoxWidgetWithTitleState extends State<CheckBoxWidgetWithTitle> {
                     unselectedWidgetColor: AppColors.textWhiteColor
                 ),
                 child: Checkbox(
-                  hoverColor: AppColors.PrimaryColor,
-                  activeColor: AppColors.PrimaryColor,
+                  hoverColor: AppColors.primaryColor,
+                  activeColor: AppColors.primaryColor,
                   checkColor: AppColors.backgroundColor,
                   value: widget.answer,
                   onChanged: (bool? value) {

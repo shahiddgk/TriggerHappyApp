@@ -1,21 +1,21 @@
 class LoginRequestModel {
   String? email;
-  String? rememberme;
   String? password;
+  String? token;
 
-  LoginRequestModel({this.email, this.rememberme, this.password});
+  LoginRequestModel({this.email, this.password,this.token});
 
   LoginRequestModel.fromJson(Map<String, dynamic> json) {
     email = json['email'];
-    rememberme = json['rememberme'];
     password = json['password'];
+    token = json['device_token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['email'] = this.email;
-    data['rememberme'] = this.rememberme;
     data['password'] = this.password;
+    data['device_token'] = this.token;
     return data;
   }
 }

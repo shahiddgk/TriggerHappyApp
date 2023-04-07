@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_quiz_app/Widgets/constants.dart';
 
 import 'colors.dart';
 
@@ -21,7 +22,7 @@ class _QuestionTextWidgetState extends State<QuestionTextWidget> {
       child: Html(data: widget.questionText!,style: {
         "#" : Style(
           color: AppColors.textWhiteColor,
-          fontSize: FontSize(18),
+          fontSize: FontSize(AppConstants.defaultFontSize),
           textAlign: TextAlign.start
         ),
       },),

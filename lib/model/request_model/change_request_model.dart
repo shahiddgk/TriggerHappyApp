@@ -22,3 +22,31 @@ class ChangePasswordRequestModel {
     return data;
   }
 }
+
+class ChangeProfileRequestModel {
+  String? name;
+  String? email;
+  String? userId;
+  String? timeZone;
+  String? deviceToken;
+
+  ChangeProfileRequestModel({this.name,this.email,this.userId,this.timeZone,this.deviceToken});
+
+  ChangeProfileRequestModel.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    email = json['email'];
+    userId = json['user_id'];
+    timeZone = json['time_zone'];
+    deviceToken = json['device_token'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['email'] = this.email;
+    data['user_id'] = this.userId;
+    data['time_zone'] = this.timeZone;
+    data['device_token'] = this.deviceToken;
+    return data;
+  }
+}

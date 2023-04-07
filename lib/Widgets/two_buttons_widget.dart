@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 
+import 'constants.dart';
+
 // ignore: must_be_immutable
 class PriviousNextButtonWidget extends StatefulWidget {
    PriviousNextButtonWidget(this.onTapNext,this.onTapPrivious,this.visibility,{Key? key}) : super(key: key);
@@ -24,7 +26,7 @@ class _PriviousNextButtonWidgetState extends State<PriviousNextButtonWidget> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           const Divider(color: AppColors.PrimaryColor,thickness: 2,),
+           const Divider(color: AppColors.primaryColor,thickness: 2,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -41,7 +43,7 @@ class _PriviousNextButtonWidgetState extends State<PriviousNextButtonWidget> {
                           TextButton(
                             onPressed: () {
                               widget.onTapPrivious();
-                          }, child: const Text("Previous",style: TextStyle(color: AppColors.textWhiteColor)),)
+                          }, child: const Text("Previous",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
                       ),
                     ),
                   )),
@@ -54,7 +56,7 @@ class _PriviousNextButtonWidgetState extends State<PriviousNextButtonWidget> {
                       child: Container(
                         margin:const EdgeInsets.symmetric(horizontal: 3),
                         child: OptionMcqAnswer(
-                        TextButton(onPressed: () { widget.onTapNext(); }, child: const Text("Next",style: TextStyle(color: AppColors.textWhiteColor)),)
+                        TextButton(onPressed: () { widget.onTapNext(); }, child: const Text("Next",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
                 ),
                       ),
                     )),

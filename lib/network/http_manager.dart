@@ -1,14 +1,21 @@
 
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
+import 'package:flutter_quiz_app/model/reponse_model/response_history_model.dart';
 import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
+import 'package:flutter_quiz_app/model/request_model/forgot_password_request.dart';
 import 'package:flutter_quiz_app/model/request_model/login_request.dart';
 import 'package:flutter_quiz_app/model/request_model/register_create_request.dart';
 import 'package:flutter_quiz_app/model/reponse_model/login_response_model.dart';
+import 'package:flutter_quiz_app/model/request_model/response_email_request.dart';
 import 'package:flutter_quiz_app/model/request_model/social_login_request_model.dart';
 import 'package:flutter_quiz_app/network/response_handler.dart';
 
 import '../model/request_model/answer_reques_model.dart';
+import '../model/request_model/logout_user_request.dart';
+import '../model/request_model/user_email_response_request.dart';
 import 'api_urls.dart';
 
 class HTTPManager {
@@ -20,6 +27,16 @@ class HTTPManager {
 
     final response =
         await _handler.post(Uri.parse(url),registerRequestModel.toJson());
+    return response;
+  }
+
+
+  Future<dynamic> treeGrowth(LogoutRequestModel logoutRequestModel) async {
+    const url = ApplicationURLs.API_TREE_GROWTH;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
     return response;
   }
 
@@ -56,6 +73,15 @@ class HTTPManager {
     return response;
   }
 
+  Future<dynamic> changeProfile(ChangeProfileRequestModel changeProfileRequestModel) async {
+    const url = ApplicationURLs.API_CHANGE_PROFILE;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),changeProfileRequestModel.toJson());
+    return response;
+  }
+
   Future<QuestionListModel> getQuestions() async {
 
     const url = ApplicationURLs.API_QUESTIONS;
@@ -82,6 +108,31 @@ class HTTPManager {
 
   }
 
+  Future<dynamic> forgotPassword(ForgotPasswordRequestModel forgotPasswordRequestModel) async {
+
+    const url = ApplicationURLs.API_FORGOT_PASSWORD;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url), forgotPasswordRequestModel.toJson());
+
+    return response;
+
+  }
+
+  Future<dynamic> userResponseEmail(UserResponseRequestModel userResponseRequestModel) async {
+
+    const url = ApplicationURLs.API_RESPONSE_EMAIL;
+    print(url);
+    print(userResponseRequestModel.answerMap);
+
+    final response =
+    await _handler.post(Uri.parse(url), userResponseRequestModel.toJson());
+
+    return response;
+
+  }
+
   Future<dynamic> deleteUser(String userId) async {
 
     String url = "${ApplicationURLs.API_DELETE}?user_id=$userId";
@@ -90,6 +141,40 @@ class HTTPManager {
     final response =
     await _handler.get(Uri.parse(url),false);
    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    print(response.toString());
+    return response;
+  }
+
+  Future<dynamic> userEmailResponse(UserEmailResponseRequestModel userEmailResponseRequestModel) async {
+
+    String url = ApplicationURLs.API_EMAIL_RESPONSE;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),userEmailResponseRequestModel.toJson());
+    return response;
+  }
+
+  Future<dynamic> responseHistory(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_RESPONSE_HISTORY;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    print(response.toString());
+    return response;
+  }
+
+  Future<dynamic> logoutUser(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_LOGOUT;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
     print(response.toString());
     return response;
   }

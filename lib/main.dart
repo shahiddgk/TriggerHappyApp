@@ -1,10 +1,66 @@
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/splash_screen.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  _configureFirebase();
+
+ // NotificationService().initNotification();
+  //tz.initializeTimeZones();
+  // Step 3
+  SystemChrome.setPreferredOrientations(
+      [ DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown, ]
+  ).then((value) => runApp(MyApp()));
   runApp(const MyApp());
+}
+
+//Too recieve FCM notification
+void _configureFirebase() async {
+  await Firebase.initializeApp();
+  if (Platform.isIOS) {
+    await FirebaseMessaging.instance.requestPermission();
+  }
+  var token = await FirebaseMessaging.instance.getToken();
+  print("Device Token = ${token}");
+  // await Clipboard.setData(ClipboardData(text: token));
+  // final controllerChat = Get.put(ChatScreenController());
+  FirebaseMessaging.onMessage.listen((message) {
+
+    print('Got a message whilst in the foreground!');
+
+    print('Message data: ${message.data}');
+  });
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+
+    // print('Got a message whilst in the foreground!');
+    //
+    // print('Message data: ${message.data}');
+
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //print('Got a message whilst in the foreground!');
+    print(message.data);
+
+    if (message.notification != null) {
+      // print(
+      //     'Message also contained a notification: ${message.notification!.body.toString()}');
+    }
+  });
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+
+ // print("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {
@@ -28,9 +84,9 @@ class MyApp extends StatelessWidget {
           ],
       ),
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Burgeon',
       theme: ThemeData(
-        primarySwatch: buildMaterialColor(AppColors.PrimaryColor),
+        primarySwatch: buildMaterialColor(AppColors.primaryColor),
       ),
       home: const SplashScreen(),
     );

@@ -1,10 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/screen_3.dart';
-import 'package:flutter_quiz_app/Screens/login_screen.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
+import 'package:flutter_quiz_app/Screens/TreeScreen/tree_screen.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Screens/AuthScreens/login_screen.dart';
+import 'Screens/PireScreens/widgets/AppBar.dart';
+import 'Screens/dashboard_tiles.dart';
+import 'Screens/utill/userConstants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -25,8 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _getUserData();
     Timer(const Duration(seconds: 5),
             ()=>isUserLoggedIn ? Navigator.pushReplacement(context, MaterialPageRoute(builder:
-                (context) =>
-            const Screen3()
+                (context) => const TreeScreen()
             )) : Navigator.pushReplacement(context,
             MaterialPageRoute(builder:
                 (context) =>
@@ -44,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
     SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      isUserLoggedIn = _sharedPreferences.getBool("user_logged_in")!;
+      isUserLoggedIn = _sharedPreferences.getBool(UserConstants().userLoggedIn)!;
       _isUserDataLoading = false;
     });
 

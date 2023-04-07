@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
+import 'constants.dart';
 
 class passwordField extends StatefulWidget {
   passwordField(this._passwordController,this.textHint,{Key? key}) : super(key: key);
@@ -19,13 +20,14 @@ class _passwordFieldState extends State<passwordField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style:const TextStyle(fontSize: AppConstants.defaultFontSize),
       controller: widget._passwordController,
       obscureText: _isShowPassword,
       validator: (value) {
         if(value!.isEmpty) {
           return "Password field can't be empty";
         }else if (value.contains(" ")) {
-          return "Spaces not allowd";
+          return "Spaces not allowed";
         } else {
           return null;
         }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
+import 'constants.dart';
 
 class userName extends StatefulWidget {
   userName(this._usernameController,{Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class _userNameState extends State<userName> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: const TextStyle(fontSize: AppConstants.defaultFontSize),
       controller: widget._usernameController,
       validator: (value) => value!.isEmpty ? "User name required" : null,
       decoration: InputDecoration(

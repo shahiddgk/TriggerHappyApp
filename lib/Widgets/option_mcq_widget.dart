@@ -16,13 +16,13 @@ class _OptionMcqAnswerState extends State<OptionMcqAnswer> {
       alignment: Alignment.center,
         margin: EdgeInsets.symmetric(vertical: 5,),
         decoration: BoxDecoration(
-            border: Border.all(color: AppColors.PrimaryColor,width: 2),
+            border: Border.all(color: AppColors.primaryColor,width: 2),
             borderRadius: BorderRadius.circular(8)
         ),
         child: Theme(
           data: Theme.of(context).copyWith(
-            unselectedWidgetColor:AppColors.PrimaryColor,
-            disabledColor: AppColors.PrimaryColor,
+            unselectedWidgetColor:AppColors.primaryColor,
+            disabledColor: AppColors.primaryColor,
           ),
           child: widget.RadioListTile,
         )
