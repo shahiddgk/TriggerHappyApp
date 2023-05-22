@@ -10,8 +10,10 @@ import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/colors.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
 import '../AuthScreens/login_screen.dart';
 import '../utill/userConstants.dart';
@@ -80,14 +82,14 @@ class _Screen8State extends State<Screen8> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    //print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -136,10 +138,22 @@ class _Screen8State extends State<Screen8> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        LogoScreen(),
+                        LogoScreen("PIRE"),
                         //  QuestionTextWidget("Tell me...."),
                         Align(alignment:Alignment.topLeft,
-                            child: QuestionTextWidget(widget.questionListResponse[5].title)),
+                            child: QuestionTextWidget(widget.questionListResponse[5].title,widget.questionListResponse[5].videoUrl,(){
+                              String urlQ8 = "https://youtu.be/1Eo1G96P29c";
+                              String? videoId = YoutubePlayer.convertUrlToId(urlQ8);
+                              YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                  initialVideoId: videoId!,
+                                  flags: const YoutubePlayerFlags(
+                                    autoPlay: false,
+                                    controlsVisibleAtStart: false,
+                                  )
+
+                              );
+                              videoPopupDialog(context, "Introduction to question#8", youtubePlayerController);
+                            },true)),
                         // QuestionTextWidget("or"),
                         // Align(
                         //     alignment: Alignment.topLeft,

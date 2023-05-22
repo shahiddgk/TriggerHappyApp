@@ -16,12 +16,12 @@ class RegisterRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['email'] = this.email;
-    data['name'] = this.name;
-    data['password'] = this.password;
-    data['device_token'] = this.token;
-    data['time_zone'] = this.timeZone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['email'] = email;
+    data['name'] = name;
+    data['password'] = password;
+    data['device_token'] = token;
+    data['time_zone'] = timeZone;
     return data;
   }
 }

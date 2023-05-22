@@ -136,11 +136,11 @@ class _Screen10State extends State<Screen10> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      LogoScreen(),
+                      LogoScreen("PIRE"),
 
                       Align(
                           alignment: Alignment.topLeft,
-                          child: QuestionTextWidget(widget.questionListResponse[7].title)),
+                          child: QuestionTextWidget(widget.questionListResponse[7].title,widget.questionListResponse[7].videoUrl,(){},false)),
 
                       // Align(
                       //     alignment: Alignment.topLeft,

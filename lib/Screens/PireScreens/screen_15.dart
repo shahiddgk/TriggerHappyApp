@@ -12,14 +12,14 @@ import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:flutter_quiz_app/model/request_model/response_email_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/constants.dart';
 import '../../Widgets/option_mcq_widget.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
-import '../AuthScreens/login_screen.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 
@@ -224,11 +224,23 @@ class _Screen15State extends State<Screen15> {
                  crossAxisAlignment: CrossAxisAlignment.center,
                  mainAxisAlignment: MainAxisAlignment.start,
                  children: [
-                   LogoScreen(),
+                   LogoScreen("PIRE"),
 
                    Align(
                        alignment: Alignment.topLeft,
-                       child: QuestionTextWidget(widget.questionListResponse[10].title)),
+                       child: QuestionTextWidget(widget.questionListResponse[10].title,widget.questionListResponse[10].videoUrl,(){
+                         String urlQ1 = "https://youtu.be/G4UOqUucvXc";
+                         String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                         YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                             initialVideoId: videoId!,
+                             flags: const YoutubePlayerFlags(
+                               autoPlay: false,
+                               controlsVisibleAtStart: false,
+                             )
+
+                         );
+                         videoPopupDialog(context, "Introduction to question#15", youtubePlayerController);
+                       },true)),
                    ListView.builder(
                        physics:const NeverScrollableScrollPhysics(),
                        scrollDirection: Axis.vertical,
@@ -308,11 +320,11 @@ class _Screen15State extends State<Screen15> {
           "answer": text15},
 
       };
-      print("All Answer Response");
-      print(name);
-      print(email);
-      print(id);
-      print(answerObject);
+      // print("All Answer Response");
+      // print(name);
+      // print(email);
+      // print(id);
+      // print(answerObject);
       final String encodedData = jsonEncode(answerObject);
       HTTPManager().userResponseEmail(UserResponseRequestModel(
           name: name, email: email, userId: id, answerMap: encodedData)).then((
@@ -336,7 +348,7 @@ class _Screen15State extends State<Screen15> {
         setState(() {
           isAnswerLoading = false;
         });
-        print(e);
+        //print(e);
         showToastMessage(context, e.toString(),false);
       });
     } else {

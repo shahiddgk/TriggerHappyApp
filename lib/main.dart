@@ -35,9 +35,9 @@ void _configureFirebase() async {
   // final controllerChat = Get.put(ChatScreenController());
   FirebaseMessaging.onMessage.listen((message) {
 
-    print('Got a message whilst in the foreground!');
+    //print('Got a message whilst in the foreground!');
 
-    print('Message data: ${message.data}');
+   // print('Message data: ${message.data}');
   });
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -49,7 +49,7 @@ void _configureFirebase() async {
   });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     //print('Got a message whilst in the foreground!');
-    print(message.data);
+    // print(message.data);
 
     if (message.notification != null) {
       // print(
@@ -70,18 +70,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: (context, child) => ResponsiveWrapper.builder(
-          BouncingScrollWrapper.builder(context, child!),
-          maxWidth: 1200,
-          minWidth: 450,
-          defaultScale: true,
-          breakpoints: [
-            const ResponsiveBreakpoint.resize(450, name: MOBILE),
-            const ResponsiveBreakpoint.autoScale(800, name: TABLET),
-            const ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-            const ResponsiveBreakpoint.resize(1200, name: DESKTOP),
-            const ResponsiveBreakpoint.autoScale(2460, name: "4K"),
-          ],
+      builder: (context, child) => ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 450, name: MOBILE),
+          const Breakpoint(start: 451, end: 800, name: TABLET),
+          const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+          const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+        ],
       ),
       debugShowCheckedModeBanner: false,
       title: 'Burgeon',

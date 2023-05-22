@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
+import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../../model/reponse_model/response_history_model.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
@@ -47,14 +48,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    // print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
 
     getResponseHistory();
     setState(() {
@@ -89,7 +90,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       });
 
     }).catchError((e) {
-      print(e);
+      //print(e);
       setState(() {
         _isLoading = false;
         errorMessage = e.toString();
@@ -113,53 +114,57 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ],
         ),
        body: Container(
-         child: _isLoading ? Container(
-           color: Colors.white,
-           child:const Center(
-             child: CircularProgressIndicator(),
-           ),
-         ) : errorMessage != "" ? Center(
-           child: Container(
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.center,
-                 mainAxisAlignment: MainAxisAlignment.center,
-                 children: [
-                   Text(errorMessage,style:const TextStyle(fontSize: 25),),
-                   const SizedBox(height: 5,),
-                   GestureDetector(
-                     onTap: () {
-                       getResponseHistory();
-                     },
-                     child: OptionMcqAnswer(
-                         TextButton(onPressed: () {
+         child: Column(
+         //  mainAxisAlignment: MainAxisAlignment.center,
+           crossAxisAlignment: CrossAxisAlignment.center,
+           children: [
+             LogoScreen("Garden"),
+             _isLoading ? const Center(
+               child: CircularProgressIndicator(),
+             ) : errorMessage != "" ? Center(
+               child: Container(
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.center,
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       Text(errorMessage,style:const TextStyle(fontSize: 25),),
+                       const SizedBox(height: 5,),
+                       GestureDetector(
+                         onTap: () {
                            getResponseHistory();
-                         }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
-                     ),
+                         },
+                         child: OptionMcqAnswer(
+                             TextButton(onPressed: () {
+                               getResponseHistory();
+                             }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
+                         ),
+                       )
+                     ],
                    )
-                 ],
-               )
-           ),
-         ) : historyResponseModel.isEmpty ? OptionMcqAnswer(
-             const Text( "No data available",style: TextStyle(fontSize:25,color: AppColors.textWhiteColor),)
-         )  : ListView.builder(
-             itemCount: historyResponseModel.length,
-             shrinkWrap: true,
-             itemBuilder: (context, index) {
-           return GestureDetector(
-             onTap: () {
-               Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ImageScreen(historyResponseModel[index]['score']!.toString())));
-             },
-             child: Container(
-               margin: const EdgeInsets.symmetric(horizontal: 10),
-               child: OptionMcqAnswer(
-                  Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text( historyResponseModel[index]['date']!,style:const TextStyle(fontSize:AppConstants.defaultFontSize,color: AppColors.textWhiteColor))),
                ),
-             ),
-           );
-         }) ,
-       ) ,
+             ) : historyResponseModel.isEmpty ? OptionMcqAnswer(
+                 const Text( "No data available",style: TextStyle(fontSize:25,color: AppColors.textWhiteColor),)
+             )  : ListView.builder(
+                 itemCount: historyResponseModel.length,
+                 shrinkWrap: true,
+                 itemBuilder: (context, index) {
+                   return GestureDetector(
+                     onTap: () {
+                       Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ImageScreen(historyResponseModel[index]['score']!.toString())));
+                     },
+                     child: Container(
+                       margin: const EdgeInsets.symmetric(horizontal: 10),
+                       child: OptionMcqAnswer(
+                         Container(
+                             padding: const EdgeInsets.symmetric(vertical: 10),
+                             child: Text( historyResponseModel[index]['date']!,style:const TextStyle(fontSize:AppConstants.defaultFontSize,color: AppColors.textWhiteColor))),
+                       ),
+                     ),
+                   );
+                 }),
+           ],
+         )
+       ),
     );
   }
 }

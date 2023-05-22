@@ -1,9 +1,8 @@
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/AuthScreens/settings_screen.dart';
+import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/email_field.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
@@ -11,13 +10,11 @@ import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/login_response_model.dart';
 import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 import '../../Widgets/constants.dart';
-import '../../Widgets/searchable_dropdown_field.dart';
 import '../../Widgets/username_field_widget.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/UserState.dart';
@@ -27,6 +24,7 @@ class ChangeProfile extends StatefulWidget {
   const ChangeProfile({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ChangeProfileState createState() => _ChangeProfileState();
 }
 
@@ -48,11 +46,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String userType = "";
   String authId = "";
   String allowEmail = "";
-  late String _timezone;
   late String _timezoneValue;
   late SingleValueDropDownController _valueDropDownController;
 
-  List<String> _availableTimezones = <String>[];
+  final List<String> _availableTimezones = <String>[];
 
 
   @override
@@ -66,7 +63,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
 
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
     firebaseMessaging.getToken().then((token){
-      print("token is $token");
+      //print("token is $token");
       setState(() {
         firebaseDeviceToken = token!;
       });
@@ -161,9 +158,9 @@ class _ChangeProfileState extends State<ChangeProfile> {
     setState(() {
       _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      authId = _sharedPreferences.getString("authId")!;
+      authId = sharedPreferences.getString("authId")!;
       _isUserDataLoading = false;
     });
 
@@ -172,14 +169,14 @@ class _ChangeProfileState extends State<ChangeProfile> {
     setState(() {
       _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      name = _sharedPreferences.getString(UserConstants().userName)!;
-      id = _sharedPreferences.getString(UserConstants().userId)!;
-      email = _sharedPreferences.getString(UserConstants().userEmail)!;
-      _timezoneValue = _sharedPreferences.getString(UserConstants().timeZone)!;
-      userType = _sharedPreferences.getString(UserConstants().userType)!;
-      allowEmail = _sharedPreferences.getString(UserConstants().allowEmail)!;
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      _timezoneValue = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+      allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
       userNameController.text = name;
       emailController.text = email;
       _valueDropDownController.dropDownValue = DropDownValueModel(name: _timezoneValue, value: _timezoneValue);
@@ -274,7 +271,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                    mainAxisAlignment: MainAxisAlignment.center,
                    crossAxisAlignment: CrossAxisAlignment.center,
                    children: [
-                     const LogoScreen(),
+                      LogoScreen(""),
 
                      Container(
                        margin:const EdgeInsets.only(top: 10),
@@ -324,10 +321,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                        );
                                      }).toList(),
                                      onChanged: (val) {
-                                       print("Value Selected");
+                                       //print("Value Selected");
                                        setState(() {
                                          _timezoneValue = _valueDropDownController.dropDownValue!.value.toString();
-                                         print(_timezoneValue);
+                                       //  print(_timezoneValue);
                                        });
                                      },
                                    ),
@@ -412,10 +409,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
   }
 
   Future<void> _changeProfile(String name1,String email,String timeZone,String deviceToken,String allowEmail) async {
-    print("ChangeProfile");
-    print(name1);
-    print(email);
-    print(timeZone);
+    // print("ChangeProfile");
+    // print(name1);
+    // print(email);
+    // print(timeZone);
 
     if(_formKey.currentState!.validate()) {
       setState(() {
@@ -424,8 +421,8 @@ class _ChangeProfileState extends State<ChangeProfile> {
       HTTPManager().changeProfile(
           ChangeProfileRequestModel(name:name1,email: email, userId: id,timeZone: timeZone,deviceToken: deviceToken)).then((
           value) async {
-        print("ChangeProfileResponse");
-        print(value);
+        // print("ChangeProfileResponse");
+        // print(value);
         UserStatePrefrence().setAnswerText(
             true,
             userType,
@@ -446,7 +443,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
         // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+            MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
                 (Route<dynamic> route) => false
         );
         // ignore: use_build_context_synchronously

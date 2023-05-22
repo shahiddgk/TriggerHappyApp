@@ -14,11 +14,11 @@ class ChangePasswordRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['old_password'] = this.currentPassword;
-    data['new_password'] = this.newPassword;
-    data['user_id'] = this.userId;
-    data['auth_id'] = this.authId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['old_password'] = currentPassword;
+    data['new_password'] = newPassword;
+    data['user_id'] = userId;
+    data['auth_id'] = authId;
     return data;
   }
 }
@@ -41,12 +41,12 @@ class ChangeProfileRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['user_id'] = this.userId;
-    data['time_zone'] = this.timeZone;
-    data['device_token'] = this.deviceToken;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['email'] = email;
+    data['user_id'] = userId;
+    data['time_zone'] = timeZone;
+    data['device_token'] = deviceToken;
     return data;
   }
 }

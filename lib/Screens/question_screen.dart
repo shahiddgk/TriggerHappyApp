@@ -1,12 +1,15 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/circular_button_widget.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../Widgets/colors.dart';
+import '../Widgets/video_player_in_pop_up.dart';
 
+// ignore: must_be_immutable
 class QuestionScreen extends StatefulWidget {
   QuestionScreen(this.id,{Key? key}) : super(key: key);
   String id;
@@ -100,7 +103,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         color: AppColors.backgroundColor,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -113,14 +116,26 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   margin:const EdgeInsets.only(top: 5),
                   child: Text("QUESTION ${i+1} OF ${questions.length}",style:const TextStyle(color: AppColors.totalQuestionColor,fontWeight: FontWeight.bold),)),
               if(i<questions.length)
-              QuestionTextWidget(questions[i]['question']),
+              QuestionTextWidget(questions[i]['question'],questions[i].videoUrl,(){
+                String urlQ1 = "https://www.youtube.com/watch?v=RHiFWm5-r3g";
+                String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                    initialVideoId: videoId!,
+                    flags: const YoutubePlayerFlags(
+                      autoPlay: false,
+                      controlsVisibleAtStart: false,
+                    )
+
+                );
+                videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
+              },false),
               if(j<answersList.length)
               OptionMcqAnswer(
               questions[i]['radio_Button'] ? RadioListTile(
                   tileColor: AppColors.textWhiteColor,
                   activeColor: AppColors.textWhiteColor,
                   value: answersList[j]['a1'].toString(),
-                  title:  Text(answersList[j]['a1'],style: TextStyle(color: AppColors.textWhiteColor)),
+                  title:  Text(answersList[j]['a1'],style: const TextStyle(color: AppColors.textWhiteColor)),
                   groupValue: _groupValue,
                   onChanged: (newValue){
                     setState(() {
@@ -157,7 +172,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       },
                     ),
                    const SizedBox(width: 10,),
-                    Text(answersList[j]['a1'],style: TextStyle(color: AppColors.textWhiteColor)),
+                    Text(answersList[j]['a1'],style: const TextStyle(color: AppColors.textWhiteColor)),
                   ],
               ),
                 )
@@ -169,7 +184,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     tileColor: AppColors.textWhiteColor,
                     activeColor: AppColors.textWhiteColor,
                     value: answersList[j]['a2'].toString(),
-                    title:  Text(answersList[j]['a2'],style: TextStyle(color: AppColors.textWhiteColor)),
+                    title:  Text(answersList[j]['a2'],style: const TextStyle(color: AppColors.textWhiteColor)),
                     groupValue: _groupValue,
                     onChanged: (newValue){
                       setState(() {
@@ -206,7 +221,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           },
                         ),
                         const SizedBox(width: 10,),
-                        Text(answersList[j]['a2'],style: TextStyle(color: AppColors.textWhiteColor)),
+                        Text(answersList[j]['a2'],style: const TextStyle(color: AppColors.textWhiteColor)),
                       ],
                     ),
                   )
@@ -217,7 +232,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     tileColor: AppColors.textWhiteColor,
                     activeColor: AppColors.textWhiteColor,
                     value: answersList[j]['a3'].toString(),
-                    title:  Text(answersList[j]['a3'],style: TextStyle(color: AppColors.textWhiteColor)),
+                    title:  Text(answersList[j]['a3'],style: const TextStyle(color: AppColors.textWhiteColor)),
                     groupValue: _groupValue,
                     onChanged: (newValue){
                       setState(() {
@@ -254,7 +269,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           },
                         ),
                         const SizedBox(width: 10,),
-                        Text(answersList[j]['a3'],style: TextStyle(color: AppColors.textWhiteColor)),
+                        Text(answersList[j]['a3'],style: const TextStyle(color: AppColors.textWhiteColor)),
                       ],
                     ),
                   )
@@ -265,7 +280,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     tileColor: AppColors.textWhiteColor,
                     activeColor: AppColors.textWhiteColor,
                     value: answersList[j]['a4'].toString(),
-                    title:  Text(answersList[j]['a4'],style: TextStyle(color: AppColors.textWhiteColor)),
+                    title:  Text(answersList[j]['a4'],style: const TextStyle(color: AppColors.textWhiteColor)),
                     groupValue: _groupValue,
                     onChanged: (newValue){
                       setState(() {
@@ -303,7 +318,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           },
                         ),
                         const SizedBox(width: 10,),
-                        Text(answersList[j]['a4'],style: TextStyle(color: AppColors.textWhiteColor)),
+                        Text(answersList[j]['a4'],style: const TextStyle(color: AppColors.textWhiteColor)),
                       ],
                     ),
                   )
@@ -322,7 +337,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           context: context,
                           fullWidth: true,
                           alignment: Alignment.topCenter,
-                          duration: Duration(seconds: 3),
+                          duration: const Duration(seconds: 3),
                           backgroundColor: Colors.red
                       );
                     }
@@ -344,7 +359,19 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       Row(
                         children: [
                          const Icon(Icons.timelapse,color: AppColors.textWhiteColor,),
-                          QuestionTextWidget("You have answered total ${answersList.length} questions"),
+                          QuestionTextWidget("You have answered total ${answersList.length} questions","",(){
+                            String urlQ1 = "https://www.youtube.com/watch?v=RHiFWm5-r3g";
+                            String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                            YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                initialVideoId: videoId!,
+                                flags: const YoutubePlayerFlags(
+                                  autoPlay: false,
+                                  controlsVisibleAtStart: false,
+                                )
+
+                            );
+                            videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
+                          },false),
                         ],
                       )
                     ],
@@ -355,7 +382,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ),
         ),
       ),
-    );;
+    );
   }
 
   void _setNextQuestion() {
@@ -372,13 +399,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   void addAnswersToList(int index,answerSelect) {
     selectedAnswer.insert(index, answerSelect);
-    print(selectedAnswer);
+    // print(selectedAnswer);
   }
 
   void removeAnswerFromList(int index) {
     if(selectedAnswer.isNotEmpty) {
       selectedAnswer.removeAt(index);
-      print(selectedAnswer);
+      // print(selectedAnswer);
     }
   }
 }

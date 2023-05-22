@@ -1,10 +1,11 @@
 
 
+// ignore_for_file: unused_element
+
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/AuthScreens/forgot_password.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/TreeScreen/tree_screen.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
@@ -20,13 +21,10 @@ import 'package:flutter_quiz_app/model/request_model/login_request.dart';
 import 'package:flutter_quiz_app/model/request_model/register_create_request.dart';
 import 'package:flutter_quiz_app/model/request_model/social_login_request_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/constants.dart';
-import '../../Widgets/searchable_dropdown_field.dart';
-import '../PireScreens/widgets/AppBar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -58,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
   late SingleValueDropDownController _valueDropDownController;
 
   late String _timezone;
+  // ignore: prefer_final_fields
   List<String> _availableTimezones = <String>[];
 
   @override
@@ -77,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
     //
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
     firebaseMessaging.getToken().then((token){
-      print("token is $token");
+      //print("token is $token");
       setState(() {
         deviceToken = token!;
       });
@@ -229,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const LogoScreen(),
+                   LogoScreen(""),
 
                   Container(
                     margin:const EdgeInsets.only(top: 10),
@@ -710,12 +709,22 @@ class _LoginPageState extends State<LoginPage> {
         print("LoginResponse");
         // ignore: avoid_print
         print(value);
+        // ignore: unused_local_variable
         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
           setState(() {
           //  loginResponseModel = value;
             _emailController.text=="";
             _passwordController.text=="";
+
+            // sharedPreferences.setBool(TrellisScreenStatus().nameExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().purposeExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().ladderExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().oPExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().rhythmsExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().needsExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().identityExpended, false);
+            // sharedPreferences.setBool(TrellisScreenStatus().tribeExpended, false);
 
             UserStatePrefrence().setAnswerText(
                 value['user_session']['user_logged_in'],

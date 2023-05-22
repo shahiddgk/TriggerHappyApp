@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/utill/UserState.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Widgets/constants.dart';
 import '../../../model/request_model/logout_user_request.dart';
@@ -12,6 +11,7 @@ import '../../AuthScreens/login_screen.dart';
 import '../../AuthScreens/settings_screen.dart';
 import '../../instruction_and_summaryPage.dart';
 
+// ignore: must_be_immutable
 class PopMenuButton extends StatefulWidget {
    PopMenuButton(this.isSummaryVisible,this.isSetting,this.userId,{Key? key}) : super(key: key);
 
@@ -80,16 +80,16 @@ class _PopMenuButtonState extends State<PopMenuButton> {
         },
         onSelected:(value){
           if(value == 0){
-            print("Summary menu is selected.");
+            // print("Summary menu is selected.");
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SummaryAndInstructions(0)));
           }else if(value == 1){
-            print("Instruction menu is selected.");
+            // print("Instruction menu is selected.");
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SummaryAndInstructions(1)));
           }else if(value == 2){
-            print("Setting menu is selected.");
+            // print("Setting menu is selected.");
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Settings("")));
           }else if(value == 3){
-            print("Logout menu is selected.");
+            // print("Logout menu is selected.");
             _logout(widget.userId);
           }
         }

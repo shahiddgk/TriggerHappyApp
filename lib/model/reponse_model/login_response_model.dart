@@ -18,10 +18,10 @@ class LoginResponseModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_login'] = this.userLogin;
-    if (this.userSession != null) {
-      data['user_session'] = this.userSession!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_login'] = userLogin;
+    if (userSession != null) {
+      data['user_session'] = userSession!.toJson();
     }
     // if (this.userCookie != null) {
     //   data['user_cookie'] = this.userCookie!.map((v) => v.toJson()).toList();
@@ -56,13 +56,13 @@ class UserSession {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['__ci_last_regenerate'] = this.iCiLastRegenerate;
-    data['user_logged_in'] = this.userLoggedIn;
-    data['usertype'] = this.usertype;
-    data['username'] = this.username;
-    data['useremail'] = this.useremail;
-    data['userid'] = this.userid;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['__ci_last_regenerate'] = iCiLastRegenerate;
+    data['user_logged_in'] = userLoggedIn;
+    data['usertype'] = usertype;
+    data['username'] = username;
+    data['useremail'] = useremail;
+    data['userid'] = userid;
     return data;
   }
 }

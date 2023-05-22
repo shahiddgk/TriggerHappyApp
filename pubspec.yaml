@@ -15,10 +15,9 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.16+16
-
+version: 1.0.29+29
 environment:
-  sdk: ">=2.17.5 <3.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -39,16 +38,16 @@ dependencies:
   http: ^0.13.5
   flutter_styled_toast: ^2.1.3
   shared_preferences: ^2.0.15
-  google_sign_in: 5.0.3
+  google_sign_in: ^6.1.0
   flutter_html: ^3.0.0-alpha.3
-  responsive_framework: ^0.2.0
-  flutter_secure_storage: ^7.0.1
-  flutter_local_notifications: ^12.0.0
-  firebase_core: 1.24.0
-  firebase_core_platform_interface: 4.5.1
-  firebase_messaging: ^10.0.0
-  new_version: ^0.3.1
-  load_switch: ^1.2.0
+  responsive_framework: ^1.0.0
+  flutter_secure_storage: ^8.0.0
+  flutter_local_notifications: ^14.1.0
+  firebase_core: ^2.13.0
+  firebase_core_platform_interface: ^4.8.0
+  firebase_messaging: ^14.6.1
+#  new_version: ^0.3.1
+  load_switch: ^2.0.3
   animations: ^2.0.7
 #  timezone: ^0.9.1
   flutter_timezone: ^1.0.4
@@ -58,6 +57,13 @@ dependencies:
   youtube_player_flutter: ^8.1.2
   flutter_switch: ^0.3.2
   cached_network_image:
+  modal_bottom_sheet: ^2.1.2
+  package_info_plus: ^4.0.1
+  in_app_update: ^4.0.1
+  flutter_dialogs: ^3.0.0
+  flutter_stripe: ^9.2.0
+#  upgrader:
+#  flutter_quill:
 #  worker_manager: ^4.4.4
 #  intl:
 
@@ -85,7 +91,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/trigger_logo.png
+    - assets/
+    - assets/apple_tree/apple_ipad/
+    - assets/apple_tree/apple_mobile/
 #    - assets/apple_tree/
 
   # An image asset can refer to one or more resolution-specific "variants", see

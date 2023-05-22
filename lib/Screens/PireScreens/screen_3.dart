@@ -3,10 +3,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Screens/instruction_and_summaryPage.dart';
@@ -15,13 +13,12 @@ import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
+import 'package:flutter_quiz_app/Widgets/video_player_in_pop_up.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:new_version/new_version.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:new_version/new_version.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/constants.dart';
@@ -29,12 +26,12 @@ import '../../Widgets/option_mcq_widget.dart';
 import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
-import '../video_player.dart';
 
 class Screen3 extends StatefulWidget {
   const Screen3({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen3State createState() => _Screen3State();
 }
 
@@ -50,16 +47,13 @@ class _Screen3State extends State<Screen3> {
   bool _isLoading = false;
   bool _isUserDataLoading = false;
   int questionIndex = 0;
-  late Timer _timer;
-  int _start = 30;
   bool isAnswerLoading = false;
   String errorMessage = "";
-  String urlFirst = "https://www.youtube.com/watch?v=8n5-yXPEU7U";
-  String urlSecond = "https://www.youtube.com/watch?v=zhRsp6NWKCE";
+  String urlQ1 = "https://www.youtube.com/watch?v=8KgbGXH35Mg";
+  // String urlSecond = "https://www.youtube.com/watch?v=zhRsp6NWKCE";
 
   late List<QuestionListResponseModel> questionListResponse;
   final GoogleSignIn googleSignIn = GoogleSignIn();
- late SharedPreferences _sharedPreferences;
   List<String> selectedAnswer = [];
   int questionListResponseLength = 0;
 
@@ -81,50 +75,8 @@ class _Screen3State extends State<Screen3> {
     super.initState();
   }
 
-  _checkNewVersion() async {
-    final newVersion = NewVersion(
-      iOSId: 'com.TrueIncrease.TriggerHappy',
-      androidId: 'com.ratedsolution.flutter_quiz_app',
-    );
-
-    final status = await newVersion.getVersionStatus();
-
-    if (status != null) {
-      debugPrint(status.releaseNotes);
-      debugPrint(status.appStoreLink);
-      debugPrint(status.localVersion);
-      debugPrint(status.storeVersion);
-      debugPrint(status.canUpdate.toString());
-      if(status.canUpdate) {
-        newVersion.showUpdateDialog(
-          context: context,
-          versionStatus: status,
-          dialogTitle: 'Update!',
-          updateButtonText: "Update",
-          dismissButtonText: "No",
-          dialogText: Platform.isAndroid ? 'New version is available on play Store' : 'New version is available on App Store',
-        );
-      }
-    }
-
-  }
 
   void startTimer() {
-    const oneSec = Duration(seconds: 1);
-    _timer = Timer.periodic(
-      oneSec,
-          (Timer timer) {
-        if (_start == 0) {
-          setState(() {
-            timer.cancel();
-          });
-        } else {
-          setState(() {
-            _start--;
-          });
-        }
-      },
-    );
   }
 
   setAnswerText() {
@@ -280,55 +232,73 @@ class _Screen3State extends State<Screen3> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                const LogoScreen(),
-
-                                Padding(
-                                  padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                                        },
-                                        child: Expanded(
-                                          child: Container(
-                                            padding:const EdgeInsets.only(left: 10),
-                                            margin: const EdgeInsets.only(top: 10),
-                                            child: Column(
-                                              children: const [
-                                                Text("Selecting a topic to process",style: TextStyle(fontSize: AppConstants.defaultFontSize,color: Colors.blue),),
-                                                SizedBox(height: 5,),
-                                                Icon(Icons.ondemand_video_sharp,size: 25,)
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                                        },
-                                        child: Expanded(
-                                          child: Container(
-                                            padding:const EdgeInsets.only(left: 10),
-                                            margin: const EdgeInsets.only(top: 10),
-                                            child: Column(
-                                              children:const [
-                                                Text("Making exercise effective",style: TextStyle(fontSize: AppConstants.defaultFontSize,color: Colors.blue),),
-                                                SizedBox(height: 5,),
-                                                Icon(Icons.ondemand_video_sharp,size: 25,)
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    LogoScreen("PIRE"),
+                                    // const SizedBox(width: 20,),
+                                    // IconButton(onPressed: (){
+                                    //   String titleColumn = "https://youtu.be/dk5vgNpIWMM";
+                                    //   String? videoId = YoutubePlayer.convertUrlToId(titleColumn);
+                                    //   YoutubePlayerController playerController = YoutubePlayerController(
+                                    //       initialVideoId: videoId!,
+                                    //       flags: const YoutubePlayerFlags(
+                                    //         autoPlay: false,
+                                    //         controlsVisibleAtStart: false,
+                                    //       )
+                                    //
+                                    //   );
+                                    //   videoPopupDialog(context,"Introduction to Trellis",playerController);
+                                    //   //bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
+                                    // }, icon: const Icon(Icons.video_collection_outlined,size:20,color: AppColors.infoIconColor,))
+                                  ],
                                 ),
+                              //  LogoScreen("PIRE"),
+
+                                // Padding(
+                                //   padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                //   child: Row(
+                                //     crossAxisAlignment: CrossAxisAlignment.center,
+                                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                //     children: [
+                                //       GestureDetector(
+                                //         onTap: () {
+                                //           String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
+                                //           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                                //         },
+                                //         child: Container(
+                                //             padding:const EdgeInsets.only(left: 10),
+                                //             margin: const EdgeInsets.only(top: 10),
+                                //             child: Column(
+                                //               children: const [
+                                //                 Text("Choosing a topic",style: TextStyle(fontSize: AppConstants.defaultFontSize,color: Colors.blue),),
+                                //                 SizedBox(height: 5,),
+                                //                 Icon(Icons.ondemand_video_sharp,size: 25,)
+                                //               ],
+                                //             ),
+                                //           ),
+                                //       ),
+                                //       GestureDetector(
+                                //         onTap: () {
+                                //           String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
+                                //           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                                //         },
+                                //         child: Container(
+                                //             padding:const EdgeInsets.only(left: 10),
+                                //             margin: const EdgeInsets.only(top: 10),
+                                //             child: Column(
+                                //               children:const [
+                                //                 Text("Improve Exercise Results",style: TextStyle(fontSize: AppConstants.defaultFontSize,color: Colors.blue),),
+                                //                 SizedBox(height: 5,),
+                                //                 Icon(Icons.ondemand_video_sharp,size: 25,)
+                                //               ],
+                                //             ),
+                                //           ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
 
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -338,17 +308,28 @@ class _Screen3State extends State<Screen3> {
                                       flex: 6,
                                       child: Align(
                                           alignment: Alignment.topLeft,
-                                          child: QuestionTextWidget(questionListResponse[questionIndex].title)),
+                                          child: QuestionTextWidget(questionListResponse[questionIndex].title,questionListResponse[questionIndex].videoUrl,(){
+                                            String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                                            YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                                initialVideoId: videoId!,
+                                                flags: const YoutubePlayerFlags(
+                                                  autoPlay: false,
+                                                  controlsVisibleAtStart: false,
+                                                )
+
+                                            );
+                                            videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
+                                          },true)),
                                     ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SummaryAndInstructions(1)));
-                                        },
-                                        child:const Icon(Icons.info_outline,size: 30,),
-                                      ),
-                                    )
+                                    // Expanded(
+                                    //   flex: 1,
+                                    //   child: GestureDetector(
+                                    //     onTap: () {
+                                    //       Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SummaryAndInstructions(1)));
+                                    //     },
+                                    //     child:const Icon(Icons.info_outline,size: 30,),
+                                    //   ),
+                                    // )
 
                                   ],
                                 ),

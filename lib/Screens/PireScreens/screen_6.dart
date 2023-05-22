@@ -1,25 +1,25 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_7.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/constants.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
-import '../AuthScreens/login_screen.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 
+// ignore: must_be_immutable
 class Screen6 extends StatefulWidget {
 
   List<QuestionListResponseModel> questionListResponse;
@@ -27,6 +27,7 @@ class Screen6 extends StatefulWidget {
    Screen6(this.questionListResponse,{Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen6State createState() => _Screen6State();
 }
 
@@ -38,11 +39,9 @@ class _Screen6State extends State<Screen6> {
   String answerNo4 = "";
   String answerText4 = "";
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool _isDataLoading = true;
   bool isAnswerLoading = false;
   List answersList = [];
-  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   String a1 = "0";
@@ -56,14 +55,14 @@ class _Screen6State extends State<Screen6> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    //print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -81,7 +80,7 @@ class _Screen6State extends State<Screen6> {
     }
     setState(() {
       answersList.sort((a, b)=>a['answer'].compareTo(b['answer']));
-      print(answersList);
+     // print(answersList);
       _isDataLoading = false;
     });
   }
@@ -96,22 +95,10 @@ class _Screen6State extends State<Screen6> {
 
   }
 
-  _getAnswerData() async {
-    setState(() {
-      _isAnswerDataLoading = true;
-    });
-    _sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      answerNo4 = _sharedPreferences.getString("answerNo3")!;
-      answerText4 = _sharedPreferences.getString("answerText3")!;
-      _isAnswerDataLoading = false;
-    });
-
-  }
 
   setAnswerText() async {
 
-    print("Calling question Submission");
+    //print("Calling question Submission");
     QuestionStatePrefrence().setAnswerText(
         PireConstants.questionFourId, widget.questionListResponse[3].id.toString(),
         PireConstants.questionFourText, selectedAnswer,
@@ -171,9 +158,9 @@ class _Screen6State extends State<Screen6> {
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           //scrollDirection: Axis.vertical,
           child: Stack(
             alignment: Alignment.center,
@@ -187,13 +174,25 @@ class _Screen6State extends State<Screen6> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      LogoScreen(),
+                      LogoScreen("PIRE"),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                            padding: EdgeInsets.only(top: 10),
+                            padding: const EdgeInsets.only(top: 10),
                             width: MediaQuery.of(context).size.width,
-                            child: QuestionTextWidget(widget.questionListResponse[3].title)),
+                            child: QuestionTextWidget(widget.questionListResponse[3].title,widget.questionListResponse[3].videoUrl,(){
+                              String urlQ1 = "https://www.youtube.com/watch?v=G4UOqUucvXc&t=16s";
+                              String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                              YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                  initialVideoId: videoId!,
+                                  flags: const YoutubePlayerFlags(
+                                    autoPlay: false,
+                                    controlsVisibleAtStart: false,
+                                  )
+
+                              );
+                              videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
+                            },true)),
                       ),
 
                       !_isDataLoading ? Container(
@@ -202,7 +201,7 @@ class _Screen6State extends State<Screen6> {
                         margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height,top: 5),
                         child: GridView.count(
                           padding: EdgeInsets.only(bottom:MediaQuery.of(context).size.height/13,left: 10,right: 10),
-                          crossAxisCount: !isPhone ? 4 : 2,
+                          crossAxisCount: !isPhone ? 5 : 3,
                           crossAxisSpacing: 4.0,
                           mainAxisSpacing: 2.0,
                           childAspectRatio: itemHeight/itemWidth,
@@ -211,8 +210,8 @@ class _Screen6State extends State<Screen6> {
                           children: List.generate(answersList.length, (index) {
                             return GestureDetector(
                               onTap: () {
-                                print("item Clicked");
-                                print(a1);
+                                // print("item Clicked");
+                                // print(a1);
 
                                 if(answersList[index]["selected"] == "0") {
 
@@ -272,22 +271,41 @@ class _Screen6State extends State<Screen6> {
                                 }
 
                               },
-                              child: OptionMcqAnswer(( Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: AppColors.primaryColor,width: 2)
+                              child: OptionMcqAnswer(Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: ( Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex:1,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(right: 7),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(color: AppColors.primaryColor,width: 2)
+                                        ),
+                                        alignment: Alignment.center,
+                                        height: 20,
+                                        width: 20,
+                                        child:answersList[index]["selected"] == "0" ? const Text("") : Text(
+                                            answersList[index]["selected"],
+                                            style: const TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold,fontSize: AppConstants.defaultFontSize)),
+                                      ),
                                     ),
-                                    alignment: Alignment.center,
-                                    height: 20,
-                                    width: 20,
-                                    child:answersList[index]["selected"] == "0" ? Text("") : Text(answersList[index]["selected"],style: TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold,fontSize: AppConstants.defaultFontSize)),
-                                  ),
-                                  Text(answersList[index]['answer'],style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
-                                ],
-                              ))),
+                                    Expanded(
+                                      flex: 4,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                            answersList[index]['answer'],
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: const TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                              )),
                             );
 
 
@@ -313,7 +331,7 @@ class _Screen6State extends State<Screen6> {
 
     selectedAnswer.add(answerSelect);
 
-    print(selectedAnswer);
+   // print(selectedAnswer);
   }
 
   void removeAnswerFromList(answerSelect) {
@@ -323,12 +341,12 @@ class _Screen6State extends State<Screen6> {
          selectedAnswer.removeAt(i);
        }
       }
-      print(selectedAnswer);
+      //print(selectedAnswer);
     }
   }
 
   void _submitAnswer() {
-    print(selectedAnswer);
+   // print(selectedAnswer);
 
     if(selectedAnswer.isNotEmpty) {
       // if(selectedAnswer.length<3) {

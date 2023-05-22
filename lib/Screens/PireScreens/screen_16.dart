@@ -3,13 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
+import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../AuthScreens/login_screen.dart';
 import '../utill/userConstants.dart';
 
@@ -44,14 +47,14 @@ class _Screen16State extends State<Screen16> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    // print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -83,7 +86,7 @@ class _Screen16State extends State<Screen16> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
             const  Padding(padding: EdgeInsets.only(top: 40)),
-              LogoScreen(),
+              LogoScreen("PIRE"),
              // QuestionTextWidget(widget.number),
               QuestionTextWidget(widget.number=="Worse" ?
               "I'm so sorry…This will get easier, promise!"
@@ -93,7 +96,19 @@ class _Screen16State extends State<Screen16> {
                   ? "That's totally normal when processing hard situations. It will get better."
                   : widget.number=="Better"
                   ? "That's great! Keep up the good work."
-                  : widget.number=="Awesome" ? "Yes! That's wonderful. Enjoy!" : ""),
+                  : widget.number=="Awesome" ? "Yes! That's wonderful. Enjoy!" : "","",(){
+                String urlQ1 = "https://www.youtube.com/watch?v=RHiFWm5-r3g";
+                String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                    initialVideoId: videoId!,
+                    flags: const YoutubePlayerFlags(
+                      autoPlay: false,
+                      controlsVisibleAtStart: false,
+                    )
+
+                );
+                videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
+              },true),
                   const SizedBox(
                     height: 10,
                   ),
@@ -102,7 +117,7 @@ class _Screen16State extends State<Screen16> {
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+                          MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
                               (Route<dynamic> route) => false
                       );
                     },
@@ -110,10 +125,10 @@ class _Screen16State extends State<Screen16> {
                        TextButton(onPressed: () {
                          Navigator.pushAndRemoveUntil(
                              context,
-                             MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+                             MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
                                  (Route<dynamic> route) => false
                          );
-                       }, child: const Text("Let's process another issue",style: TextStyle(color: AppColors.textWhiteColor)),)
+                       }, child: const Text("Back to Home Screen",style: TextStyle(color: AppColors.textWhiteColor)),)
                     ),
                   )
             ],

@@ -15,11 +15,11 @@ class UserResponseRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['user_id'] = this.userId;
-    data['answers'] = this.answerMap;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['email'] = email;
+    data['user_id'] = userId;
+    data['answers'] = answerMap;
     return data;
   }
 }

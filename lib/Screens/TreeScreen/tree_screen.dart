@@ -1,19 +1,14 @@
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:animations/animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
-import 'package:flutter_quiz_app/network/api_urls.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
@@ -24,12 +19,13 @@ class TreeScreen extends StatefulWidget {
   const TreeScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _TreeScreenState createState() => _TreeScreenState();
 }
 
-class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateMixin{
+class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
 
- // late AnimationController controllerReverse;
+  late AnimationController controllerBlink;
   late AnimationController controllerForward;
 
   String name = "";
@@ -39,10 +35,13 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
   late int countNumber;
   bool _showFirstImage = true;
   String errorMessage = "";
+  // ignore: prefer_typing_uninitialized_variables
   late final _random;
+  // ignore: prefer_typing_uninitialized_variables
   var element;
   String url = "";
   late bool isPhone;
+  bool showTapHereButton = false;
 
   bool get isForwardAnimation =>
       controllerForward.status == AnimationStatus.forward ||
@@ -53,7 +52,7 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
   //         controllerReverse.status == AnimationStatus.completed;
 
   List quoteList = <String> [
-    "You can’t heal what isn’t real or true, we must first see the pain.",
+    "You cannot heal what isn’t real, or true.",
     "Empathy is a superpower",
     "One of the problems with being a victim is we inevitably become the persecutor",
     "Feeling empowered always leads to creativity and connectivity giving life to all",
@@ -83,7 +82,7 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
     "There is a time and a season for everything under the sun",
     "Most people want to avoid pain, and discipline is usually painful.",
     "We must all suffer one of two things: the pain of discipline or the pain of regret or disappointment.",
-    "We often want mercy for ourselves but just for others",
+    "We often want mercy for ourselves but justice for others.",
   ];
 
   @override
@@ -92,6 +91,12 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
     _random = Random();
     element = quoteList[_random.nextInt(quoteList.length)];
     _getUserData();
+    controllerBlink = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+      reverseDuration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+
     // controllerForward = AnimationController(
     //   value: 1,
     //   duration: Duration(milliseconds: 2000),
@@ -101,10 +106,11 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
 
     controllerForward = AnimationController(
       value: 1,
-      duration:const Duration(milliseconds: 6000),
-      reverseDuration:const Duration(milliseconds: 6000),
+      duration:const Duration(milliseconds: 3000),
+      reverseDuration:const Duration(milliseconds: 3000),
       vsync: this,
     )..addStatusListener((status) => setState(() {}));
+
     // _getAnswerData();
     // TODO: implement initState
     super.initState();
@@ -128,26 +134,27 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
   void dispose() {
    // controllerReverse.dispose();
     controllerForward.dispose();
+    controllerBlink.dispose();
     super.dispose();
   }
 
 
   void _changeImage(int count) {
-    print("COUNT NUMBER");
-    print(count);
+    // print("COUNT NUMBER");
+    // print(count);
 
     if(count == 0) {
       setState(() {
         countNumber = 1;
         controllerForward.forward();
       });
-      print(countNumber);
+      // print(countNumber);
       if(!isPhone) {
-        url = "${ApplicationURLs.BASE_URL_FOR_IPAD_IMAGES}$countNumber.png";
+        url = "assets/apple_tree/apple_ipad/$countNumber.png";
       } else {
-        url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}$countNumber.png";
+        url = "assets/apple_tree/apple_mobile/$countNumber.png";
       }
-      print(url);
+      // print(url);
     } else {
       setState(() {
         controllerForward.reverse();
@@ -156,14 +163,20 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
         } else {
           countNumber = count;
         }
-        print(countNumber);
+        // print(countNumber);
         if(!isPhone) {
-          url = "${ApplicationURLs.BASE_URL_FOR_IPAD_IMAGES}$countNumber.png";
+          url = "assets/apple_tree/apple_ipad/$countNumber.png";
         } else {
-          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}$countNumber.png";
+          url = "assets/apple_tree/apple_mobile/$countNumber.png";
         }
-        print(url);
-        Future.delayed(const Duration(seconds: 6)).then((value) {
+        // print(url);
+        Future.delayed(const Duration(seconds: 3)).then((value) {
+          Future.delayed(const Duration(seconds: 5)).then((value) {
+
+            setState(() {
+              showTapHereButton = true;
+            });
+          });
           setState(() {
             _showFirstImage = false;
             if (_showFirstImage) {
@@ -171,13 +184,13 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
             } else {
               countNumber = count;
             }
-            print(countNumber);
+            //print(countNumber);
             if(!isPhone) {
-              url = "${ApplicationURLs.BASE_URL_FOR_IPAD_IMAGES}$countNumber.png";
+              url = "assets/apple_tree/apple_ipad/$countNumber.png";
             } else {
-              url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}$countNumber.png";
+              url = "assets/apple_tree/apple_mobile/$countNumber.png";
             }
-            print(url);
+            //print(url);
             controllerForward.forward();
           });
         });
@@ -197,10 +210,10 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
 
 
       int count = value["response_count"];
-      countNumber = value["response_count"];
+     // countNumber = value["response_count"];
 
       setState(() {
-        sharedPreferences.setString("Score", countNumber.toString());
+        sharedPreferences.setString("Score", count.toString());
       });
 
      //  if(count == 0) {
@@ -229,59 +242,19 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
       _isUserDataLoading = true;
     });
 
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    print("Data getting called");
-    print(name);
-    print(id);
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    // print("Data getting called");
+    // print(name);
+    // print(id);
     _getTreeGrowth();
     setState(() {
       _isUserDataLoading = false;
     });
   }
 
-  // List imageList = <String> [
-  //   "assets/apple_tree/1.png",
-  //   "assets/apple_tree/2.png",
-  //   "assets/apple_tree/3.png",
-  //   "assets/apple_tree/4.png",
-  //   "assets/apple_tree/5.png",
-  //   "assets/apple_tree/6.png",
-  //   "assets/apple_tree/7.png",
-  //   "assets/apple_tree/8.png",
-  //   "assets/apple_tree/9.png",
-  //   "assets/apple_tree/10.png",
-  //   "assets/apple_tree/11.png",
-  //   "assets/apple_tree/12.png",
-  //   "assets/apple_tree/13.png",
-  //   "assets/apple_tree/14.png",
-  //   "assets/apple_tree/15.png",
-  //   "assets/apple_tree/16.png",
-  //   "assets/apple_tree/17.png",
-  //   "assets/apple_tree/18.png",
-  //   "assets/apple_tree/19.png",
-  //   "assets/apple_tree/20.png",
-  //   "assets/apple_tree/21.png",
-  //   "assets/apple_tree/22.png",
-  //   "assets/apple_tree/23.png",
-  //   "assets/apple_tree/24.png",
-  //   "assets/apple_tree/25.png",
-  //   "assets/apple_tree/26.png",
-  //   "assets/apple_tree/27.png",
-  //   "assets/apple_tree/28.png",
-  //   "assets/apple_tree/29.png",
-  //   "assets/apple_tree/30.png",
-  //   "assets/apple_tree/31.png",
-  //   "assets/apple_tree/32.png",
-  //   "assets/apple_tree/33.png",
-  //   "assets/apple_tree/34.png",
-  //   "assets/apple_tree/35.png",
-  //   "assets/apple_tree/36.png",
-  //   "assets/apple_tree/37.png",
-  //
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -300,25 +273,23 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
                 child: CircularProgressIndicator(),
               ),
             ) : errorMessage != "" ? Center(
-              child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(errorMessage,style:const TextStyle(fontSize: 25),),
-                      const SizedBox(height: 5,),
-                      GestureDetector(
-                        onTap: () {
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(errorMessage,style:const TextStyle(fontSize: 25),),
+                  const SizedBox(height: 5,),
+                  GestureDetector(
+                    onTap: () {
+                      _getTreeGrowth();
+                    },
+                    child: OptionMcqAnswer(
+                        TextButton(onPressed: () {
                           _getTreeGrowth();
-                        },
-                        child: OptionMcqAnswer(
-                            TextButton(onPressed: () {
-                              _getTreeGrowth();
-                            }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
-                        ),
-                      )
-                    ],
+                        }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
+                    ),
                   )
+                ],
               ),
             ) : Container(
               color: Colors.white,
@@ -334,17 +305,48 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
                   child:const Center(
                     child: CircularProgressIndicator(),
                   ),
-                ) : Center(
-                  child: CachedNetworkImage(
-                    imageUrl: url,
-                    progressIndicatorBuilder: (context, url, downloadProgress) =>
-                        CircularProgressIndicator(value: downloadProgress.progress),
-                    errorWidget: (context, url, error) => Icon(Icons.error,color: AppColors.redColor,),
-                  ),
-                ),
+                ) : Image.asset(url,fit: BoxFit.fill,),
+
+                // CachedNetworkImage(
+                //     imageUrl: url,
+                //     fit: BoxFit.fill,
+                //     progressIndicatorBuilder: (context, url, downloadProgress) {
+                //       return Container(
+                //                        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                //                         child: CircularProgressIndicator(
+                //                             value: downloadProgress.progress));
+                //                   },
+                //     errorWidget: (context, url, error) => Container(
+                //         alignment: Alignment.center,
+                //         child: Icon(Icons.error,color: AppColors.redColor,)),
+                //   ),
               ),
             ),
           ),
+           GestureDetector(
+             onTap: () {
+               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
+             },
+             child: Padding(
+               padding: const EdgeInsets.only(bottom: 40),
+               child: Align(
+                 alignment: Alignment.bottomCenter,
+                 child: Visibility(
+                  visible: showTapHereButton,
+                    child: Card(
+                      color: AppColors.primaryColor,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(10)
+                            ),
+                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                            child: const Text("Tap to proceed!",style: TextStyle(fontWeight: FontWeight.normal,fontSize: AppConstants.headingFontSize),))),
+          ),
+               ),
+             ),
+           ),
           GestureDetector(
             onTap: () {
               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
@@ -352,7 +354,7 @@ class _TreeScreenState extends State<TreeScreen> with SingleTickerProviderStateM
             child: Align(
               alignment: Alignment.topCenter,
               child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding:const EdgeInsets.symmetric(horizontal: 10),
                   margin:const EdgeInsets.only(top: 20),
                   child: Text(element.toString(),style:const TextStyle(fontSize: AppConstants.defaultFontSize),textAlign: TextAlign.center,)),
             ),

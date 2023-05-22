@@ -14,11 +14,11 @@ class AnswerRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['question_id'] = this.questionId;
-    data['user_id'] = this.userId;
-    data['options'] = this.options;
-    data['text'] = this.text;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['question_id'] = questionId;
+    data['user_id'] = userId;
+    data['options'] = options;
+    data['text'] = text;
     return data;
   }
 }

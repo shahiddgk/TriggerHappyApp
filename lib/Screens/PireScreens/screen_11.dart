@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/AuthScreens/change_password.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_5.dart';
@@ -12,15 +11,19 @@ import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_mo
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../AuthScreens/login_screen.dart';
 
+// ignore: must_be_immutable
 class Screen11 extends StatefulWidget {
   List<QuestionListResponseModel> questionListResponse;
 
   Screen11(this.questionListResponse,{Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen11State createState() => _Screen11State();
 }
 
@@ -36,7 +39,7 @@ class _Screen11State extends State<Screen11> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   void startTimer() {
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(
       oneSec,
           (Timer timer) {
@@ -65,10 +68,10 @@ class _Screen11State extends State<Screen11> {
     setState(() {
       _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      name = _sharedPreferences.getString("username")!;
-      id = _sharedPreferences.getString("userid")!;
+      name = sharedPreferences.getString("username")!;
+      id = sharedPreferences.getString("userid")!;
       _isUserDataLoading = false;
     });
 
@@ -93,9 +96,9 @@ class _Screen11State extends State<Screen11> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const ChangePassword()));
           }, icon: const Icon(Icons.person,color: AppColors.textWhiteColor,)),
           IconButton(onPressed: () async {
-            SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
             setState(() {
-              _sharedPreferences.setBool("user_logged_in",false);
+              sharedPreferences.setBool("user_logged_in",false);
               googleSignIn.signOut();
             });
             // ignore: use_build_context_synchronously
@@ -124,7 +127,7 @@ class _Screen11State extends State<Screen11> {
                 context: context,
                 fullWidth: true,
                 alignment: Alignment.topCenter,
-                duration: Duration(seconds: 3),
+                duration: const Duration(seconds: 3),
                 backgroundColor: Colors.red
             );
           }
@@ -133,7 +136,7 @@ class _Screen11State extends State<Screen11> {
         },true)
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,
@@ -146,11 +149,23 @@ class _Screen11State extends State<Screen11> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  LogoScreen(),
+                  LogoScreen("PIRE"),
 
                   Align(
                       alignment: Alignment.topLeft,
-                      child: QuestionTextWidget(widget.questionListResponse[8].title)),
+                      child: QuestionTextWidget(widget.questionListResponse[8].title,widget.questionListResponse[8].videoUrl,(){
+                        String urlQ1 = "https://youtu.be/T4-coEpZvgY";
+                        String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
+                        YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                            initialVideoId: videoId!,
+                            flags: const YoutubePlayerFlags(
+                              autoPlay: false,
+                              controlsVisibleAtStart: false,
+                            )
+
+                        );
+                        videoPopupDialog(context, "Introduction to question#11", youtubePlayerController);
+                      },true)),
 
                   Container(
                     height: MediaQuery.of(context).size.height/2,

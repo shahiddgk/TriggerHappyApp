@@ -6,7 +6,7 @@ class QuestionStatePrefrence {
   late SharedPreferences _sharedPreferences;
 
   setAnswerText(String idKey,String idValue,String textKey,List<String> textValue,String typeKey,String typeValue) async {
-    print("Submission called Successfully");
+    // print("Submission called Successfully");
     _sharedPreferences = await SharedPreferences.getInstance();
     _sharedPreferences.setString(idKey, idValue);
     _sharedPreferences.setString(typeKey,typeValue);
@@ -16,7 +16,7 @@ class QuestionStatePrefrence {
   clearAnswerText() async {
     _sharedPreferences = await SharedPreferences.getInstance();
 
-      print("Clearing data of answers");
+      // print("Clearing data of answers");
       _sharedPreferences.remove(PireConstants.questionOneText);
       _sharedPreferences.remove(PireConstants.questionOneId);
       _sharedPreferences.remove(PireConstants.questionOneType);

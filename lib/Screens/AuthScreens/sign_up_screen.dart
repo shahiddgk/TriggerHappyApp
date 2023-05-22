@@ -6,7 +6,6 @@ import 'package:flutter_quiz_app/Widgets/circular_button_widget.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/email_field.dart';
 import 'package:flutter_quiz_app/Widgets/username_field_widget.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import '../../Widgets/password_field_widget.dart';
 
@@ -14,14 +13,15 @@ class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPageState createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class _SignUpPageState extends State<SignUpPage> {
         color: AppColors.backgroundColor,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 60),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -72,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
       _passwordController.text == "";
       showToastMessage(context, "User registered successfully",true);
 
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>Screen3()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Screen3()));
     }
   }
 }

@@ -1,4 +1,6 @@
 
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
@@ -24,10 +26,9 @@ class ChangePassword extends StatefulWidget {
 class _ChangePasswordState extends State<ChangePassword> {
 
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _currentPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  bool _isLogin = true;
   late LoginResponseModel loginResponseModel;
   bool _isUserDataLoading = false;
   bool isLoading = false;
@@ -82,7 +83,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         color: AppColors.backgroundColor,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 60),
         child: Stack(
           children: [
             Form(
@@ -93,10 +94,10 @@ class _ChangePasswordState extends State<ChangePassword> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    LogoScreen(),
+                    LogoScreen(""),
 
                     Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: const EdgeInsets.only(top: 10),
                       padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       decoration: BoxDecoration(
                           color: AppColors.hoverColor,
@@ -149,10 +150,10 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   Future<void> _changePassword(String currentPass,String newPass) async {
 
-    print("ChangePassword");
-    print(currentPass);
-    print(newPass);
-    print(authId);
+    // print("ChangePassword");
+    // print(currentPass);
+    // print(newPass);
+    // print(authId);
 
     if(_formKey.currentState!.validate()) {
       if(_currentPasswordController.text == _newPasswordController.text){
@@ -170,8 +171,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                     ? currentPass
                     : "", newPassword: newPass, userId: id, authId: authId))
             .then((value) async {
-          print("ChangePasswordResponse");
-          print(value);
+          // print("ChangePasswordResponse");
+          // print(value);
 
           setState(() {
             _currentPasswordController.text == "";

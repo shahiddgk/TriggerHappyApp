@@ -1,52 +1,50 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/AuthScreens/login_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_8.dart';
-import 'package:flutter_quiz_app/Screens/AuthScreens/settings_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/constants.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 
 
+// ignore: must_be_immutable
 class Screen7 extends StatefulWidget {
    Screen7(this.questionListResponse,{Key? key}) : super(key: key);
 
   List<QuestionListResponseModel> questionListResponse;
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen7State createState() => _Screen7State();
 }
 
 class _Screen7State extends State<Screen7> {
 
   List <String> selectedAnswer = [];
-  String _groupValue ="";
+  // ignore: unused_field
+  final String _groupValue ="";
 
   String name = "";
   String id = "";
   String answerNo5 = "";
   String answerText5 = "";
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool _isDataLoading = true;
   bool isAnswerLoading = false;
   List answersList = [];
-  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   String a1 = "0";
   String email = "";
@@ -58,14 +56,14 @@ class _Screen7State extends State<Screen7> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    //print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -83,7 +81,7 @@ class _Screen7State extends State<Screen7> {
     }
     // setState(() {
     //   answersList.sort((a, b)=>a['answer'].compareTo(b['answer']));
-      print(answersList);
+    //   print(answersList);
       _isDataLoading = false;
     //});
   }
@@ -97,22 +95,10 @@ class _Screen7State extends State<Screen7> {
     setListOptions();
   }
 
-  _getAnswerData() async {
-    setState(() {
-      _isAnswerDataLoading = true;
-    });
-    _sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      answerNo5 = _sharedPreferences.getString("answerType7")!;
-      answerText5 = _sharedPreferences.getString("answerText7")!;
-      _isAnswerDataLoading = false;
-    });
-
-  }
 
   setAnswerText() async {
 
-    print("Calling question Submission");
+    //print("Calling question Submission");
     QuestionStatePrefrence().setAnswerText(
         PireConstants.questionFiveId, widget.questionListResponse[4].id.toString(),
         PireConstants.questionFiveText, selectedAnswer,
@@ -173,10 +159,10 @@ class _Screen7State extends State<Screen7> {
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -188,13 +174,25 @@ class _Screen7State extends State<Screen7> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      LogoScreen(),
+                      LogoScreen("PIRE"),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                            padding: EdgeInsets.only(top: 1),
+                            padding: const EdgeInsets.only(top: 1),
                             width: MediaQuery.of(context).size.width,
-                            child: QuestionTextWidget(widget.questionListResponse[4].title)),
+                            child: QuestionTextWidget(widget.questionListResponse[4].title,widget.questionListResponse[4].videoUrl,(){
+                              String urlQ7 = "https://www.youtube.com/watch?v=s59egGceFMA";
+                              String? videoId = YoutubePlayer.convertUrlToId(urlQ7);
+                              YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                  initialVideoId: videoId!,
+                                  flags: const YoutubePlayerFlags(
+                                    autoPlay: false,
+                                    controlsVisibleAtStart: false,
+                                  )
+
+                              );
+                              videoPopupDialog(context, "Introduction to question#7", youtubePlayerController);
+                            },true)),
                       ),
                       // Align(
                       //   alignment: Alignment.topLeft,
@@ -210,7 +208,7 @@ class _Screen7State extends State<Screen7> {
                         margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height,top: 5),
                         child: GridView.count(
                           padding: EdgeInsets.only(bottom:MediaQuery.of(context).size.height/13,left: 10,right: 10),
-                          crossAxisCount: !isPhone ? 3 : 2,
+                          crossAxisCount: !isPhone ? 5 : 2,
                           crossAxisSpacing: 4.0,
                           mainAxisSpacing: 2.0,
                           childAspectRatio: itemHeight/itemWidth,
@@ -219,8 +217,8 @@ class _Screen7State extends State<Screen7> {
                           children: List.generate(answersList.length, (index) {
                             return GestureDetector(
                               onTap: () {
-                                print("item Clicked");
-                                print(a1);
+                                // print("item Clicked");
+                                // print(a1);
 
                                 if(answersList[index]["selected"] == "0") {
 
@@ -291,9 +289,9 @@ class _Screen7State extends State<Screen7> {
                                     alignment: Alignment.center,
                                     height: 20,
                                     width: 20,
-                                    child:answersList[index]["selected"] == "0" ? Text("") : Text(answersList[index]["selected"],style: TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold,fontSize: AppConstants.defaultFontSize)),
+                                    child:answersList[index]["selected"] == "0" ? const Text("") : Text(answersList[index]["selected"],style: const TextStyle(color: AppColors.textWhiteColor,fontWeight: FontWeight.bold,fontSize: AppConstants.defaultFontSize)),
                                   ),
-                                  Text(answersList[index]['answer'],style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
+                                  Text(answersList[index]['answer'],style: const TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
                                 ],
                               ))),
                             );
@@ -318,7 +316,7 @@ class _Screen7State extends State<Screen7> {
 
   void addAnswersToList(answerSelect) {
     selectedAnswer.add(answerSelect);
-    print(selectedAnswer);
+   // print(selectedAnswer);
   }
 
   void removeAnswerFromList(answerSelect) {
@@ -328,13 +326,13 @@ class _Screen7State extends State<Screen7> {
           selectedAnswer.removeAt(i);
         }
       }
-      print(selectedAnswer);
+     // print(selectedAnswer);
     }
   }
 
   void _submitAnswer() {
 
-    print(selectedAnswer);
+  //  print(selectedAnswer);
 
     if(selectedAnswer.isNotEmpty) {
       // if(selectedAnswer.length<3) {

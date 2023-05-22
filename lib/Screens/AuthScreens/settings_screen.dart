@@ -1,5 +1,4 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/Posts/post_reminders.dart';
@@ -12,7 +11,6 @@ import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/login_response_model.dart';
 import 'package:flutter_quiz_app/model/request_model/user_email_response_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -23,18 +21,18 @@ import 'change_password.dart';
 import 'edit_profile.dart';
 import 'login_screen.dart';
 
+// ignore: must_be_immutable
 class Settings extends StatefulWidget {
   Settings(this.type,{Key? key}) : super(key: key);
   String type;
   @override
+  // ignore: library_private_types_in_public_api
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
 
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _currentPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
   final GoogleSignIn googleSignIn = GoogleSignIn();
   bool isStatusLoading = false;
   bool status = false;
@@ -61,9 +59,9 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      authId = _sharedPreferences.getString("authId")!;
+      authId = sharedPreferences.getString("authId")!;
       _isUserDataLoading = false;
     });
 
@@ -72,13 +70,13 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      name = _sharedPreferences.getString(UserConstants().userName)!;
-      id = _sharedPreferences.getString(UserConstants().userId)!;
-      email = _sharedPreferences.getString(UserConstants().userEmail)!;
-      timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-      allowEmail = _sharedPreferences.getString(UserConstants().allowEmail)!;
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
       setState(() {
         if(allowEmail == "yes") {
           status = true;
@@ -116,7 +114,7 @@ class _SettingsState extends State<Settings> {
         color: AppColors.backgroundColor,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 60),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -125,10 +123,10 @@ class _SettingsState extends State<Settings> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                LogoScreen(),
+                LogoScreen(""),
 
                 Container(
-                  margin: EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: 10),
                   padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                   decoration: BoxDecoration(
                       color: AppColors.hoverColor,
@@ -201,18 +199,21 @@ class _SettingsState extends State<Settings> {
                                        child: Text("Would you prefer to receive response via email?",style: TextStyle(fontSize: AppConstants.defaultFontSize),)),
                                     Expanded(
                                       flex: 1,
-                                      child: FlutterSwitch(
-                                        activeColor: AppColors.primaryColor,
-                                        value: status,
-                                        borderRadius: 30.0,
-                                        padding: 8.0,
-                                        showOnOff: true,
-                                        onToggle: (val) {
-                                          setState(() {
-                                            setEmailResponse(id,val);
-                                            status = val;
-                                          });
-                                        },
+                                      child: MediaQuery(
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                        child: FlutterSwitch(
+                                          activeColor: AppColors.primaryColor,
+                                          value: status,
+                                          borderRadius: 30.0,
+                                          padding: 8.0,
+                                          showOnOff: true,
+                                          onToggle: (val) {
+                                            setState(() {
+                                              setEmailResponse(id,val);
+                                              status = val;
+                                            });
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -333,8 +334,8 @@ class _SettingsState extends State<Settings> {
       }
     });
 
-    print(id);
-    print(selectedStatus);
+    // print(id);
+    // print(selectedStatus);
     HTTPManager().userEmailResponse(UserEmailResponseRequestModel(userId: id,status: selectedStatus)).then((value) {
       setState(() {
         isStatusLoading = false;
@@ -349,6 +350,7 @@ class _SettingsState extends State<Settings> {
           selectedStatus!);
       showToastMessage(context, "Status updated successfully", true);
     }).catchError((e) {
+      // ignore: avoid_print
       print(e);
       setState(() {
         isStatusLoading = false;

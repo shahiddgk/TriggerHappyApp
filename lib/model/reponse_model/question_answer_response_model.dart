@@ -1,6 +1,7 @@
 class QuestionListResponseModel {
   String? id;
   String? title;
+  String? videoUrl;
   String? subTitle;
   String? textLength;
   List options = [];
@@ -8,11 +9,12 @@ class QuestionListResponseModel {
   String? createdAt;
 
   QuestionListResponseModel(
-      {this.id, this.title, this.subTitle,this.textLength, required this.options, this.responseType, this.createdAt});
+      {this.id, this.title, this.videoUrl,this.subTitle,this.textLength, required this.options, this.responseType, this.createdAt});
 
   QuestionListResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
+    videoUrl = json['video_url'];
     subTitle = json['sub_title'] ?? "";
     textLength = json['text_length'];
     options = json['options'] ?? [];
@@ -21,14 +23,15 @@ class QuestionListResponseModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['title'] = this.title;
-    data['sub_title'] = this.subTitle;
-    data['text_length'] = this.textLength;
-    data['options'] = this.options;
-    data['response_type'] = this.responseType;
-    data['created_at'] = this.createdAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['video_url'] = videoUrl;
+    data['sub_title'] = subTitle;
+    data['text_length'] = textLength;
+    data['options'] = options;
+    data['response_type'] = responseType;
+    data['created_at'] = createdAt;
     return data;
   }
 }

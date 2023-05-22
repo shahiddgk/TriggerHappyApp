@@ -7,7 +7,7 @@ class UserStatePrefrence {
   late SharedPreferences _sharedPreferences;
 
   setAnswerText(bool isLoggedIn,String userType,String userName,String userEmail,String userId,String userTimezone,String allowEmail) async {
-    print("Submission called Successfully");
+    // print("Submission called Successfully");
     _sharedPreferences = await SharedPreferences.getInstance();
 
     _sharedPreferences.setBool(UserConstants().userLoggedIn, isLoggedIn);
@@ -30,6 +30,17 @@ class UserStatePrefrence {
     _sharedPreferences.remove(UserConstants().userId);
     _sharedPreferences.remove(UserConstants().timeZone);
     _sharedPreferences.remove(UserConstants().allowEmail);
+
+    _sharedPreferences.remove(TrellisScreenStatus().needsExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().purposeExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().ladderExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().needsExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().identityExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().oPExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().rhythmsExpended);
+    _sharedPreferences.remove(TrellisScreenStatus().tribeExpended);
+
+
   }
 
 }

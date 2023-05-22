@@ -45,7 +45,7 @@ class _GardenScreenState extends State<GardenScreen> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
+    // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     name = sharedPreferences.getString(UserConstants().userName)!;
@@ -90,27 +90,28 @@ class _GardenScreenState extends State<GardenScreen> {
         ],
       ),
       body: Container(
+        alignment: Alignment.topCenter,
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LogoScreen(),
-              // Align(
-              //   alignment: Alignment.topLeft,
-              //   child: Container(
-              //       padding: EdgeInsets.only(top: 1),
-              //       width: MediaQuery.of(context).size.width,
-              //       child: QuestionTextWidget(widget.questionListResponse[4].subTitle)),
-              // ),
+        child: Column(
+          children: [
+            LogoScreen("Garden"),
+            // Align(
+            //   alignment: Alignment.topLeft,
+            //   child: Container(
+            //       padding: EdgeInsets.only(top: 1),
+            //       width: MediaQuery.of(context).size.width,
+            //       child: QuestionTextWidget(widget.questionListResponse[4].subTitle)),
+            // ),
 
-              Container(
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                alignment: Alignment.topCenter,
                 margin: EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height/1.28,
+                height: MediaQuery.of(context).size.height/1.34,
                 width: MediaQuery.of(context).size.width,
                 child: GridView.count(
                     padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
@@ -142,16 +143,16 @@ class _GardenScreenState extends State<GardenScreen> {
                             const Card(
                               color: AppColors.primaryColor,
                               child: Center(
-                                child: Text("PIRE",style: TextStyle(fontSize: 22),),
+                                child: Text("Current",style: TextStyle(fontSize: 22),),
                               ),
                             )
                         ),
                       ),
                     ]
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

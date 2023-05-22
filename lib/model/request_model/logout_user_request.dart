@@ -8,8 +8,8 @@ class LogoutRequestModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_id'] = this.userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_id'] = userId;
     return data;
   }
 }

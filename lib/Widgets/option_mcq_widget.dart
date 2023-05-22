@@ -14,7 +14,7 @@ class _OptionMcqAnswerState extends State<OptionMcqAnswer> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-        margin: EdgeInsets.symmetric(vertical: 5,),
+        margin: EdgeInsets.symmetric(vertical: 7,),
         decoration: BoxDecoration(
             border: Border.all(color: AppColors.primaryColor,width: 2),
             borderRadius: BorderRadius.circular(8)

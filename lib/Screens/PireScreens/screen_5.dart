@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_15.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_6.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/answer_field_widget.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
@@ -14,10 +13,12 @@ import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../AuthScreens/login_screen.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../utill/userConstants.dart';
 
+// ignore: must_be_immutable
 class Screen5 extends StatefulWidget {
    Screen5(this.questionListResponse,this.index,this.screen,{Key? key}) : super(key: key);
 
@@ -27,12 +28,13 @@ class Screen5 extends StatefulWidget {
    List<QuestionListResponseModel> questionListResponse;
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen5State createState() => _Screen5State();
 }
 
 class _Screen5State extends State<Screen5> {
 
-  TextEditingController _fieldController = TextEditingController();
+  final TextEditingController _fieldController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String name = "";
@@ -40,12 +42,14 @@ class _Screen5State extends State<Screen5> {
   String answerNo3 = "";
   String answerText3 = "";
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool isAnswerLoading = false;
   List <String> selectedAnswer = [];
   late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
+  String urlQ3 = "https://www.youtube.com/watch?v=0sqBsbiVjUQ";
+  String urlQ11 = "https://youtu.be/T4-coEpZvgY";
+  String urlQ12 = "https://youtu.be/-0ajZdKJWsw";
 
   @override
   void initState() {
@@ -55,28 +59,27 @@ class _Screen5State extends State<Screen5> {
     super.initState();
   }
 
+  // ignore: unused_element
   _getAnswerData() async {
     setState(() {
-      _isAnswerDataLoading = true;
     });
     _sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       answerNo3 = _sharedPreferences.getString("answerType${widget.index}")!;
       answerText3 = _sharedPreferences.getString("answerText${widget.index}")!;
-      _isAnswerDataLoading = false;
     });
 
   }
 
   setAnswerText() async {
-    print("Screen Data");
-    print(widget.screen);
-    print(widget.index);
+    // print("Screen Data");
+    // print(widget.screen);
+    // print(widget.index);
     _sharedPreferences = await SharedPreferences.getInstance();
 
     if(widget.screen == 6) {
 
-      print("Calling question Submission");
+     // print("Calling question Submission");
       QuestionStatePrefrence().setAnswerText(
           PireConstants.questionThreeId, widget.questionListResponse[widget.index].id.toString(),
           PireConstants.questionThreeText, selectedAnswer,
@@ -85,7 +88,7 @@ class _Screen5State extends State<Screen5> {
 
     } else if(widget.screen == 12) {
 
-      print("Calling question Submission");
+    //  print("Calling question Submission");
       QuestionStatePrefrence().setAnswerText(
           PireConstants.questionEightId, widget.questionListResponse[widget.index].id.toString(),
           PireConstants.questionEightText, selectedAnswer,
@@ -94,7 +97,7 @@ class _Screen5State extends State<Screen5> {
 
     } else if(widget.screen == 13) {
 
-      print("Calling question Submission");
+     // print("Calling question Submission");
       QuestionStatePrefrence().setAnswerText(
           PireConstants.questionNineId, widget.questionListResponse[widget.index].id.toString(),
           PireConstants.questionNineText, selectedAnswer,
@@ -116,14 +119,14 @@ class _Screen5State extends State<Screen5> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+   // print("Data getting called");
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -152,7 +155,7 @@ class _Screen5State extends State<Screen5> {
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           color: AppColors.backgroundColor,
@@ -170,10 +173,21 @@ class _Screen5State extends State<Screen5> {
                      mainAxisAlignment: MainAxisAlignment.start,
                      crossAxisAlignment: CrossAxisAlignment.center,
                      children: [
-                       LogoScreen(),
+                       LogoScreen("PIRE"),
                        Align(
                            alignment: Alignment.topLeft,
-                           child: QuestionTextWidget(widget.questionListResponse[widget.index].title)),
+                           child: QuestionTextWidget(widget.questionListResponse[widget.index].title,widget.questionListResponse[widget.index].videoUrl,(){
+                             String? videoId = YoutubePlayer.convertUrlToId(widget.screen == 6 ? urlQ3 : widget.screen == 12 ? urlQ11 : urlQ12);
+                             YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                                 initialVideoId: videoId!,
+                                 flags: const YoutubePlayerFlags(
+                                   autoPlay: false,
+                                   controlsVisibleAtStart: false,
+                                 )
+
+                             );
+                             videoPopupDialog(context, "Introduction to question#2", youtubePlayerController);
+                           },true)),
                        AnswerFieldWidget(_fieldController,int.parse(widget.questionListResponse[widget.index].textLength.toString())),
                      ],
                    ),
@@ -205,11 +219,11 @@ class _Screen5State extends State<Screen5> {
               MaterialPageRoute(builder: (context) => Screen6(widget.questionListResponse)));
         } else if(widget.screen == 12) {
 
-          print(widget.screen);
+          //print(widget.screen);
           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Screen5(widget.questionListResponse,9,13)));
         } else if(widget.screen ==13) {
 
-          print(widget.screen);
+         // print(widget.screen);
           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Screen15(widget.questionListResponse)));
         }
 

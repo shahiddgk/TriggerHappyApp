@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/email_field.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/model/request_model/forgot_password_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import '../../Widgets/constants.dart';
 import '../Widgets/toast_message.dart';
@@ -14,11 +13,12 @@ class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  TextEditingController _emailController = new TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
@@ -26,20 +26,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Forgot Password"),
+        title: const Text("Forgot Password"),
       ),
       body: Stack(
         alignment: Alignment.center,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 100),
+            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 100),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  LogoScreen(),
+                  LogoScreen(""),
                   const  SizedBox(
                     height: 30,
                   ),

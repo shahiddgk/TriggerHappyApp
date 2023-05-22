@@ -7,15 +7,15 @@ class SocialLoginResponse {
   SocialLoginResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     userSession = json['user_session'] != null
-        ? new UserSession.fromJson(json['user_session'])
+        ? UserSession.fromJson(json['user_session'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['message'] = this.message;
-    if (this.userSession != null) {
-      data['user_session'] = this.userSession!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['message'] = message;
+    if (userSession != null) {
+      data['user_session'] = userSession!.toJson();
     }
     return data;
   }
@@ -47,13 +47,13 @@ class UserSession {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_logged_in'] = this.userLoggedIn;
-    data['usertype'] = this.usertype;
-    data['username'] = this.username;
-    data['useremail'] = this.useremail;
-    data['authID'] = this.authID;
-    data['userid'] = this.userid;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_logged_in'] = userLoggedIn;
+    data['usertype'] = usertype;
+    data['username'] = username;
+    data['useremail'] = useremail;
+    data['authID'] = authID;
+    data['userid'] = userid;
     return data;
   }
 }

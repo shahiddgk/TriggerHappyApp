@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/TreeScreen/tree_screen.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Screens/AuthScreens/login_screen.dart';
-import 'Screens/PireScreens/widgets/AppBar.dart';
-import 'Screens/dashboard_tiles.dart';
 import 'Screens/utill/userConstants.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -3,17 +3,17 @@ import 'package:flutter_quiz_app/Screens/PireScreens/screen_5.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/constants.dart';
 import '../../Widgets/option_mcq_widget.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
 import '../AuthScreens/login_screen.dart';
 import '../Widgets/toast_message.dart';
@@ -42,7 +42,7 @@ class _Screen4State extends State<Screen4> {
   List <String> selectedAnswer = [];
   late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-
+  String urlQ2 = "https://youtu.be/r94TTmxEVd4";
   @override
   void initState() {
     _getUserData();
@@ -82,7 +82,7 @@ class _Screen4State extends State<Screen4> {
     setState(() {
       _isUserDataLoading = true;
     });
-    print("Data getting called");
+    // print("Data getting called");
     SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
 
     name = _sharedPreferences.getString(UserConstants().userName)!;
@@ -136,10 +136,21 @@ class _Screen4State extends State<Screen4> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    LogoScreen(),
+                    LogoScreen("PIRE"),
                     Align(
                         alignment: Alignment.topLeft,
-                        child: QuestionTextWidget(widget.questionListResponse[1].title)),
+                        child: QuestionTextWidget(widget.questionListResponse[1].title,widget.questionListResponse[1].videoUrl,(){
+                          String? videoId = YoutubePlayer.convertUrlToId(urlQ2);
+                          YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+                              initialVideoId: videoId!,
+                              flags: const YoutubePlayerFlags(
+                                autoPlay: false,
+                                controlsVisibleAtStart: false,
+                              )
+
+                          );
+                          videoPopupDialog(context, "Introduction to question#2", youtubePlayerController);
+                        },true)),
                     ListView.builder(
                         physics:const NeverScrollableScrollPhysics(),
                         scrollDirection: Axis.vertical,
@@ -178,7 +189,7 @@ class _Screen4State extends State<Screen4> {
   }
 
   void _submitAnswer() {
-    print(selectedAnswer);
+    //print(selectedAnswer);
 
 
      if(selectedAnswer.isNotEmpty) {

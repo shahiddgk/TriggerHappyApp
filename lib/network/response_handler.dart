@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import 'app_exceptions.dart';
 
+// ignore: non_constant_identifier_names
 String MESSAGE_KEY = 'message';
 
 class ResponseHandler {
@@ -18,12 +18,14 @@ class ResponseHandler {
 
   Future post(
       Uri url, Map<String, dynamic> params,) async {
-    var head = Map<String, String>();
+    var head = <String, String>{};
     head['content-type'] = 'application/x-www-form-urlencoded';
+    // ignore: prefer_typing_uninitialized_variables
     var responseJson;
     try {
-      final response = await http.post(url, body: params, headers: head).timeout(Duration(seconds: 45));
+      final response = await http.post(url, body: params, headers: head).timeout(const Duration(seconds: 45));
       responseJson = json.decode(response.body.toString());
+      // ignore: avoid_print
       print(responseJson);
       if(responseJson['status']!= 200) throw FetchDataException(responseJson['message'].toString());
       return responseJson;
@@ -65,12 +67,14 @@ class ResponseHandler {
   // }
 
   Future get(Uri url, bool isHeaderRequired) async {
-    var head = Map<String, String>();
+    var head = <String, String>{};
     head['content-type'] = 'application/json; charset=utf-8';
+    // ignore: prefer_typing_uninitialized_variables
     var responseJson;
     try {
-      final response = await http.get(url, headers: head).timeout(Duration(seconds: 45));
+      final response = await http.get(url, headers: head).timeout(const Duration(seconds: 45));
       responseJson = json.decode(response.body.toString());
+      // ignore: avoid_print
       print(responseJson);
       if(responseJson['status']!= 200) throw FetchDataException(responseJson['message'].toString());
       return responseJson;
