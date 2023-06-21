@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,7 +9,6 @@ import '../../Widgets/colors.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../PireScreens/widgets/AppBar.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
-import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 import 'history_screen.dart';
 import 'image_screen.dart';
@@ -25,12 +25,10 @@ class _GardenScreenState extends State<GardenScreen> {
   String name = "";
   String id = "";
   bool _isUserDataLoading = true;
-  late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   String email = "";
   String timeZone = "";
   String userType = "";
-  late bool _isLoading;
   late bool isPhone;
   late String score;
 
@@ -61,7 +59,6 @@ class _GardenScreenState extends State<GardenScreen> {
 
   getScreenDetails() {
     setState(() {
-      _isLoading = true;
     });
     if(MediaQuery.of(context).size.width<= 500) {
       isPhone = true;
@@ -69,7 +66,6 @@ class _GardenScreenState extends State<GardenScreen> {
       isPhone = false;
     }
     setState(() {
-      _isLoading = false;
     });
   }
 
@@ -82,7 +78,7 @@ class _GardenScreenState extends State<GardenScreen> {
     final double itemWidth = size.width / 2;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,true,"","",false) : AppBar(
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
         centerTitle: true,
         title: Text(name),
         actions:  [
@@ -94,7 +90,7 @@ class _GardenScreenState extends State<GardenScreen> {
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
         child: Column(
           children: [
             LogoScreen("Garden"),
@@ -110,11 +106,11 @@ class _GardenScreenState extends State<GardenScreen> {
               alignment: Alignment.topCenter,
               child: Container(
                 alignment: Alignment.topCenter,
-                margin: EdgeInsets.only(top: 10),
+                margin: const EdgeInsets.only(top: 10),
                 height: MediaQuery.of(context).size.height/1.34,
                 width: MediaQuery.of(context).size.width,
                 child: GridView.count(
-                    padding: EdgeInsets.symmetric(vertical:10,horizontal: 10),
+                    padding: const EdgeInsets.symmetric(vertical:10,horizontal: 10),
                     crossAxisCount:!isPhone ? 3 : 2,
                     crossAxisSpacing: 4.0,
                     mainAxisSpacing: 2.0,

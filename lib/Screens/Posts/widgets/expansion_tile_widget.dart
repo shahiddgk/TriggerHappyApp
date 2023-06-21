@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:load_switch/load_switch.dart';
 
 import '../../../Widgets/colors.dart';
-import '../../../Widgets/option_mcq_widget.dart';
 
 // ignore: must_be_immutable
 class ExpansionTileWidget extends StatelessWidget {

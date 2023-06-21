@@ -1,24 +1,23 @@
+// ignore_for_file: file_names, unused_local_variable, unused_field
+
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_11.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_5.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/Widgets/two_buttons_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
-import '../AuthScreens/login_screen.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 
+// ignore: must_be_immutable
 class Screen10 extends StatefulWidget {
 
   List<QuestionListResponseModel> questionListResponse;
@@ -26,12 +25,11 @@ class Screen10 extends StatefulWidget {
    Screen10(this.questionListResponse,{Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen10State createState() => _Screen10State();
 }
 
 class _Screen10State extends State<Screen10> {
-  TextEditingController _fieldController = TextEditingController();
-  TextEditingController _fieldController1 = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String name = "";
@@ -44,7 +42,7 @@ class _Screen10State extends State<Screen10> {
   int _start = 30;
 
   void startTimer() {
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(
       oneSec,
           (Timer timer) {
@@ -77,14 +75,15 @@ class _Screen10State extends State<Screen10> {
     setState(() {
       _isUserDataLoading = true;
     });
+    // ignore: avoid_print
     print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -94,7 +93,7 @@ class _Screen10State extends State<Screen10> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //
@@ -117,7 +116,7 @@ class _Screen10State extends State<Screen10> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,
@@ -180,6 +179,7 @@ class _Screen10State extends State<Screen10> {
     );
   }
 
+  // ignore: unused_element
   void _submitAnswer(String text) {
     selectedAnswer.clear();
     if(_formKey.currentState!.validate()) {

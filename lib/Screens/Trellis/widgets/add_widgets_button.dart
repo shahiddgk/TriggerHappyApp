@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
+import 'package:flutter/material.dart';
 
 import '../../../Widgets/colors.dart';
 import '../../../Widgets/constants.dart';
+import '../../Payment/payment_screen.dart';
 
 // ignore: must_be_immutable
 class AddButton extends StatefulWidget {
@@ -19,7 +19,9 @@ class _AddButtonState extends State<AddButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        !widget.isAllow ? widget.onTap() : showToastMessage(context, "Please upadate your plane", false);
+        // ignore: avoid_print
+        print(widget.isAllow);
+        !widget.isAllow ? widget.onTap() : Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
       },
       child: Container(
         margin:const EdgeInsets.only(right: 10,bottom: 10),

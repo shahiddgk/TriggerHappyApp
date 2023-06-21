@@ -1,4 +1,6 @@
 
+// ignore_for_file: prefer_final_fields, library_private_types_in_public_api, must_be_immutable
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -16,7 +18,6 @@ class EmailField extends StatefulWidget {
 
 class _EmailFieldState extends State<EmailField> {
 
-  late String _errorMessage;
   @override
   Widget build(BuildContext context) {
     return TextFormField(

@@ -1,4 +1,5 @@
-import 'dart:convert';
+// ignore_for_file: avoid_print, duplicate_ignore
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,13 +20,13 @@ import 'package:flutter_quiz_app/model/request_model/tribe_data_saving_request.d
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/colors.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/trellis_principle_data_response.dart';
-import '../../model/request_model/trellis_ladder_request_model.dart';
 import '../../model/request_model/trellis_principles_request_model.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
@@ -47,6 +48,12 @@ class _TrellisScreenState extends State<TrellisScreen> {
   String email = "";
   String timeZone = "";
   String userType = "";
+
+  String userPremium = "";
+  String userPremiumType = "";
+  String userCustomerId = "";
+  String userSubscriptionId = "";
+
   bool _isLoading = true;
   bool _isDataLoading = false;
   late bool isPhone;
@@ -62,6 +69,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
   List <Trellis_principle_data_model_class> trellisPrinciplesData = [];
   List <Trellis_principle_data_model_class> trellisRhythmsData = [];
   List <dynamic> trellisTribeData = [];
+  // ignore: non_constant_identifier_names
   late Trellis_principle_data_model_class trellis_principle_data_model_class;
 
   String initialValueForType = "physical";
@@ -82,6 +90,14 @@ class _TrellisScreenState extends State<TrellisScreen> {
   bool isNeedsExpanded = false;
   bool isIdentityExpanded = false;
   bool isTribeExpanded = false;
+
+  int isLadderGoals = 2;
+  int isLadderAchievements = 2;
+  int isOPLength = 2;
+  int isRhythmsLength = 2;
+  int isNeedsLength = 2;
+  int isIdentityLength = 2;
+  int isTribeLength = 1;
 
   bool isMentorVisible = true;
   bool isPeerVisible = false;
@@ -163,6 +179,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
     timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
     userType = sharedPreferences.getString(UserConstants().userType)!;
 
+    userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+    userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
+    userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
+    userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
 
     setState(() {
       _isUserDataLoading = false;
@@ -216,8 +236,11 @@ class _TrellisScreenState extends State<TrellisScreen> {
   }
 
   setScreenStatus(String key,bool value) async {
+    // ignore: avoid_print
     print("Screen Status called");
+// ignore: avoid_print
     print(key);
+    // ignore: avoid_print
     print(value);
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -243,6 +266,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
   @override
   void initState() {
+    _getTrellisDetails();
     _getUserData();
     _getScreenStatus();
     _getScreenStatus2();
@@ -263,6 +287,33 @@ class _TrellisScreenState extends State<TrellisScreen> {
     }
   }
 
+  _getTrellisDetails() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    HTTPManager().getAppVersion().then((value)  async {
+      setState(() {
+         isLadderGoals = int.parse(value['goal'].toString());
+         isLadderAchievements = int.parse(value['achievements'].toString());
+         isOPLength = int.parse(value['principle'].toString());
+         isRhythmsLength = int.parse(value['rhythms'].toString());
+         isNeedsLength = int.parse(value['needs'].toString());
+         isIdentityLength = int.parse(value['identity'].toString());
+         isTribeLength = int.parse(value['tribe'].toString());
+
+        _isLoading = false;
+      });
+
+
+    }).catchError((e) {
+      // print(e);
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
   _getNeedsData() {
     setState(() {
       _isLoading = true;
@@ -271,22 +322,28 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
       trellisLadderDataForGoalsAchievements = value['data'];
       for(int i=0; i<trellisLadderDataForGoalsAchievements.length;i++) {
-        if (trellisLadderDataForGoalsAchievements[i]['type'].toString() == "goal") {
-          if(trellisLadderDataForGoalsAchievements[i]['option2'] == "Challenges") {
-            trellisLadderDataForGoalsChallenges.add(trellisLadderDataForGoalsAchievements[i]);
-          }else {
-            trellisLadderDataForGoals.add(
+        if(trellisLadderDataForGoalsAchievements[i]['favourite'] == "yes") {
+          if (trellisLadderDataForGoalsAchievements[i]['type'].toString() ==
+              "goal") {
+            if (trellisLadderDataForGoalsAchievements[i]['option2'] ==
+                "Challenges") {
+              trellisLadderDataForGoalsChallenges.add(
+                  trellisLadderDataForGoalsAchievements[i]);
+            } else {
+              trellisLadderDataForGoals.add(
+                  trellisLadderDataForGoalsAchievements[i]);
+            }
+          } else {
+            trellisLadderDataForAchievements.add(
                 trellisLadderDataForGoalsAchievements[i]);
           }
-
-          } else {
-          trellisLadderDataForAchievements.add(trellisLadderDataForGoalsAchievements[i]);
         }
 
       }
       setState(() {
         _isLoading = false;
       });
+      // ignore: avoid_print
       print("Ladder Data Load");
       // setState(() {
       //   _isLoading = false;
@@ -316,14 +373,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
           }
         }
       }
+      // ignore: avoid_print
       print("Identity Data");
+      // ignore: avoid_print
       print(trellisIdentityData);
+      // ignore: avoid_print
       print(trellisNeedsData);
 
       setState(() {
         _isLoading = false;
       });
     }).catchError((e) {
+      // ignore: avoid_print
       print(e.toString());
       showToastMessage(context, e.toString(), false);
       setState(() {
@@ -375,8 +436,11 @@ class _TrellisScreenState extends State<TrellisScreen> {
       setState(() {
         _isLoading = false;
       });
+      // ignore: avoid_print
       print(trellisTribeData);
+      // ignore: avoid_print
       print(value);
+      // ignore: avoid_print
       print("Trellis Tribe Data");
     }).catchError((e) {
 
@@ -412,7 +476,9 @@ class _TrellisScreenState extends State<TrellisScreen> {
       setState(() {
         _isLoading = false;
       });
+      // ignore: avoid_print
       print(trellisData);
+      // ignore: avoid_print
       print("Trellis Data");
     }).catchError((e) {
 
@@ -421,6 +487,39 @@ class _TrellisScreenState extends State<TrellisScreen> {
         _isLoading = false;
       });
     });
+  }
+
+  showDeletePopup(String type,String recordId,int index1,String goalsOrChallenges) {
+
+    showDialog(context: context,
+        builder: (context) {
+          return AlertDialog(
+            title:const Text('Confirm delete?'),
+            content:const SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Text("Are you sure you want to delete!"),
+            ),
+            actions: [
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('Yes'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _deleteRecord(type, recordId, index1,goalsOrChallenges);
+                  // Invoke the update now callback
+                  // onUpdateNowPressed(deviceType);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   Future<bool> _onWillPop() async {
@@ -500,7 +599,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                         },() {
                       String? videoId = YoutubePlayer.convertUrlToId(nameUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController1 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -508,7 +607,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to name",_playerController);
+                      videoPopupDialog(context,"Introduction to name",playerController1);
                      // bottomSheet(context,"Name","Names have meaning and power. Try searching the meanings of the names of the five closest people to you. You'll likely find that they live up to their meaning. Fill in your first and middle name in the name section, and write the meaning in the description. Your name can give clues about who you are and who you're meant to be.","");
                     },
                         <Widget>[
@@ -558,7 +657,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(purposeUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController2 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -566,7 +665,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to purpose",_playerController);
+                      videoPopupDialog(context,"Introduction to purpose",playerController2);
                      // bottomSheet(context,"Purpose","Define your purpose and keep it in focus daily for success. In the Purpose section, write a sentence about your life purpose. Review and tweak it daily until it feels right. Use exercises to help uncover your purpose. If unsure, write the first thing that comes to mind. Imagine your headstone for inspiration. Enjoy living out your purpose!","");
                     },
                         <Widget>[
@@ -608,7 +707,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(ladderUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController3 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -616,7 +715,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Ladder",_playerController);
+                      videoPopupDialog(context,"Introduction to Ladder",playerController3);
                      // bottomSheet(context,"Ladder","Use the Ladder exercise to take a historical view of your life. Divide events into past (Memories & Achievements) and future (Goals & Challenges). See patterns and direction in one linear path.","");
                     },
                         <Widget>[
@@ -630,7 +729,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  margin:const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                                  margin:const EdgeInsets.symmetric(horizontal: 10),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -652,72 +751,72 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                         ],
                                       ),
 
-                                      AddButton( trellisLadderDataForGoals.length>=2,(){
-
-                                        ladderBottomSheet(context,true,"Ladder","Goals/Challenges",
-                                            initialValueForType,itemsForType,
-                                            initialValueForGoals,itemsForGoals,
-                                                (){_setLadderGoalsData();},
-                                                (value) {
-                                                    setState(() {
-                                                      initialValueForGoals = value;
-                                                    });
-                                                },
-                                                (value) {
-                                                  setState(() {
-                                                    initialValueForType = value;
-                                                  });
-                                                },
-                                            dateForGController,
-                                            titleForGController,
-                                            descriptionForGController
-                                        //     <Widget>[
-                                        //   DropDownField(initialValueForType, itemsForType.map((item) {
-                                        //     return  DropdownMenuItem(
-                                        //       value: item.toString(),
-                                        //       child: Text(item.toString()),
-                                        //     );
-                                        //   }).toList(), (value) {
-                                        //     setState(() {
-                                        //       initialValueForType = value;
-                                        //     });
-                                        //   }),
-                                        //
-                                        //   DropDownField(initialValueForGoals, itemsForGoals.map((item) {
-                                        //     return  DropdownMenuItem(
-                                        //       value: item.toString(),
-                                        //       child: Text(item.toString()),
-                                        //     );
-                                        //   }).toList(), (value) {
-                                        //     setState(() {
-                                        //       initialValueForGoals = value;
-                                        //     });
-                                        //   }),
-                                        //
-                                        //   Visibility(
-                                        //       visible: initialValueForGoals != "Challenges",
-                                        //       child: DatePickerField(dateForGController,"Select date",true)),
-                                        //
-                                        //   Container(
-                                        //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                        //       child: NameField(titleForGController,"title",1,70,true)),
-                                        //   Container(
-                                        //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                        //       child: NameField(descriptionForGController,"description",4,70,true)),
-                                        //   SaveButtonWidgets( (){
-                                        //     _setLadderGoalsData();
-                                        //   }),
-                                        // ]
-                                        );
-
-                                      } ),
+                                      // AddButton( userPremium == "no" ? trellisLadderDataForGoals.length>= isLadderGoals :false,(){
+                                      //
+                                      //   ladderBottomSheet(context,true,"Ladder","Goals/Challenges",
+                                      //       initialValueForType,itemsForType,
+                                      //       initialValueForGoals,itemsForGoals,
+                                      //           (){_setLadderGoalsData();},
+                                      //           (value) {
+                                      //               setState(() {
+                                      //                 initialValueForGoals = value;
+                                      //               });
+                                      //           },
+                                      //           (value) {
+                                      //             setState(() {
+                                      //               initialValueForType = value;
+                                      //             });
+                                      //           },
+                                      //       dateForGController,
+                                      //       titleForGController,
+                                      //       descriptionForGController
+                                      //   //     <Widget>[
+                                      //   //   DropDownField(initialValueForType, itemsForType.map((item) {
+                                      //   //     return  DropdownMenuItem(
+                                      //   //       value: item.toString(),
+                                      //   //       child: Text(item.toString()),
+                                      //   //     );
+                                      //   //   }).toList(), (value) {
+                                      //   //     setState(() {
+                                      //   //       initialValueForType = value;
+                                      //   //     });
+                                      //   //   }),
+                                      //   //
+                                      //   //   DropDownField(initialValueForGoals, itemsForGoals.map((item) {
+                                      //   //     return  DropdownMenuItem(
+                                      //   //       value: item.toString(),
+                                      //   //       child: Text(item.toString()),
+                                      //   //     );
+                                      //   //   }).toList(), (value) {
+                                      //   //     setState(() {
+                                      //   //       initialValueForGoals = value;
+                                      //   //     });
+                                      //   //   }),
+                                      //   //
+                                      //   //   Visibility(
+                                      //   //       visible: initialValueForGoals != "Challenges",
+                                      //   //       child: DatePickerField(dateForGController,"Select date",true)),
+                                      //   //
+                                      //   //   Container(
+                                      //   //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
+                                      //   //       child: NameField(titleForGController,"title",1,70,true)),
+                                      //   //   Container(
+                                      //   //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
+                                      //   //       child: NameField(descriptionForGController,"description",4,70,true)),
+                                      //   //   SaveButtonWidgets( (){
+                                      //   //     _setLadderGoalsData();
+                                      //   //   }),
+                                      //   // ]
+                                      //   );
+                                      //
+                                      // } ),
 
                                     ],
                                   ),
                                 ),
 
                                 trellisLadderDataForGoals.isEmpty ? const Text("") : Container(
-                                  margin: const EdgeInsets.symmetric(vertical:5,horizontal: 10),
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   child: ListView.builder(
                                       shrinkWrap: true,
                                       itemCount: trellisLadderDataForGoals.length,
@@ -742,9 +841,16 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
                                                       Text("${trellisLadderDataForGoals[index]['option1']} | ${trellisLadderDataForGoals[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+
+                                                      Row(
+                                                        children: [
+                                                      trellisLadderDataForGoals[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                        _deleteRecord("goal", trellisLadderDataForGoals[index]['id'].toString(),index,trellisLadderDataForGoals[index]['option2']);
+                                                      showDeletePopup( "goal",trellisLadderDataForGoals[index]['id'].toString(),index,trellisLadderDataForGoals[index]['option2']);
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+                                                        ],
+                                                      )
+
                                                     ],
                                                   ),
                                                   // Align(alignment: Alignment.topRight,
@@ -763,10 +869,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                 ),
                               //  const Divider(),
                                 trellisLadderDataForGoalsChallenges.isEmpty ? const Text("") : Container(
-                                  margin: const EdgeInsets.symmetric(vertical:5,horizontal: 10),
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: trellisLadderDataForGoalsChallenges.length,
+                                      itemCount: trellisLadderDataForGoalsChallenges.length >= 3 ? 3 : trellisLadderDataForGoalsChallenges.length ,
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
                                           onTap: () {
@@ -788,9 +894,17 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
                                                       Text("${trellisLadderDataForGoalsChallenges[index]['option1']} | ${trellisLadderDataForGoalsChallenges[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
-                                                      IconButton(onPressed: () {
-                                                        _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index]['id'].toString(),index,trellisLadderDataForGoalsChallenges[index]['option2']);
-                                                      }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+
+                                                      Row(
+                                                        children: [
+                                                          trellisLadderDataForGoalsChallenges[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                          IconButton(onPressed: () {
+                                                            _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index]['id'].toString(),index,trellisLadderDataForGoalsChallenges[index]['option2']);
+                                                          }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+                                                        ],
+                                                      )
+
+
                                                     ],
                                                   ),
                                                   // Align(alignment: Alignment.topRight,
@@ -808,10 +922,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   ),
                                 ),
 
-                                const Divider(),
-
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                                  margin: const EdgeInsets.symmetric(horizontal: 10,),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -829,71 +941,71 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             onPressed: (){
                                               bottomSheet(context,"Memories/Achievements","Memories & Achievements are significant events that shape us. Memories are things that happened to us, while achievements are things we worked to accomplish. Convert goals to achievements once completed.","");
                                             },
-                                            icon:Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
+                                            icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
                                         ],
                                       ),
 
-                                      AddButton(trellisLadderDataForAchievements.length>=2,
-                                          () {
-                                            ladderBottomSheet(context,false,"Ladder","Memories/Achievements",
-                                                initialValueForMType,itemsForMType,
-                                                initialValueForMGoals,itemsForGoals,
-                                                    (){_setLadderMemoriesData();},
-                                                    (value) {
-                                                  setState(() {
-                                                    initialValueForMGoals = value;
-                                                  });
-                                                },
-                                                    (value) {
-                                                  setState(() {
-                                                    initialValueForMType = value;
-                                                  });
-                                                },
-                                                dateForMController,
-                                                titleForMController,
-                                                descriptionForMController
-                                            //     <Widget>[
-                                            //
-                                            //   DropDownField(initialValueForMType, itemsForMType.map((item) {
-                                            //     return  DropdownMenuItem(
-                                            //       value: item.toString(),
-                                            //       child: Text(item.toString()),
-                                            //     );
-                                            //   }).toList(), (value) {
-                                            //     setState(() {
-                                            //       initialValueForMType = value;
-                                            //     });
-                                            //   }),
-                                            //
-                                            //   DropDownField(initialValueForMGoals, itemsForGoals.map((item) {
-                                            //     return  DropdownMenuItem(
-                                            //       value: item.toString(),
-                                            //       child: Text(item.toString()),
-                                            //     );
-                                            //   }).toList(), (value) {
-                                            //     setState(() {
-                                            //       initialValueForMGoals = value;
-                                            //     });
-                                            //   }),
-                                            //
-                                            //   Visibility(
-                                            //       visible: initialValueForMGoals != "Challenges",
-                                            //       child: DatePickerField(dateForMController,"Select date",false)),
-                                            //
-                                            //   Container(
-                                            //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                            //       child: NameField(titleForMController,"title",1,70,true)),
-                                            //   Container(
-                                            //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                            //       child: NameField(descriptionForMController,"description",4,70,true)),
-                                            //   SaveButtonWidgets( (){
-                                            //     _setLadderMemoriesData();
-                                            //   }),
-                                            //
-                                            // ]
-                                            );
-                                          }
-                                      ),
+                                      // AddButton(userPremium == "no" ? trellisLadderDataForAchievements.length>=isLadderAchievements : false,
+                                      //     () {
+                                      //       ladderBottomSheet(context,false,"Ladder","Memories/Achievements",
+                                      //           initialValueForMType,itemsForMType,
+                                      //           initialValueForMGoals,itemsForGoals,
+                                      //               (){_setLadderMemoriesData();},
+                                      //               (value) {
+                                      //             setState(() {
+                                      //               initialValueForMGoals = value;
+                                      //             });
+                                      //           },
+                                      //               (value) {
+                                      //             setState(() {
+                                      //               initialValueForMType = value;
+                                      //             });
+                                      //           },
+                                      //           dateForMController,
+                                      //           titleForMController,
+                                      //           descriptionForMController
+                                      //       //     <Widget>[
+                                      //       //
+                                      //       //   DropDownField(initialValueForMType, itemsForMType.map((item) {
+                                      //       //     return  DropdownMenuItem(
+                                      //       //       value: item.toString(),
+                                      //       //       child: Text(item.toString()),
+                                      //       //     );
+                                      //       //   }).toList(), (value) {
+                                      //       //     setState(() {
+                                      //       //       initialValueForMType = value;
+                                      //       //     });
+                                      //       //   }),
+                                      //       //
+                                      //       //   DropDownField(initialValueForMGoals, itemsForGoals.map((item) {
+                                      //       //     return  DropdownMenuItem(
+                                      //       //       value: item.toString(),
+                                      //       //       child: Text(item.toString()),
+                                      //       //     );
+                                      //       //   }).toList(), (value) {
+                                      //       //     setState(() {
+                                      //       //       initialValueForMGoals = value;
+                                      //       //     });
+                                      //       //   }),
+                                      //       //
+                                      //       //   Visibility(
+                                      //       //       visible: initialValueForMGoals != "Challenges",
+                                      //       //       child: DatePickerField(dateForMController,"Select date",false)),
+                                      //       //
+                                      //       //   Container(
+                                      //       //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
+                                      //       //       child: NameField(titleForMController,"title",1,70,true)),
+                                      //       //   Container(
+                                      //       //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
+                                      //       //       child: NameField(descriptionForMController,"description",4,70,true)),
+                                      //       //   SaveButtonWidgets( (){
+                                      //       //     _setLadderMemoriesData();
+                                      //       //   }),
+                                      //       //
+                                      //       // ]
+                                      //       );
+                                      //     }
+                                      // ),
 
                                     ],
                                   ),
@@ -903,7 +1015,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
                                   child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: trellisLadderDataForAchievements.length,
+                                      itemCount: trellisLadderDataForAchievements.length >=3 ? 3 : trellisLadderDataForAchievements.length,
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
                                           onTap: () {
@@ -925,9 +1037,15 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
                                                       Text("${trellisLadderDataForAchievements[index]['option1']} | ${trellisLadderDataForAchievements[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+
+                                                      Row(
+                                                        children: [
+                                                      trellisLadderDataForAchievements[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                        _deleteRecord("achievements", trellisLadderDataForAchievements[index]['id'],index,"");
+                                                        showDeletePopup( "achievements",trellisLadderDataForAchievements[index]['id'].toString(),index,"");
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+                                                        ],
+                                                      )
                                                     ],
                                                   ),
                                                   Align(
@@ -956,7 +1074,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(oPUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController4 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -964,11 +1082,11 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Organizing Principle",_playerController);
+                      videoPopupDialog(context,"Introduction to Organizing Principle",playerController4);
                      // bottomSheet(context,"Organizing Principles","Two organizing principles shape us: Powerless Beliefs and Empowered Truths. Powerless Beliefs are negative, unconsciously formed around fear or shame in our formative years, such as I don't have what it takes. Empowered Truths are core, empowering principles to organize our lives around, such as There is goodness in me, for me, and through me. Shade out powerless beliefs.","");
                     },
                         <Widget>[
-                          AddButton(trellisPrinciplesData.length>=2,() {
+                          AddButton(userPremium == "no" ? trellisPrinciplesData.length>=isOPLength : false,() {
                             needsBottomSheet(context, "Organizing Principles", <Widget>[
                               Column(
                                 children: [
@@ -1134,7 +1252,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             // Align(alignment: Alignment.topRight,
                                             //   child: ,),
                                             Container(
-                                              margin: EdgeInsets.only(bottom: 10),
+                                              margin: const EdgeInsets.only(bottom: 10),
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -1361,7 +1479,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(rhythmsUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController5 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -1369,12 +1487,12 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Rhythms",_playerController);
+                      videoPopupDialog(context,"Introduction to Rhythms",playerController5);
                     //  bottomSheet(context,"Rhythms","Rhythms are either principles or habitual behaviors that either increase or decrease our well-being. Empowered Rhythms bring life-giving results while Powerless Rhythms decrease overall flourishing. Example: Empowering Rhythm is waking up early to avoid rushing, while a Powerless Rhythm is talking over people.","");
                     },
                         <Widget>[
 
-                          AddButton(trellisRhythmsData.length>=2,() {
+                          AddButton(userPremium == "no" ? trellisRhythmsData.length>= isRhythmsLength: false ,() {
                             needsBottomSheet(context, "Rhythms", <Widget>[
                               Column(
                                 children: [
@@ -1545,7 +1663,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     icon:const Icon(Icons.delete,color: AppColors.redColor,),
                                             //   ),),
                                             Container(
-                                              margin: EdgeInsets.only(bottom: 10),
+                                              margin: const EdgeInsets.only(bottom: 10),
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -1772,7 +1890,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(needsUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController6 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -1780,7 +1898,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Needs",_playerController);
+                      videoPopupDialog(context,"Introduction to Needs",playerController6);
                      //bottomSheet(context,"Needs","The essential and engaging aspects of my life that increase my functioning (joy, peace, and confidence) when present, and lead to greater breakdown and dysfunction when absent. Example - “Regular emotional and relational intimacy with people I enjoy.”","");
                     },
                         <Widget>[
@@ -1793,7 +1911,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             child: Column(
                               children: [
 
-                                AddButton(trellisNeedsData.length>= 2,() {
+                                AddButton(userPremium == "no" ? trellisNeedsData.length>= isNeedsLength : false,() {
                                   needsBottomSheet(context, "Needs", <Widget>[
                                     NameField(needsController,"needs",5,70,true),
                                     SaveButtonWidgets( (){
@@ -1855,7 +1973,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(identityUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController7 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -1863,7 +1981,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Identity",_playerController);
+                      videoPopupDialog(context,"Introduction to Identity",playerController7);
                      // bottomSheet(context,"Identity","My identity is the primary way I identify myself to me and the world around me. Example - “I am a beloved child of God.” Also you can use personality assessments like Enneagram, Strengths, or Meyers-Briggs results and others.","");
                     },
                         <Widget>[
@@ -1875,7 +1993,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
-                                AddButton(trellisIdentityData.length>=2,(){
+                                AddButton(userPremium == "no" ? trellisIdentityData.length>= isIdentityLength : false,(){
                                   needsBottomSheet(context, "Identity", <Widget>[
                                     NameField(identityController,"identity",5,200,true),
                                     SaveButtonWidgets( (){
@@ -1938,7 +2056,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       });
                     },() {
                       String? videoId = YoutubePlayer.convertUrlToId(tribeUrl);
-                      YoutubePlayerController _playerController = YoutubePlayerController(
+                      YoutubePlayerController playerController0 = YoutubePlayerController(
                           initialVideoId: videoId!,
                           flags: const YoutubePlayerFlags(
                             autoPlay: false,
@@ -1946,7 +2064,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
 
                       );
-                      videoPopupDialog(context,"Introduction to Tribe",_playerController);
+                      videoPopupDialog(context,"Introduction to Tribe",playerController0);
                      // bottomSheet(context,"Tribe","Your Tribe represents your inner circle and concentric circles of people who help you to live the life you desire and be the person you want to be. ","");
                     },
                         <Widget>[
@@ -1958,15 +2076,15 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
-                                AddButton(trellisTribeData.isNotEmpty,() {
+                                AddButton(userPremium == "no" ? trellisTribeData.isNotEmpty : false,() {
                                   tribeBottomSheet(context,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
                                     children: [
                                       Align(
                                           alignment: Alignment.topLeft,
                                           child: Container(
                                               margin:const EdgeInsets.only(left: 10,right: 10),
-                                              child: Row(
-                                                children:const [
+                                              child:  const Row(
+                                                children: [
                                                   Icon(Icons.person,color: AppColors.primaryColor,),
                                                   SizedBox(
                                                     width: 5,
@@ -2001,8 +2119,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                           alignment: Alignment.topLeft,
                                           child: Container(
                                               margin:const EdgeInsets.only(left: 10,right: 10),
-                                              child: Row(
-                                                children:const [
+                                              child:const Row(
+                                                children: [
                                                   Icon(Icons.person,color: AppColors.primaryColor,),
                                                   SizedBox(
                                                     width: 5,
@@ -2037,8 +2155,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                           alignment: Alignment.topLeft,
                                           child: Container(
                                               margin:const EdgeInsets.only(left: 10,right: 10),
-                                              child: Row(
-                                                children:const [
+                                              child:const Row(
+                                                children: [
                                                   Icon(Icons.person,color: AppColors.primaryColor,),
                                                   SizedBox(
                                                     width: 5,
@@ -2278,8 +2396,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Row(
-                                                        children:const [
+                                                      const Row(
+                                                        children: [
                                                           Icon(Icons.person,color: AppColors.primaryColor,),
                                                           SizedBox(
                                                             width: 5,
@@ -2297,7 +2415,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   ),
                                                   Container(
                                                     alignment: Alignment.centerLeft,
-                                                    padding: EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       mainAxisAlignment: MainAxisAlignment.start,
@@ -2308,8 +2426,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                       ],
                                                     ),
                                                   ),
-                                                  Row(
-                                                    children:const [
+                                                  const Row(
+                                                    children: [
                                                       Icon(Icons.person,color: AppColors.primaryColor,),
                                                       SizedBox(
                                                         width: 5,
@@ -2319,7 +2437,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   ),
                                                   Container(
                                                     alignment: Alignment.centerLeft,
-                                                    padding: EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       mainAxisAlignment: MainAxisAlignment.start,
@@ -2330,8 +2448,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                       ],
                                                     ),
                                                   ),
-                                                  Row(
-                                                    children:const [
+                                                  const  Row(
+                                                    children: [
                                                       Icon(Icons.person,color: AppColors.primaryColor,),
                                                       SizedBox(
                                                         width: 5,
@@ -2341,7 +2459,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   ),
                                                   Container(
                                                     alignment: Alignment.centerLeft,
-                                                    padding: EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       mainAxisAlignment: MainAxisAlignment.start,
@@ -2373,6 +2491,22 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
                         ]
                     ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: (){
+                          _saveTrellisTriggerResponse();
+                        },
+                        style:ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 30),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          backgroundColor: AppColors.primaryColor,
+                        ),
+                        child: const Text("Get My Reward",style: TextStyle(color: AppColors.backgroundColor),),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -2502,7 +2636,25 @@ class _TrellisScreenState extends State<TrellisScreen> {
     );
   }
 
-
+  _saveTrellisTriggerResponse() {
+    setState(() {
+      _isDataLoading = true;
+    });
+    HTTPManager().trellisTriggerData(TrellisTriggerRequestModel(userId: id)).then((value) {
+      // ignore: avoid_print
+      print(value);
+      setState(() {
+        _isDataLoading = false;
+      });
+      showToastMessage(context, "Your reward has been added for today", true);
+    }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      print(e);
+    });
+  }
 
   _deleteRecord(String type,String recordId,int index,String goalsOrChallenges) {
     // print(type);
@@ -2561,75 +2713,76 @@ class _TrellisScreenState extends State<TrellisScreen> {
     });
   }
 
-  _setLadderGoalsData() {
-    print("Seleted Date:${dateForGController.text}");
+  // _setLadderGoalsData() {
+  //   // ignore: avoid_print
+  //   print("Seleted Date:${dateForGController.text}");
+  //
+  //   if(initialValueForGoals != "" || dateForGController.text.isNotEmpty || initialValueForType == "" || titleForGController.text.isNotEmpty ) {
+  //     setState(() {
+  //       _isDataLoading = true;
+  //     });
+  //     HTTPManager().trellisLadderForGoals(TrellisLadderGoalsRequestModel(userId: id,type: "goal",option1: initialValueForType,option2: initialValueForGoals,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text)).then((value) {
+  //
+  //       Navigator.of(context).pop();
+  //       setState(() {
+  //         dateForGController.text = "";
+  //         titleForGController.text = "";
+  //         descriptionForGController.text = "";
+  //       });
+  //       if(value['post_data']['option2'] == "Challenges") {
+  //         trellisLadderDataForGoalsChallenges.insert(0, value['post_data']);
+  //       } else {
+  //         trellisLadderDataForGoals.insert(0, value['post_data']);
+  //       }
+  //       setState(() {
+  //         _isDataLoading = false;
+  //       });
+  //       // print(value);
+  //       // print("Ladder Data For Goals");
+  //       showToastMessage(context, "Record added successfully", true);
+  //     }).catchError((e) {
+  //       showToastMessage(context, e.toString(), false);
+  //       setState(() {
+  //         _isDataLoading = false;
+  //       });
+  //     });
+  //
+  //   } else {
+  //     showToastMessage(context, "Add some data please", false);
+  //   }
+  // }
 
-    if(initialValueForGoals != "" || dateForGController.text.isNotEmpty || initialValueForType == "" || titleForGController.text.isNotEmpty ) {
-      setState(() {
-        _isDataLoading = true;
-      });
-      HTTPManager().trellisLadderForGoals(TrellisLadderGoalsRequestModel(userId: id,type: "goal",option1: initialValueForType,option2: initialValueForGoals,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text)).then((value) {
-
-        Navigator.of(context).pop();
-        setState(() {
-          dateForGController.text = "";
-          titleForGController.text = "";
-          descriptionForGController.text = "";
-        });
-        if(value['post_data']['option2'] == "Challenges") {
-          trellisLadderDataForGoalsChallenges.insert(0, value['post_data']);
-        } else {
-          trellisLadderDataForGoals.insert(0, value['post_data']);
-        }
-        setState(() {
-          _isDataLoading = false;
-        });
-        // print(value);
-        // print("Ladder Data For Goals");
-        showToastMessage(context, "Record added successfully", true);
-      }).catchError((e) {
-        showToastMessage(context, e.toString(), false);
-        setState(() {
-          _isDataLoading = false;
-        });
-      });
-
-    } else {
-      showToastMessage(context, "Add some data please", false);
-    }
-  }
-
-  _setLadderMemoriesData() {
-    if( dateForMController.text.isNotEmpty  || titleForMController.text.isNotEmpty ) {
-      setState(() {
-        _isDataLoading = true;
-      });
-      HTTPManager().trellisLadderForAchievements(TrellisLadderAchievementRequestModel(userId: id,type: "achievements",option1:initialValueForMType ,date: dateForMController.text,title: titleForMController.text,description: descriptionForMController.text)).then((value) {
-
-        Navigator.of(context).pop();
-        setState(() {
-          dateForMController.text = "";
-          titleForMController.text = "";
-          descriptionForMController.text = "";
-        });
-        trellisLadderDataForAchievements.insert(0,value['post_data']);
-        setState(() {
-          _isDataLoading = false;
-        });
-        // print(value);
-        // print("Ladder Data For Achievements");
-        showToastMessage(context, "Record added successfully", true);
-      }).catchError((e) {
-        showToastMessage(context, e.toString(), false);
-        setState(() {
-          _isDataLoading = false;
-        });
-      });
-
-    } else {
-      showToastMessage(context, "Add some data please", false);
-    }
-  }
+  // _setLadderMemoriesData() {
+  //   if( dateForMController.text.isNotEmpty  || titleForMController.text.isNotEmpty ) {
+  //     setState(() {
+  //       _isDataLoading = true;
+  //     });
+  //     HTTPManager().trellisLadderForAchievements(TrellisLadderAchievementRequestModel(userId: id,type: "achievements",option1:initialValueForMType ,date: dateForMController.text,title: titleForMController.text,description: descriptionForMController.text)).then((value) {
+  //
+  //       Navigator.of(context).pop();
+  //       setState(() {
+  //         dateForMController.text = "";
+  //         titleForMController.text = "";
+  //         descriptionForMController.text = "";
+  //       });
+  //       trellisLadderDataForAchievements.insert(0,value['post_data']);
+  //       setState(() {
+  //         _isDataLoading = false;
+  //       });
+  //       // print(value);
+  //       // print("Ladder Data For Achievements");
+  //       showToastMessage(context, "Record added successfully", true);
+  //     }).catchError((e) {
+  //       showToastMessage(context, e.toString(), false);
+  //       setState(() {
+  //         _isDataLoading = false;
+  //       });
+  //     });
+  //
+  //   } else {
+  //     showToastMessage(context, "Add some data please", false);
+  //   }
+  // }
 
   _setTrellisOPData () {
 
@@ -2660,6 +2813,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
         });
        // Navigator.of(context).pop();
       }).catchError((e) {
+        // ignore: avoid_print
         print(e);
         showToastMessage(context, e.toString(), false);
         setState(() {
@@ -2771,6 +2925,9 @@ class _TrellisScreenState extends State<TrellisScreen> {
   }
 
   _setTribeData() {
+    print(mentorNameController.text);
+    print(peerNameController.text);
+    print(menteeNameController.text);
     if(mentorNameController.text.isNotEmpty
         || peerNameController.text.isNotEmpty
         || menteeNameController.text.isNotEmpty)
@@ -2803,6 +2960,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
       })
           .catchError((e) {
         showToastMessage(context, e.toString(), false);
+        // ignore: avoid_print
         print(e);
         setState(() {
           _isDataLoading = false;

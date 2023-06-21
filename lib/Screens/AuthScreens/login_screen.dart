@@ -2,6 +2,8 @@
 
 // ignore_for_file: unused_element
 
+import 'dart:io';
+
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,9 @@ import 'package:flutter_quiz_app/model/request_model/register_create_request.dar
 import 'package:flutter_quiz_app/model/request_model/social_login_request_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../Widgets/constants.dart';
 
@@ -61,8 +65,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _getPckageInfo();
     _valueDropDownController = SingleValueDropDownController();
     _initData();
 
@@ -86,6 +90,109 @@ class _LoginPageState extends State<LoginPage> {
    //    print("Credentials revoked");
    //  });
 
+  }
+
+  _getPckageInfo()async {
+    setState(() {
+      isLoading = true;
+    });
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appVersion = packageInfo.version;
+    // ignore: avoid_print
+    print('App version: $appVersion');
+
+
+
+    HTTPManager().getAppVersion().then((value)  async {
+      setState(() {
+        isLoading = false;
+      });
+      // final newVersion = NewVersion(
+      //   iOSId: 'com.TrueIncrease.TriggerHappy',
+      //   androidId: 'com.ratedsolution.flutter_quiz_app',
+      // );
+      // final status = await newVersion.getVersionStatus();
+      // print("App Version");
+      // print(appVersion);
+      // print(value);
+      if(Platform.isAndroid) {
+        if (appVersion != value['data'][0]['cur_playstore']) {
+          showUpdate("Android",value['data'][0]['new_updates']);
+        }
+      } else if(appVersion != value['data'][0]['cur_apple']) {
+        showUpdate("IOS",value['data'][0]['new_updates']);
+      }
+
+
+    }).catchError((e) {
+      // print(e);
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
+
+  showUpdate(String deviceType,String updates) {
+
+    showDialog(context: context,
+        builder: (context) {
+          return AlertDialog(
+            title:const Text('Update Available'),
+            content:const SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Text("Things added in new version: \n - Premium version added \n - Bugs Fixation \n - Ui Enhancement"),
+              // Html(data: updates,style: {
+              //   "#" : Style(
+              //     color: AppColors.textWhiteColor,
+              //     fontSize: FontSize(AppConstants.defaultFontSize),
+              //     textAlign: TextAlign.start,
+              //
+              //   ),
+              // },),
+            ),
+            actions: [
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('No'),
+                onPressed: () {
+                  // Invoke the remind me later callback
+                  onRemindMeLaterPressed();
+                },
+              ),
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('Update Now'),
+                onPressed: () {
+
+                  // Invoke the update now callback
+                  onUpdateNowPressed(deviceType);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+
+  void onUpdateNowPressed(String deviceType) {
+    // Handle update now action here
+    if (deviceType == "Android") {
+      // ignore: deprecated_member_use
+      launch('https://play.google.com/store/apps/details?id=com.ratedsolution.flutter_quiz_app');
+    } else if (deviceType == "IOS") {
+      // ignore: deprecated_member_use
+      launch('https://apps.apple.com/us/app/your-app/id1666301888');
+    }
+    // After update, dismiss the update pop-up
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const LoginPage()), (route) => false);
+  }
+
+  void onRemindMeLaterPressed() {
+    // Handle remind me later action here
+    // Dismiss the update pop-up
+    Navigator.of(context).pop();
+    // Schedule a reminder if needed
+    // ...
   }
 
   Future<void> _initData() async {
@@ -204,7 +311,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _valueDropDownController.dispose();
   }
@@ -671,7 +777,11 @@ class _LoginPageState extends State<LoginPage> {
               value['user_session']['useremail'].toString(),
               value['user_session']['userid'].toString(),
               value['user_session']['timezone'].toString(),
-              value['user_session']['allowemail'].toString(),);
+              value['user_session']['allowemail'].toString(),
+            value['user_session']['premium'].toString(),
+            value['user_session']['premium_type'].toString(),
+            value['user_session']['customer_id'].toString(),
+            value['user_session']['subscription_id'].toString(),);
           sharedPreferences.setString("authId", value['user_session']['authID']);
 
           isLoading = false;
@@ -734,6 +844,10 @@ class _LoginPageState extends State<LoginPage> {
                 value['user_session']['userid'].toString(),
                 value['user_session']['timezone'].toString(),
                 value['user_session']['allowemail'].toString(),
+                value['user_session']['premium'].toString(),
+                value['user_session']['premium_type'].toString(),
+                value['user_session']['customer_id'].toString(),
+                value['user_session']['subscription_id'].toString(),
             );
 
             isLoading = false;

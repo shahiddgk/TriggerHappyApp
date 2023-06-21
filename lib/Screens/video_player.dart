@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -37,8 +38,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget().appBar(false, false, widget.name, widget.userId, true),
-      body: Container(
+      appBar: AppBarWidget().appBar(context,false, false, widget.name, widget.userId, true),
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: YoutubePlayer(
             controller: _playerController,

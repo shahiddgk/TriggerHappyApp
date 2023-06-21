@@ -1,8 +1,9 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/answer_field_widget.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
@@ -14,7 +15,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../Widgets/colors.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
-import '../AuthScreens/login_screen.dart';
 import '../utill/userConstants.dart';
 import 'Screen_10.dart';
 
@@ -25,10 +25,12 @@ class Screen9 extends StatefulWidget {
   Screen9(this.questionListResponse,{Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen9State createState() => _Screen9State();
 }
 
 class _Screen9State extends State<Screen9> {
+  // ignore: prefer_final_fields
   TextEditingController _fieldController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -37,7 +39,6 @@ class _Screen9State extends State<Screen9> {
   String answerNo7 = "";
   String answerText7 = "";
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool isAnswerLoading = false;
   List<String> selectedAnswer = [];
   late SharedPreferences _sharedPreferences;
@@ -51,15 +52,14 @@ class _Screen9State extends State<Screen9> {
     super.initState();
   }
 
+  // ignore: unused_element
   _getAnswerData() async {
     setState(() {
-      _isAnswerDataLoading = true;
     });
     _sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       answerNo7 = _sharedPreferences.getString("answerType9")!;
       answerText7 = _sharedPreferences.getString("answerText9")!;
-      _isAnswerDataLoading = false;
     });
 
   }
@@ -99,7 +99,7 @@ class _Screen9State extends State<Screen9> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();
@@ -122,7 +122,7 @@ class _Screen9State extends State<Screen9> {
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child:  Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,

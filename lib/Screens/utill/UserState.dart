@@ -1,4 +1,6 @@
 
+// ignore_for_file: file_names, avoid_print
+
 import 'package:flutter_quiz_app/Screens/utill/userConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,7 +8,7 @@ class UserStatePrefrence {
 
   late SharedPreferences _sharedPreferences;
 
-  setAnswerText(bool isLoggedIn,String userType,String userName,String userEmail,String userId,String userTimezone,String allowEmail) async {
+  setAnswerText(bool isLoggedIn,String userType,String userName,String userEmail,String userId,String userTimezone,String allowEmail,String userPremium,String userPremiumType,String userCustomerId,String userSubscriptionId) async {
     // print("Submission called Successfully");
     _sharedPreferences = await SharedPreferences.getInstance();
 
@@ -17,6 +19,10 @@ class UserStatePrefrence {
     _sharedPreferences.setString(UserConstants().userId, userId);
     _sharedPreferences.setString(UserConstants().timeZone, userTimezone);
     _sharedPreferences.setString(UserConstants().allowEmail, allowEmail);
+    _sharedPreferences.setString(UserConstants().userPremium, userPremium);
+    _sharedPreferences.setString(UserConstants().userPremiumType, userPremiumType);
+    _sharedPreferences.setString(UserConstants().userCustomerId, userCustomerId);
+    _sharedPreferences.setString(UserConstants().userSubscriptionId, userSubscriptionId);
   }
 
   clearAnswerText() async {
@@ -30,6 +36,10 @@ class UserStatePrefrence {
     _sharedPreferences.remove(UserConstants().userId);
     _sharedPreferences.remove(UserConstants().timeZone);
     _sharedPreferences.remove(UserConstants().allowEmail);
+    _sharedPreferences.remove(UserConstants().userPremium);
+    _sharedPreferences.remove(UserConstants().userPremiumType);
+    _sharedPreferences.remove(UserConstants().userCustomerId);
+    _sharedPreferences.remove(UserConstants().userSubscriptionId);
 
     _sharedPreferences.remove(TrellisScreenStatus().needsExpended);
     _sharedPreferences.remove(TrellisScreenStatus().purposeExpended);

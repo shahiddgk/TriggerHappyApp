@@ -128,7 +128,7 @@ class _ImageScreenState extends State<ImageScreen> {
   Widget build(BuildContext context) {
     getScreenDetails();
     return Scaffold(
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,true,"","",false) : AppBar(
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
         centerTitle: true,
         title: Text(name),
         actions:  [

@@ -1,12 +1,13 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
-import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +19,7 @@ class ColumnDetailsScreen extends StatefulWidget {
   ColumnReadDataModel columnReadDataModel;
 
   @override
+  // ignore: library_private_types_in_public_api
   _ColumnDetailsScreenState createState() => _ColumnDetailsScreenState();
 }
 
@@ -105,7 +107,7 @@ class _ColumnDetailsScreenState extends State<ColumnDetailsScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               color: AppColors.lightGreyColor,
               child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
                 child: Column(
                   children: [
                     Row(

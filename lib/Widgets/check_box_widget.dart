@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
@@ -43,7 +45,7 @@ class _CheckBoxWidgetWithTitleState extends State<CheckBoxWidgetWithTitle> {
             const SizedBox(width: 10,),
             Expanded(
               flex: 2,
-                child: Text(widget.title,style: TextStyle(color: AppColors.textWhiteColor))),
+                child: Text(widget.title,style: const TextStyle(color: AppColors.textWhiteColor))),
           ],
         )
       ),

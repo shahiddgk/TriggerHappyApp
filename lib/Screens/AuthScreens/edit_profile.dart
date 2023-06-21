@@ -46,6 +46,11 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String userType = "";
   String authId = "";
   String allowEmail = "";
+  String userPremium = "";
+  String userPremiumType = "";
+  String userCustomerId = "";
+  String userSubscriptionId = "";
+
   late String _timezoneValue;
   late SingleValueDropDownController _valueDropDownController;
 
@@ -177,6 +182,11 @@ class _ChangeProfileState extends State<ChangeProfile> {
       _timezoneValue = sharedPreferences.getString(UserConstants().timeZone)!;
       userType = sharedPreferences.getString(UserConstants().userType)!;
       allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
+      userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+      userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
+      userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
+      userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+
       userNameController.text = name;
       emailController.text = email;
       _valueDropDownController.dropDownValue = DropDownValueModel(name: _timezoneValue, value: _timezoneValue);
@@ -430,7 +440,11 @@ class _ChangeProfileState extends State<ChangeProfile> {
             email,
             id,
             timeZone,
-            allowEmail);
+            allowEmail,
+            userPremium,
+            userPremiumType,
+            userCustomerId,
+            userSubscriptionId);
 
         setState(() {
           name = name1;

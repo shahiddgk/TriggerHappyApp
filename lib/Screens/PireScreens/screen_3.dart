@@ -6,8 +6,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
-import 'package:flutter_quiz_app/Screens/instruction_and_summaryPage.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_4.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
@@ -56,6 +56,7 @@ class _Screen3State extends State<Screen3> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   List<String> selectedAnswer = [];
   int questionListResponseLength = 0;
+
 
   List answersList = [];
 
@@ -109,12 +110,12 @@ class _Screen3State extends State<Screen3> {
     setState(() {
       _isLoading = true;
     });
-    HTTPManager().getQuestions().then((value) {
+    HTTPManager().getQuestions("Pire").then((value) {
       print(value);
+      // ignore: duplicate_ignore
       setState(() {
         _isLoading = false;
         questionListResponseLength = value.values.length;
-        // ignore: avoid_print
         print("List Length");
         print(questionListResponseLength);
       //  if(value.values.isNotEmpty) {
@@ -125,7 +126,6 @@ class _Screen3State extends State<Screen3> {
        // }
       });
     }).catchError((e){
-      // ignore: avoid_print
       print(e.toString());
       setState(() {
         questionListResponseLength == 0;
@@ -137,19 +137,13 @@ class _Screen3State extends State<Screen3> {
   }
 
   Future<bool> _onWillPop() async {
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-
+    // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const VideoScreen()));
+    Navigator.of(context).pop();
     return true;
   }
 
   @override
   Widget build(BuildContext context) {
-
-    var size = MediaQuery.of(context).size;
-
-    /*24 is for notification bar on Android*/
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
-    final double itemWidth = size.width / 2;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -161,7 +155,7 @@ class _Screen3State extends State<Screen3> {
             leading: IconButton(
               icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
               onPressed: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
+                Navigator.of(context).pop();
               },
             ),
             title: Text(_isUserDataLoading ? "" : name),

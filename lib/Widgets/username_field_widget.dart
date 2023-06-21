@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, prefer_const_constructors_in_immutables, camel_case_types, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
@@ -5,7 +7,7 @@ import 'constants.dart';
 
 class userName extends StatefulWidget {
   userName(this._usernameController,{Key? key}) : super(key: key);
-  TextEditingController _usernameController;
+  final TextEditingController _usernameController;
   @override
   _userNameState createState() => _userNameState();
 }

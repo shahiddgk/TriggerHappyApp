@@ -1,5 +1,6 @@
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors_in_immutables
+
 import 'package:dropdown_textfield/dropdown_textfield.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'constants.dart';
@@ -7,9 +8,9 @@ import 'constants.dart';
 class SearchableDropdownField extends StatefulWidget {
    SearchableDropdownField(this._valueDropDownController,this._availableTimezones,this._onValueChange,{Key? key}) : super(key: key);
 
-  SingleValueDropDownController _valueDropDownController;
-  List<String> _availableTimezones;
-  Function _onValueChange;
+  final SingleValueDropDownController _valueDropDownController;
+  final List<String> _availableTimezones;
+  final Function _onValueChange;
 
   @override
   _SearchableDropdownFieldState createState() => _SearchableDropdownFieldState();

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class UserConstants {
 
   late String userLoggedIn = "userLoggedIn";
@@ -7,6 +9,10 @@ class UserConstants {
   late String userId = "userId" ;
   late String timeZone = "timeZone" ;
   late String allowEmail = "allowEmail" ;
+  late String userPremium = "userPremium" ;
+  late String userPremiumType = "userPremiumType" ;
+  late String userSubscriptionId = "userSubscriptionId" ;
+  late String userCustomerId = "userCustomerId" ;
 }
 
 class TrellisScreenStatus {

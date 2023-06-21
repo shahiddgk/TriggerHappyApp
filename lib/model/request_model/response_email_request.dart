@@ -4,6 +4,7 @@ class UserResponseRequestModel {
   String? email;
   String? userId;
   String? answerMap;
+  // String? type;
 
   UserResponseRequestModel({this.name,this.email, this.userId,this.answerMap});
 

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, library_private_types_in_public_api, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 
@@ -14,7 +16,7 @@ class _OptionMcqAnswerState extends State<OptionMcqAnswer> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-        margin: EdgeInsets.symmetric(vertical: 7,),
+        margin: const EdgeInsets.symmetric(vertical: 7,),
         decoration: BoxDecoration(
             border: Border.all(color: AppColors.primaryColor,width: 2),
             borderRadius: BorderRadius.circular(8)
@@ -29,3 +31,4 @@ class _OptionMcqAnswerState extends State<OptionMcqAnswer> {
     );
   }
 }
+

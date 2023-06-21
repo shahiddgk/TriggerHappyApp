@@ -136,7 +136,7 @@ class _Screen5State extends State<Screen5> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar:  _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();

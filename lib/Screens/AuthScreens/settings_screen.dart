@@ -45,6 +45,10 @@ class _SettingsState extends State<Settings> {
   String email = "";
   String userType = "";
   String timeZone = "";
+  String userPremium = "";
+  String userPremiumType = "";
+  String userCustomerId = "";
+  String userSubscriptionId = "";
 
   @override
   void initState() {
@@ -77,6 +81,10 @@ class _SettingsState extends State<Settings> {
       email = sharedPreferences.getString(UserConstants().userEmail)!;
       timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
       allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
+      userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+      userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
+      userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
+      userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
       setState(() {
         if(allowEmail == "yes") {
           status = true;
@@ -347,7 +355,12 @@ class _SettingsState extends State<Settings> {
           email,
           id,
           timeZone,
-          selectedStatus!);
+          selectedStatus!,
+          userPremium,
+      userPremiumType,
+        userCustomerId,
+        userSubscriptionId
+      );
       showToastMessage(context, "Status updated successfully", true);
     }).catchError((e) {
       // ignore: avoid_print

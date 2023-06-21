@@ -1,26 +1,26 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/utill/userConstants.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
-import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Widgets/constants.dart';
 
+// ignore: must_be_immutable
 class SummaryAndInstructions extends StatefulWidget {
    SummaryAndInstructions(this.instructionSummary,{Key? key}) : super(key: key);
     int instructionSummary;
 
   @override
+  // ignore: library_private_types_in_public_api
   _SummaryAndInstructionsState createState() => _SummaryAndInstructionsState();
 }
 
 class _SummaryAndInstructionsState extends State<SummaryAndInstructions> {
 
-  bool _isUserDataLoading = true;
   late String name;
   late String id;
-  late SharedPreferences _sharedPreferences;
 
   @override
   void initState() {
@@ -31,14 +31,12 @@ class _SummaryAndInstructionsState extends State<SummaryAndInstructions> {
 
   _getUserData() async {
     setState(() {
-      _isUserDataLoading = true;
     });
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      name = _sharedPreferences.getString(UserConstants().userName)!;
-      id = _sharedPreferences.getString(UserConstants().userId)!;
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
 
-      _isUserDataLoading = false;
     });
 
   }
@@ -57,12 +55,12 @@ class _SummaryAndInstructionsState extends State<SummaryAndInstructions> {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Container(
-            margin: EdgeInsets.only(top: 20),
+            margin: const EdgeInsets.only(top: 20),
             color: AppColors.hoverColor,
-            child: Column(
+            child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   SizedBox(height: 20,),
                     Text("Summary",style: TextStyle(fontSize: 40,color: AppColors.primaryColor),),
                   Padding(padding: EdgeInsets.only(

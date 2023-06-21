@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 
 import '../../../Widgets/colors.dart';
@@ -5,12 +7,14 @@ import '../../../Widgets/constants.dart';
 
 class NameField extends StatefulWidget {
   NameField(this._NameFieldController,this.fieldName,this.maxLength,this.maxFieldLength,this.bottomSheet,{Key? key}) : super(key: key);
-  TextEditingController _NameFieldController;
+  // ignore: non_constant_identifier_names
+  final TextEditingController _NameFieldController;
   int maxLength;
   String fieldName;
   bool bottomSheet;
   int maxFieldLength;
   @override
+  // ignore: library_private_types_in_public_api
   _NameFieldState createState() => _NameFieldState();
 }
 
@@ -22,7 +26,7 @@ class _NameFieldState extends State<NameField> {
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(
            color: widget.bottomSheet ? AppColors.lightGreyColor: null,
             borderRadius: BorderRadius.circular(5)

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Screens/Trellis/tellis_screen.dart';
@@ -271,13 +270,13 @@ class _TrellisVideoScreenState extends State<TrellisVideoScreen> {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TrellisScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TrellisScreen()));
                 },
                 child: Container(
                   margin:const EdgeInsets.symmetric(horizontal: 3),
                   child: OptionMcqAnswer(
                       TextButton(onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TrellisScreen()));
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TrellisScreen()));
                       }, child: const Text("Proceed",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
                   ),
                 ),

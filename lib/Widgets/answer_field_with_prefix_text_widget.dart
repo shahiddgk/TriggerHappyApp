@@ -1,6 +1,7 @@
+// ignore_for_file: prefer_final_fields, library_private_types_in_public_api, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
-import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 
 class AnswerFiedlWithPrefixText extends StatefulWidget {
   AnswerFiedlWithPrefixText(this._fieldController,this.prefixText,{Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _AnswerFiedlWithPrefixTextState extends State<AnswerFiedlWithPrefixText> {
           //         padding: EdgeInsets.only(top: 5,left: 5),
           //       child: Text(widget.prefixText,style: TextStyle(color: AppColors.textWhiteColor),)),
           Padding(
-            padding: EdgeInsets.only(top: 5,),
+            padding: const EdgeInsets.only(top: 5,),
             child: TextFormField(
                 controller: widget._fieldController,
                 validator: (value) {

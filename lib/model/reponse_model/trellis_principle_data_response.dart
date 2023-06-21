@@ -1,4 +1,6 @@
 // ignore: camel_case_types
+// ignore_for_file: unnecessary_this, camel_case_types, duplicate_ignore
+
 class Trellis_principle_data_model_class {
   String? id;
   String? userId;

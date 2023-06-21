@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, avoid_function_literals_in_foreach_calls
+
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -6,10 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/splash_screen.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Stripe.publishableKey = 'pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC';
+//  await Stripe.instance.applySettings();
   await Firebase.initializeApp();
   _configureFirebase();
 
@@ -19,7 +24,7 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations(
       [ DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown, ]
-  ).then((value) => runApp(MyApp()));
+  ).then((value) => runApp(const MyApp()));
   runApp(const MyApp());
 }
 
@@ -30,7 +35,7 @@ void _configureFirebase() async {
     await FirebaseMessaging.instance.requestPermission();
   }
   var token = await FirebaseMessaging.instance.getToken();
-  print("Device Token = ${token}");
+  print("Device Token = $token");
   // await Clipboard.setData(ClipboardData(text: token));
   // final controllerChat = Get.put(ChatScreenController());
   FirebaseMessaging.onMessage.listen((message) {

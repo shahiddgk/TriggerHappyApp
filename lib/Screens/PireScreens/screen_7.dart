@@ -130,7 +130,7 @@ class _Screen7State extends State<Screen7> {
     final double itemWidth = size.width / 2;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();

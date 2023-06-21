@@ -7,7 +7,7 @@ class LoginResponseModel {
   LoginResponseModel.fromJson(Map<String, dynamic> json) {
     userLogin = json['user_login'];
     userSession = json['user_session'] != null
-        ? new UserSession.fromJson(json['user_session'])
+        ? UserSession.fromJson(json['user_session'])
         : null;
     // if (json['user_cookie'] != null) {
     //   userCookie = <Null>[];

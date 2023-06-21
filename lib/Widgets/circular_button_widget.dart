@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields, library_private_types_in_public_api, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 
@@ -15,7 +17,7 @@ class _CircularButtonState extends State<CircularButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -23,18 +25,18 @@ class _CircularButtonState extends State<CircularButton> {
           onPressed: (){
             widget._onPressed();
           },
-          child: Text(widget._title,style: TextStyle(color: AppColors.backgroundColor),),
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Color(
+            backgroundColor: MaterialStateProperty.all<Color>(const Color(
                 0xFFFFFFFF)),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0),
-                    side: BorderSide(color: Color(
+                    side: const BorderSide(color: Color(
                         0xFF3e396f),width: 1)
                 )
             )
-        ),),
+        ),
+          child: Text(widget._title,style: const TextStyle(color: AppColors.backgroundColor),),),
       ),
     );
   }

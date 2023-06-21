@@ -1,6 +1,7 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
-import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 
 class DropDownField extends StatefulWidget {
   DropDownField(this.initialValue,this.items,this.onValueChange,{Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class DropDownField extends StatefulWidget {
   final List<DropdownMenuItem<String>> items;
 
   @override
+  // ignore: library_private_types_in_public_api
   _DropDownFieldState createState() => _DropDownFieldState();
 }
 
@@ -32,7 +34,7 @@ class _DropDownFieldState extends State<DropDownField> {
               //     return 'Please select one options';
               //   }
               // },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 enabledBorder: InputBorder.none,
                 enabled: false,
                 border: InputBorder.none,

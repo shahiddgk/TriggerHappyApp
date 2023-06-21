@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
-import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class DatePickerField extends StatefulWidget {
    DatePickerField(this.controller,this.hint,this.isNewDateAvailable,{Key? key}) : super(key: key);
 String hint;
@@ -10,6 +11,7 @@ TextEditingController controller;
 bool isNewDateAvailable;
 
   @override
+  // ignore: library_private_types_in_public_api
   _DatePickerFieldState createState() => _DatePickerFieldState();
 }
 
@@ -69,7 +71,7 @@ class _DatePickerFieldState extends State<DatePickerField> {
     );
   }
 
-  Future<Null> _selectDate(BuildContext context,bool newDates) async {
+  Future<void> _selectDate(BuildContext context,bool newDates) async {
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),

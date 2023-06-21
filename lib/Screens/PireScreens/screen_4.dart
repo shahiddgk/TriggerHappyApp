@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_5.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
@@ -15,7 +17,6 @@ import '../../Widgets/constants.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/question_answer_response_model.dart';
-import '../AuthScreens/login_screen.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 
@@ -27,6 +28,7 @@ class Screen4 extends StatefulWidget {
 
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen4State createState() => _Screen4State();
 }
 
@@ -37,7 +39,6 @@ class _Screen4State extends State<Screen4> {
   String answerNo = "";
   List answerText = [];
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool isAnswerLoading = false;
   List <String> selectedAnswer = [];
   late SharedPreferences _sharedPreferences;
@@ -51,21 +52,21 @@ class _Screen4State extends State<Screen4> {
     super.initState();
   }
 
+  // ignore: unused_element
   _getAnswerData() async {
     setState(() {
-      _isAnswerDataLoading = true;
     });
     _sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       answerNo = _sharedPreferences.getString("questionId4")!;
       answerText = _sharedPreferences.getStringList("answerText4")!;
       //_groupValue = answerText[0];
-      _isAnswerDataLoading = false;
     });
 
   }
 
   setAnswerText()  {
+    // ignore: avoid_print
     print("Calling question Submission");
     QuestionStatePrefrence().setAnswerText(
         PireConstants.questionTwoId, widget.questionListResponse[1].id.toString(),
@@ -83,13 +84,13 @@ class _Screen4State extends State<Screen4> {
       _isUserDataLoading = true;
     });
     // print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -100,7 +101,7 @@ class _Screen4State extends State<Screen4> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();
@@ -120,7 +121,7 @@ class _Screen4State extends State<Screen4> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,

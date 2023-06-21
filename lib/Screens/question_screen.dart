@@ -15,6 +15,7 @@ class QuestionScreen extends StatefulWidget {
   String id;
 
   @override
+  // ignore: library_private_types_in_public_api
   _QuestionScreenState createState() => _QuestionScreenState();
 }
 

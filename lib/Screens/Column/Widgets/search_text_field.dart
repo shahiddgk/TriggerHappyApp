@@ -7,13 +7,15 @@ import '../../../Widgets/constants.dart';
 class SearchTextField extends StatefulWidget {
   // ignore: no_leading_underscores_for_local_identifiers
   SearchTextField(this.onChange,this._NameFieldController,this.maxLength,this.title,this.hint,{Key? key}) : super(key: key);
-  TextEditingController _NameFieldController;
+  // ignore: non_constant_identifier_names
+  final TextEditingController _NameFieldController;
   int maxLength;
   bool title;
   String hint;
   Function(String value) onChange;
 
   @override
+  // ignore: library_private_types_in_public_api
   _SearchTextFieldState createState() => _SearchTextFieldState();
 }
 

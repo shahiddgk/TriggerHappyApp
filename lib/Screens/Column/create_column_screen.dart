@@ -1,7 +1,8 @@
+// ignore_for_file: override_on_non_overriding_member
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 // import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quiz_app/Screens/Column/Widgets/date_picker_field_for_column.dart';
 import 'package:flutter_quiz_app/Screens/Column/Widgets/text_field_widet.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/logo_widget_for_all_screens.dart';
-import '../../Widgets/option_mcq_widget.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
 import '../utill/userConstants.dart';
 
@@ -20,6 +20,7 @@ class CreateColumnScreen extends StatefulWidget {
   const CreateColumnScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreateColumnScreenState createState() => _CreateColumnScreenState();
 }
 class _CreateColumnScreenState extends State<CreateColumnScreen> {
@@ -34,9 +35,7 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
   // ignore: prefer_final_fields
   bool _isLoading = false;
   // ignore: prefer_final_fields
-  bool _isDataLoading = false;
   late bool isPhone;
-  final FocusNode _focusNode = FocusNode();
 
   int selectedRadio = 1;
 
@@ -45,12 +44,12 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
   // );
 
 
-  TextEditingController titleController = new TextEditingController();
-  TextEditingController dateController = new TextEditingController();
-  TextEditingController descriptionController = new TextEditingController();
-  TextEditingController takeAwaysController = new TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController takeAwaysController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
-  String _prevText = '';
 
   @override
   TextEditingValue formatEditUpdate(
@@ -67,7 +66,6 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
       }
       return '• $line';
     }).join('\n');
-    _prevText = formatted;
     return TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(
@@ -144,14 +142,14 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
         ],
       ),
       floatingActionButton: Container(
-        width: 85.0,
-        height: 85.0,
+        width: 60.0,
+        height: 60.0,
         margin:const EdgeInsets.only(right: 10,bottom: 10),
         child: FloatingActionButton(
           onPressed: (){
             _saveColumnData();
           },
-          child: const Icon(Icons.save,color: AppColors.backgroundColor,size: 40,),
+          child: const Icon(Icons.save,color: AppColors.backgroundColor,size: 30,),
         ),
       ),
       body: SizedBox(
@@ -159,149 +157,76 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
         width: MediaQuery.of(context).size.width,
         child: Stack(
           children: [
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    LogoScreen("Column"),
-                    // SizedBox(width: 20,),
-                    // IconButton(onPressed: (){
-                    //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
-                    // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
-                  ],
-                ),
-
-                Container(
-                  padding:const EdgeInsets.symmetric(horizontal: 5),
-                  child: Row(
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: RadioListTile(
-                          value: 1,
-                          groupValue: selectedRadio,
-                          title:const Text('Entry'),
-                          onChanged: (int? val) {
-                            setSelectedRadio(val!);
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: RadioListTile(
-                          value: 2,
-                          groupValue: selectedRadio,
-                          title:const Text('Session'),
-                          onChanged: (int? val) {
-                            setSelectedRadio(val!);
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: RadioListTile(
-                          value: 3,
-                          groupValue: selectedRadio,
-                          title:const Text('Meeting'),
-                          onChanged: (int? val) {
-                            setSelectedRadio(val!);
-                          },
-                        ),
-                      ),
-                      // Add more RadioListTile widgets for additional options
+                      LogoScreen("Column"),
+                      // SizedBox(width: 20,),
+                      // IconButton(onPressed: (){
+                      //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
+                      // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
                     ],
                   ),
-                ),
-                Container(
-                    margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                    child: TextFieldWidgetForColumnScreen(titleController, 1, true, "Type your Entry/Session Title",)),
 
-                Container(
-                    margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                    child: DatePickerFieldForColumn(dateController,"Select date",true)),
-                Container(
-                    margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                    child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
-                Container(
-                    margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                    child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
-                  // Container(
-                  //   padding:const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
-                  //  // margin:const EdgeInsets.only(top: 10),
-                  //   child: OptionMcqAnswer(
-                  //      Container(
-                  //        alignment: Alignment.topLeft,
-                  //        padding:const EdgeInsets.symmetric(vertical: 5),
-                  //        child: Column(
-                  //          mainAxisAlignment: MainAxisAlignment.start,
-                  //           crossAxisAlignment: CrossAxisAlignment.start,
-                  //          children: [
-                  //          Row(
-                  //            mainAxisAlignment: MainAxisAlignment.start,
-                  //            crossAxisAlignment: CrossAxisAlignment.start,
-                  //            children: [
-                  //              Expanded(
-                  //                child: QuillToolbar.basic(
-                  //
-                  //                  showListBullets: true,
-                  //                  showDividers : false,
-                  //                  showFontFamily : false,
-                  //                  showFontSize : false,
-                  //                  showBoldButton : false,
-                  //                  showItalicButton : false,
-                  //                  showSmallButton : false,
-                  //                  showUnderLineButton : false,
-                  //                  showStrikeThrough : false,
-                  //                  showInlineCode : false,
-                  //                  showColorButton : false,
-                  //                  showBackgroundColorButton: false,
-                  //                  showClearFormat : false,
-                  //                  showAlignmentButtons : false,
-                  //                  showLeftAlignment : false,
-                  //                  showCenterAlignment : false,
-                  //                  showRightAlignment : false,
-                  //                  showJustifyAlignment : false,
-                  //                  showHeaderStyle : false,
-                  //                  showListNumbers : false,
-                  //                  showListCheck : false,
-                  //                  showCodeBlock : false,
-                  //                  showQuote : false,
-                  //                  showIndent : false,
-                  //                  showLink : false,
-                  //                  showUndo : false,
-                  //                  showRedo : false,
-                  //                  multiRowsDisplay : false,
-                  //                  showDirection : false,
-                  //                  showSearchButton : false,
-                  //                  controller: _controller,
-                  //
-                  //                ),
-                  //              ),
-                  //              Expanded(
-                  //                  flex: 6,
-                  //                  child: Container())
-                  //
-                  //            ],
-                  //          ),
-                  //     SizedBox(height: 5,),
-                  //     QuillEditor(
-                  //       minHeight: 40,
-                  //       placeholder: "please add take-a-ways",
-                  //         controller: _controller,
-                  //         focusNode: _focusNode,
-                  //         scrollController: ScrollController(),
-                  //         scrollable: true,
-                  //         padding:const EdgeInsets.symmetric(horizontal: 5),
-                  //         autoFocus: false,
-                  //         readOnly: false,
-                  //         expands: false),
-                  //         ],
-                  //     ),
-                  //      ),
-                  //   ),
-                  // ),
+                  Container(
+                    padding:const EdgeInsets.symmetric(horizontal: 5),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile(
+                            value: 1,
+                            groupValue: selectedRadio,
+                            title:const Text('Entry'),
+                            onChanged: (int? val) {
+                              setSelectedRadio(val!);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            value: 2,
+                            groupValue: selectedRadio,
+                            title:const Text('Session'),
+                            onChanged: (int? val) {
+                              setSelectedRadio(val!);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            value: 3,
+                            groupValue: selectedRadio,
+                            title:const Text('Meeting'),
+                            onChanged: (int? val) {
+                              setSelectedRadio(val!);
+                            },
+                          ),
+                        ),
+                        // Add more RadioListTile widgets for additional options
+                      ],
+                    ),
+                  ),
+                  Container(
+                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                      child: TextFieldWidgetForColumnScreen(titleController, 1, true, "Type your Entry/Session Title",)),
 
+                  Container(
+                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                      child: DatePickerFieldForColumn(dateController,"Select date",true)),
+                  Container(
+                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                      child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
+                  Container(
+                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                      child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
 
-              ],
+                ],
+              ),
             ),
             Align(
               alignment: Alignment.center,
@@ -338,7 +263,7 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
 //     print(items);
 
     //print(radioOption);
-    if(titleController.text.isNotEmpty && dateController.text.isNotEmpty && descriptionController.text.isNotEmpty) {
+    if(_formKey.currentState!.validate()) {
      setState(() {
        _isLoading = true;
      });

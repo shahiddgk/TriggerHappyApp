@@ -2,7 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/payment_screen.dart';
+import 'package:flutter_quiz_app/Screens/AuthScreens/login_screen.dart';
+import 'package:flutter_quiz_app/Screens/Payment/payment_screen.dart';
+import 'package:flutter_quiz_app/Widgets/constants.dart';
+import 'package:flutter_quiz_app/model/request_model/column_read_list_request.dart';
+import 'package:flutter_quiz_app/model/request_model/trellis_data_saving_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_quiz_app/Screens/Garden/garden_screen.dart';
@@ -16,8 +20,9 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../Widgets/colors.dart';
 import '../Widgets/logo_widget_for_all_screens.dart';
 import '../Widgets/option_mcq_widget.dart';
-import '../Widgets/video_player_in_pop_up.dart';
+import 'Bridge/bridge_category_screen.dart';
 import 'Column/column_screen.dart';
+import 'Ladder/Ladder_Screen.dart';
 import 'PireScreens/video_screen.dart';
 import 'PireScreens/widgets/AppBar.dart';
 import 'Trellis/tellis_screen.dart';
@@ -45,6 +50,10 @@ class _DashboardState extends State<Dashboard> {
   late bool isPhone;
   String introUrl = "https://youtu.be/O4fsrMcxRqc";
   late YoutubePlayerController youtubePlayerController;
+  String userPremium = "";
+  String userPremiumType = "";
+  String userCustomerId = "";
+  String userSubscriptionId = "";
 
   @override
   void initState() {
@@ -71,7 +80,8 @@ class _DashboardState extends State<Dashboard> {
     });
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appVersion = packageInfo.version;
-   // print('App version: $appVersion');
+    // ignore: avoid_print
+    print('App version: $appVersion');
 
 
 
@@ -89,10 +99,10 @@ class _DashboardState extends State<Dashboard> {
       // print(value);
       if(Platform.isAndroid) {
         if (appVersion != value['data'][0]['cur_playstore']) {
-          showUpdate("Android");
+          showUpdate("Android",value['data'][0]['new_updates']);
         }
       } else if(appVersion != value['data'][0]['cur_apple']) {
-        showUpdate("IOS");
+        showUpdate("IOS",value['data'][0]['new_updates']);
       }
 
 
@@ -104,12 +114,24 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  showUpdate(String deviceType) {
+  showUpdate(String deviceType,String updates) {
+
     showDialog(context: context,
         builder: (context) {
           return AlertDialog(
             title:const Text('Update Available'),
-            content:const Text('A new version of the app is available. Would you like to update?'),
+            content:const SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Text("Things added in new version: \n - Premium version added \n - Bugs Fixation \n - Ui Enhancement"),
+                // Html(data: updates,style: {
+                //   "#" : Style(
+                //     color: AppColors.textWhiteColor,
+                //     fontSize: FontSize(AppConstants.defaultFontSize),
+                //     textAlign: TextAlign.start,
+                //
+                //   ),
+                // },),
+            ),
             actions: [
               // ignore: deprecated_member_use
               TextButton(
@@ -123,6 +145,7 @@ class _DashboardState extends State<Dashboard> {
               TextButton(
                 child:const Text('Update Now'),
                 onPressed: () {
+
                   // Invoke the update now callback
                   onUpdateNowPressed(deviceType);
                 },
@@ -143,7 +166,7 @@ class _DashboardState extends State<Dashboard> {
       launch('https://apps.apple.com/us/app/your-app/id1666301888');
     }
     // After update, dismiss the update pop-up
-    Navigator.of(context).pop();
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const LoginPage()), (route) => false);
   }
 
   void onRemindMeLaterPressed() {
@@ -160,7 +183,6 @@ class _DashboardState extends State<Dashboard> {
     String currentVersion = packageInfo.version;
     // ignore: use_build_context_synchronously
     String? appStoreVersion = await getAppStoreVersion(context);
-    String kAppStoreId = packageInfo.packageName;
     // print("UPDATE FUNCTION CALLED");
     // print(appStoreVersion);
     // print(currentVersion);
@@ -180,10 +202,14 @@ class _DashboardState extends State<Dashboard> {
       final url = 'https://play.google.com/store/apps/details?id=$packageName';
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        // print("UPDATE FUNCTION CALLED FOR ANDROID");
-        // print(url);
-        // print(packageName);
-        // print(version);
+        // ignore: avoid_print
+        print("UPDATE FUNCTION CALLED FOR ANDROID");
+        // ignore: avoid_print
+        print(url);
+        // ignore: avoid_print
+        print(packageName);
+        // ignore: avoid_print
+        print(version);
         version = RegExp('Current Version.*?>([0-9.]+)<').firstMatch(response.body)?.group(1);
 
       }
@@ -248,8 +274,42 @@ class _DashboardState extends State<Dashboard> {
     email = sharedPreferences.getString(UserConstants().userEmail)!;
     timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
     userType = sharedPreferences.getString(UserConstants().userType)!;
+    _getSubscriptionDetails(id);
     setState(() {
       _isUserDataLoading = false;
+    });
+  }
+
+  _getSubscriptionDetails(String userId1) {
+    setState(() {
+      _isLoading = true;
+    });
+
+    HTTPManager().subscriptionDetailsRead(ColumnReadRequestModel(userId: userId1)).then((value) {
+
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: avoid_print
+      print("Subscription details ");
+      // ignore: avoid_print
+      print(value);
+      setState(() {
+        userPremium = value['user_session']['premium'].toString();
+        userPremiumType = value['user_session']['premium_type'].toString();
+      });
+
+      _sharedPreferences.setString(UserConstants().userPremium, value['user_session']['premium'].toString());
+      _sharedPreferences.setString(UserConstants().userPremiumType, value['user_session']['premium_type'].toString());
+      _sharedPreferences.setString(UserConstants().userCustomerId, value['user_session']['customer_id'].toString());
+      _sharedPreferences.setString(UserConstants().userSubscriptionId, value['user_session']['subscription_id'].toString());
+
+    }).catchError((e) {
+      // ignore: avoid_print
+      print(e);
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 
@@ -277,7 +337,7 @@ class _DashboardState extends State<Dashboard> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,true,"","",false) : AppBarWidget().appBar(false,true,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBarWidget().appBar(context,false,true,name,id,false),
       body: Container(
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,
@@ -302,20 +362,20 @@ class _DashboardState extends State<Dashboard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           LogoScreen(""),
-                          const SizedBox(width: 20,),
-                          IconButton(onPressed: (){
-                            String? videoId = YoutubePlayer.convertUrlToId(introUrl);
-                            YoutubePlayerController playerController = YoutubePlayerController(
-                                initialVideoId: videoId!,
-                                flags: const YoutubePlayerFlags(
-                                  autoPlay: false,
-                                  controlsVisibleAtStart: false,
-                                )
-
-                            );
-                            videoPopupDialog(context,"Introduction to Trellis",playerController);
-                            //bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
-                          }, icon: const Icon(Icons.ondemand_video,size:30,color: AppColors.infoIconColor,))
+                          // const SizedBox(width: 20,),
+                          // IconButton(onPressed: (){
+                          //   String? videoId = YoutubePlayer.convertUrlToId(introUrl);
+                          //   YoutubePlayerController playerController = YoutubePlayerController(
+                          //       initialVideoId: videoId!,
+                          //       flags: const YoutubePlayerFlags(
+                          //         autoPlay: false,
+                          //         controlsVisibleAtStart: false,
+                          //       )
+                          //
+                          //   );
+                          //   videoPopupDialog(context,"Introduction to Trellis",playerController);
+                          //   //bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
+                          // }, icon: const Icon(Icons.ondemand_video,size:30,color: AppColors.infoIconColor,))
                         ],
                       ),
                     //  LogoScreen(""),
@@ -349,7 +409,8 @@ class _DashboardState extends State<Dashboard> {
                       //     ),
                       //   ),
                       // ),
-                      _isLoading ?Container(margin:EdgeInsets.only(top: 10),child: const Center(child:  CircularProgressIndicator())) : Container(
+                      _isLoading ?Container(
+                          margin:const EdgeInsets.only(top: 10),child: const Center(child:  CircularProgressIndicator())) : Container(
                           margin: const EdgeInsets.only(top: 10),
                         height: MediaQuery.of(context).size.height/1.28,
                         width: MediaQuery.of(context).size.width,
@@ -370,7 +431,7 @@ class _DashboardState extends State<Dashboard> {
                                   const Card(
                                     color: AppColors.primaryColor,
                                     child: Center(
-                                      child: Text("P.I.R.E",style: TextStyle(fontSize: 22),),
+                                      child: Text("P.I.R.E",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -378,6 +439,7 @@ class _DashboardState extends State<Dashboard> {
                             GestureDetector(
                               onTap: () {
                                 //  showToastMessage(context, "Coming Soon...",false);
+                                // _saveTrellisTriggerResponse();
                                 Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TrellisScreen()));
                              //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Settings()));
                               },
@@ -385,7 +447,47 @@ class _DashboardState extends State<Dashboard> {
                                   const Card(
                                     color: AppColors.primaryColor,
                                     child: Center(
-                                      child: Text("Trellis",style: TextStyle(fontSize: 22),),
+                                      child: Text("Trellis",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                    ),
+                                  )
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                if(userPremium == "no") {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+                                } else {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const ColumnScreen()));
+                                }
+                                // showToastMessage(context, "Coming Soon...",false);
+
+                              },
+                              child: OptionMcqAnswer(
+                                  const  Card(
+                                    color: AppColors.primaryColor,
+                                    child: Center(
+                                      child: Text("Column",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                    ),
+                                  )
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                // ignore: avoid_print
+                                print(userPremium);
+                                if(userPremium == "no") {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+                                } else {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const GardenScreen()));
+                                }
+                                //   showToastMessage(context, "Coming Soon...",false);
+
+                              },
+                              child: OptionMcqAnswer(
+                                  const  Card(
+                                    color: AppColors.primaryColor,
+                                    child: Center(
+                                      child: Text("Garden",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -393,55 +495,27 @@ class _DashboardState extends State<Dashboard> {
                             GestureDetector(
                               onTap: () {
                                 // showToastMessage(context, "Coming Soon...",false);
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const ColumnScreen()));
+                                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const LadderTileSection()));
                               },
                               child: OptionMcqAnswer(
                                   const  Card(
                                     color: AppColors.primaryColor,
                                     child: Center(
-                                      child: Text("Column",style: TextStyle(fontSize: 22),),
+                                      child: Text("Ladder",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
                             ),
                             GestureDetector(
                               onTap: () {
-                                //   showToastMessage(context, "Coming Soon...",false);
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const GardenScreen()));
+                                // showToastMessage(context, "Coming Soon...",false);
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
                               },
                               child: OptionMcqAnswer(
                                   const  Card(
                                     color: AppColors.primaryColor,
                                     child: Center(
-                                      child: Text("Garden",style: TextStyle(fontSize: 22),),
-                                    ),
-                                  )
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showToastMessage(context, "Coming Soon...",false);
-                                //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Settings()));
-                              },
-                              child: OptionMcqAnswer(
-                                  const  Card(
-                                    color: AppColors.greyColor,
-                                    child: Center(
-                                      child: Text("Ladder",style: TextStyle(fontSize: 22),),
-                                    ),
-                                  )
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showToastMessage(context, "Coming Soon...",false);
-                                //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Settings()));
-                              },
-                              child: OptionMcqAnswer(
-                                  const  Card(
-                                    color: AppColors.greyColor,
-                                    child: Center(
-                                      child: Text("Bridge",style: TextStyle(fontSize: 22),),
+                                      child: Text("Bridge",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -455,7 +529,7 @@ class _DashboardState extends State<Dashboard> {
                                   const  Card(
                                     color: AppColors.greyColor,
                                     child: Center(
-                                      child: Text("Posts",style: TextStyle(fontSize: 22),),
+                                      child: Text("Posts",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -469,7 +543,7 @@ class _DashboardState extends State<Dashboard> {
                             //       const  Card(
                             //         color: AppColors.primaryColor,
                             //         child: Center(
-                            //           child: Text("Column",style: TextStyle(fontSize: 22),),
+                            //           child: Text("Column",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                             //         ),
                             //       )
                             //   ),
@@ -483,7 +557,7 @@ class _DashboardState extends State<Dashboard> {
                             //       const  Card(
                             //         color: AppColors.primaryColor,
                             //         child: Center(
-                            //           child: Text("Garden",style: TextStyle(fontSize: 22),),
+                            //           child: Text("Garden",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                             //         ),
                             //       )
                             //   ),
@@ -497,7 +571,21 @@ class _DashboardState extends State<Dashboard> {
                                   const  Card(
                                     color: AppColors.greyColor,
                                     child: Center(
-                                      child: Text("Base",style: TextStyle(fontSize: 22),),
+                                      child: Text("Base",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                    ),
+                                  )
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showToastMessage(context, "Coming Soon...",false);
+                                //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+                              },
+                              child: OptionMcqAnswer(
+                                  const  Card(
+                                    color: AppColors.greyColor,
+                                    child: Center(
+                                      child: Text("ORG",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -511,7 +599,7 @@ class _DashboardState extends State<Dashboard> {
                                   const  Card(
                                     color: AppColors.greyColor,
                                     child: Center(
-                                      child: Text("ORG",style: TextStyle(fontSize: 22),),
+                                      child: Text("Promenade",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -525,21 +613,7 @@ class _DashboardState extends State<Dashboard> {
                                   const  Card(
                                     color: AppColors.greyColor,
                                     child: Center(
-                                      child: Text("Promenade",style: TextStyle(fontSize: 22),),
-                                    ),
-                                  )
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showToastMessage(context, "Coming Soon...",false);
-                                //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Settings()));
-                              },
-                              child: OptionMcqAnswer(
-                                  const  Card(
-                                    color: AppColors.greyColor,
-                                    child: Center(
-                                      child: Text("Tribe",style: TextStyle(fontSize: 22),),
+                                      child: Text("Tribe",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -547,13 +621,12 @@ class _DashboardState extends State<Dashboard> {
                             GestureDetector(
                               onTap: () {
                               //  showToastMessage(context, "Coming Soon...",false);
-                              //      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const StripePayment()));
                               },
                               child: OptionMcqAnswer(
                                   const  Card(
                                     color: AppColors.greyColor,
                                     child: Center(
-                                      child: Text("Sage",style: TextStyle(fontSize: 22),),
+                                      child: Text("Sage",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                                     ),
                                   )
                               ),
@@ -562,7 +635,7 @@ class _DashboardState extends State<Dashboard> {
                             //   const  Card(
                             //       color: AppColors.PrimaryColor,
                             //       child: Center(
-                            //         child: Text("Reminders",style: TextStyle(fontSize: 22),),
+                            //         child: Text("Reminders",style: TextStyle(fontSize: AppConstants.headingFontSize),),
                             //       ),
                             //     )
                             // ),
@@ -581,4 +654,5 @@ class _DashboardState extends State<Dashboard> {
 
     );
   }
+
 }

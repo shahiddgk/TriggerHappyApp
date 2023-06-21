@@ -36,6 +36,28 @@ class ResponseHandler {
     }
   }
 
+  Future stripePost(
+      Uri url, dynamic body,String publishableKey) async {
+    var head = <String, String>{};
+
+    head['Authorization'] = 'Bearer $publishableKey';
+    head['content-type'] = 'application/x-www-form-urlencoded';
+    // ignore: prefer_typing_uninitialized_variables
+    var responseJson;
+    try {
+      final response = await http.post(url, body: body, headers: head).timeout(const Duration(seconds: 45));
+      responseJson = response.body;
+      // ignore: avoid_print
+      print(responseJson);
+      if(response.statusCode!= 200) throw FetchDataException(responseJson['message'].toString());
+      return responseJson;
+    } on TimeoutException {
+      throw FetchDataException("Slow internet connection");
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+  }
+
   // Future postImage(String url, Map<String, String> params,
   //     File image, bool isHeaderRequired, String message) async {
   //   var head = Map<String, String>();

@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this
+
 class QuestionListResponseModel {
   String? id;
   String? title;

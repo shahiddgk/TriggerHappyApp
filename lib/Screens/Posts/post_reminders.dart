@@ -59,7 +59,7 @@ class _PostsState extends State<Posts> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar:_isUserDataLoading ? AppBarWidget().appBar(true,false,"","",true) : AppBarWidget().appBar(true,false,name,id,true),
+      appBar:_isUserDataLoading ? AppBarWidget().appBar(context,true,false,"","",true) : AppBarWidget().appBar(context,true,false,name,id,true),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,

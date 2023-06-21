@@ -1,6 +1,7 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Column/Widgets/search_text_field.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -16,18 +17,19 @@ import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
 import '../../network/http_manager.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
-import '../Trellis/widgets/bottom_sheet.dart';
 import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
 import 'column_details_screen.dart';
 import 'create_column_screen.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class ColumnScreen extends StatefulWidget {
   const ColumnScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ColumnScreenState createState() => _ColumnScreenState();
 }
 
@@ -44,7 +46,6 @@ class _ColumnScreenState extends State<ColumnScreen> {
   String userType = "";
   String selectedValue = "All";
   // ignore: prefer_final_fields
-  bool _isLoading = true;
   // ignore: prefer_final_fields
   bool _isDataLoading = false;
   late bool isPhone;
@@ -56,7 +57,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
   List<ColumnReadDataModel> columnReadDataModelForAll = [];
   List<ColumnReadDataModel> columnReadDataModelForEntry = [];
   List<ColumnReadDataModel> columnReadDataModelForSession = [];
-  TextEditingController _searchController = new TextEditingController();
+  final TextEditingController _searchController =  TextEditingController();
 
   String titleColumn = "https://youtu.be/zhhv_BVSXgI";
 
@@ -74,6 +75,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
     });
     HTTPManager().sessionRead(ColumnReadRequestModel(userId: id)).then((value) {
 
+      // ignore: avoid_print
       print(value.toString());
       ColumnReadResponseListModel columnReadResponseListModel = ColumnReadResponseListModel.fromJson(value['data']);
 
@@ -122,6 +124,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
   }
 
   void filterSearchResults(String query) {
+    // ignore: avoid_print
     print(query);
     // for(int i = 0;i<columnReadDataModel.length;i++) {
     //   if(columnReadDataModel[i].entryTitle.toString().toLowerCase().contains(query.toLowerCase()) ||
@@ -133,6 +136,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
     //   }
     // }
     setState(() {
+      // ignore: avoid_print
       print(DateFormat('MM-dd-yy').format(DateTime.parse(columnReadDataModel[0].entryDate.toString())));
       columnReadDataModelForSearch = columnReadDataModel
           .where((ColumnReadDataModel item) => ("${DateFormat('MM-dd-yy').format(DateTime.parse(item.entryDate.toString()))} ${item.entryTitle.toString()} ${item.entryDecs.toString()}").toLowerCase().contains(query.toLowerCase()))
@@ -167,8 +171,8 @@ class _ColumnScreenState extends State<ColumnScreen> {
         ],
       ),
       floatingActionButton: Container(
-        width: 85.0,
-        height: 85.0,
+        width: 60.0,
+        height: 60.0,
         margin:const EdgeInsets.only(right: 10,bottom: 10),
         child: FloatingActionButton(
           onPressed: ()  async{
@@ -177,7 +181,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
            _getColumnScreenData(false);
 
           },
-          child: const Icon(Icons.add,color: AppColors.backgroundColor,size: 40,),
+          child: const Icon(Icons.add,color: AppColors.backgroundColor,size: 30,),
         ),
       ),
       body: SizedBox(
@@ -228,7 +232,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
                         flex: 1,
                         child: OptionMcqAnswer(
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: DropdownButton<String>(
                               isExpanded: true,
                               elevation: 0,
@@ -296,7 +300,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
                     alignment: Alignment.centerRight,
                     child: OptionMcqAnswer(
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: DropdownButton<String>(
                           isExpanded: true,
                           elevation: 0,
@@ -304,8 +308,11 @@ class _ColumnScreenState extends State<ColumnScreen> {
                           value: selectedValue,
                           onChanged: (String? newValue) {
                             // columnReadDataModel.clear();
+                            // ignore: avoid_print
                             print(columnReadDataModelForAll);
+                            // ignore: avoid_print
                             print(columnReadDataModelForEntry);
+                            // ignore: avoid_print
                             print(columnReadDataModelForSession);
 
                             setState(() {
@@ -347,6 +354,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
                   _isDataLoading ? const Center(child: CircularProgressIndicator(),) : columnReadDataModel.isNotEmpty  ? ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
+                      reverse: true,
                       itemCount: isSearch ? columnReadDataModelForSearch.length : columnReadDataModel.length,
                       itemBuilder: (context,index) {
                         return GestureDetector(
@@ -356,9 +364,9 @@ class _ColumnScreenState extends State<ColumnScreen> {
                           child: Card(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
                             elevation: 1,
-                            margin: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                            margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                               color: AppColors.lightGreyColor,
                               child: Column(
 
@@ -417,6 +425,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
       _isDeleteDataLoading = true;
     });
       HTTPManager().sessionDelete(ColumnDeleteRequestModel(recordId: id)).then((value) {
+        // ignore: avoid_print
         print(value);
         showToastMessage(context, "Data deleted Successfully add", true);
         //Navigator.of(context).pop();
@@ -454,6 +463,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
           _isDeleteDataLoading = false;
         });
       }).catchError((e) {
+        // ignore: avoid_print
         print(e);
         setState(() {
           _isDeleteDataLoading = false;

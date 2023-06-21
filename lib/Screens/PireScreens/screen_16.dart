@@ -1,7 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -13,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/video_player_in_pop_up.dart';
-import '../AuthScreens/login_screen.dart';
 import '../utill/userConstants.dart';
 
 class Screen16 extends StatefulWidget {
@@ -22,6 +22,7 @@ class Screen16 extends StatefulWidget {
   String number;
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen16State createState() => _Screen16State();
 }
 
@@ -63,7 +64,7 @@ class _Screen16State extends State<Screen16> {
   Future<bool> _onWillPop() async {
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (BuildContext context) => Screen3()),
+        MaterialPageRoute(builder: (BuildContext context) => const VideoScreen()),
             (Route<dynamic> route) => false
     );
       return true;
@@ -76,7 +77,7 @@ class _Screen16State extends State<Screen16> {
       onWillPop: _onWillPop,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        appBar:  _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+        appBar:  _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
         body: Container(
           color: AppColors.backgroundColor,
           width: MediaQuery.of(context).size.width,
@@ -117,7 +118,7 @@ class _Screen16State extends State<Screen16> {
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
+                          MaterialPageRoute(builder: (BuildContext context) => const VideoScreen()),
                               (Route<dynamic> route) => false
                       );
                     },
@@ -125,7 +126,7 @@ class _Screen16State extends State<Screen16> {
                        TextButton(onPressed: () {
                          Navigator.pushAndRemoveUntil(
                              context,
-                             MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+                             MaterialPageRoute(builder: (BuildContext context) =>const VideoScreen()),
                                  (Route<dynamic> route) => false
                          );
                        }, child: const Text("Back to Home Screen",style: TextStyle(color: AppColors.textWhiteColor)),)

@@ -1,4 +1,6 @@
 
+// ignore_for_file: library_private_types_in_public_api, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
@@ -27,17 +29,20 @@ class _LogoScreenState extends State<LogoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     getScreenDetails();
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       alignment: Alignment.center,
         child: widget.screen == "" ?  Text("Burgeon",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             : widget.screen == "PIRE" ?  Text("Burgeon-PIRE",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             : widget.screen == "Trellis" ?  Text("Burgeon-Trellis",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             : widget.screen == "Garden" ?  Text("Burgeon-Garden",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor) ,)
             :  widget.screen == "Column" ?  Text("Burgeon-Column",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
+            :  widget.screen == "Premium" ?  Text("Burgeon-Premium",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
+            :  widget.screen == "Ladder" ?  Text("Burgeon-Ladder",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
+            :  widget.screen == "NAQ" ?  Text("Neurological Alignment \nQuotient",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
+            :  widget.screen == "Bridge" ?  Text("Burgeon-Bridge",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             :Text("Burgeon",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
       // Image.asset(widget.screen == "" ? "assets/trigger_logo.png"
       //     : widget.screen == "PIRE" ? "assets/burgeon_pire.png"

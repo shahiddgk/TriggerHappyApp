@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_quiz_app/Screens/PireScreens/screen_16.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
@@ -30,6 +31,7 @@ class Screen15 extends StatefulWidget {
   Screen15(this.questionListResponse,{Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _Screen15State createState() => _Screen15State();
 }
 
@@ -43,7 +45,6 @@ class _Screen15State extends State<Screen15> {
   String answerNo = "";
   String answerText = "";
   bool _isUserDataLoading = true;
-  bool _isAnswerDataLoading = true;
   bool isAnswerLoading = false;
   late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -95,15 +96,16 @@ class _Screen15State extends State<Screen15> {
     setState(() {
       _isUserDataLoading = true;
     });
+    // ignore: avoid_print
     print("Data getting called");
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = _sharedPreferences.getString(UserConstants().userName)!;
-    id = _sharedPreferences.getString(UserConstants().userId)!;
-    email = _sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = _sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = _sharedPreferences.getString(UserConstants().userType)!;
-    allowEmail = _sharedPreferences.getString(UserConstants().allowEmail)!;
+    name = sharedPreferences.getString(UserConstants().userName)!;
+    id = sharedPreferences.getString(UserConstants().userId)!;
+    email = sharedPreferences.getString(UserConstants().userEmail)!;
+    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+    userType = sharedPreferences.getString(UserConstants().userType)!;
+    allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
     setState(() {
       _isUserDataLoading = false;
     });
@@ -160,21 +162,20 @@ class _Screen15State extends State<Screen15> {
 
   }
 
+  // ignore: unused_element
   _getAnswerData() async {
     setState(() {
-      _isAnswerDataLoading = true;
     });
     _sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       answerNo = _sharedPreferences.getString("answerType15")!;
       answerText = _sharedPreferences.getString("answerText15")!;
-      _isAnswerDataLoading = false;
     });
 
   }
 
   setAnswerText()  {
-
+// ignore: avoid_print
     print("Calling question Submission");
     QuestionStatePrefrence().setAnswerText(
         PireConstants.questionTenId, widget.questionListResponse[10].id.toString(),
@@ -188,7 +189,7 @@ class _Screen15State extends State<Screen15> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(false,false,"","",false) : AppBarWidget().appBar(false,false,name,id,false),
+      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();
@@ -207,7 +208,7 @@ class _Screen15State extends State<Screen15> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: AppColors.backgroundColor,
@@ -252,7 +253,7 @@ class _Screen15State extends State<Screen15> {
                              tileColor: AppColors.textWhiteColor,
                              activeColor: AppColors.primaryColor,
                              value: widget.questionListResponse[10].options[index],
-                             title: Text(widget.questionListResponse[10].options[index],style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
+                             title: Text(widget.questionListResponse[10].options[index],style: const TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),
                              groupValue: _groupValue,
                              onChanged:  (newValue) {
                                selectedAnswer.clear();

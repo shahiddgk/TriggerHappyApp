@@ -1,26 +1,27 @@
 
-import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_quiz_app/model/reponse_model/column_read_data_model.dart';
+// ignore_for_file: avoid_print, duplicate_ignore
+
+import 'package:flutter_quiz_app/model/reponse_model/naq_response_model.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
-import 'package:flutter_quiz_app/model/reponse_model/response_history_model.dart';
 import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
 import 'package:flutter_quiz_app/model/request_model/forgot_password_request.dart';
 import 'package:flutter_quiz_app/model/request_model/login_request.dart';
 import 'package:flutter_quiz_app/model/request_model/register_create_request.dart';
-import 'package:flutter_quiz_app/model/reponse_model/login_response_model.dart';
 import 'package:flutter_quiz_app/model/request_model/response_email_request.dart';
 import 'package:flutter_quiz_app/model/request_model/social_login_request_model.dart';
 import 'package:flutter_quiz_app/model/request_model/trellis_data_saving_request.dart';
 import 'package:flutter_quiz_app/network/response_handler.dart';
 
+import '../model/reponse_model/naq__response_model.dart';
 import '../model/request_model/answer_reques_model.dart';
 import '../model/request_model/column_delete_request.dart';
 import '../model/request_model/column_read_list_request.dart';
+import '../model/request_model/ladder_add_favourite_response.dart';
 import '../model/request_model/logout_user_request.dart';
 import '../model/request_model/read_trellis_model.dart';
 import '../model/request_model/session_entry_request.dart';
+import '../model/request_model/stripe_request_payment_model.dart';
 import '../model/request_model/trellis_delete_request_model.dart';
 import '../model/request_model/trellis_identity_request_model.dart';
 import '../model/request_model/trellis_ladder_request_model.dart';
@@ -99,9 +100,9 @@ class HTTPManager {
     return response;
   }
 
-  Future<QuestionListModel> getQuestions() async {
+  Future<QuestionListModel> getQuestions(String questionListType) async {
 
-    const url = ApplicationURLs.API_QUESTIONS;
+    String url = "${ApplicationURLs.API_QUESTIONS}?type=$questionListType";
     // ignore: avoid_print
     print(url);
 
@@ -111,6 +112,20 @@ class HTTPManager {
     // ignore: avoid_print
     print(response.toString());
     return questionAnswerResponseModel;
+  }
+
+  Future<NaqModelClassResponse> getNaqQuestions(String questionListType) async {
+
+    String url = "${ApplicationURLs.API_QUESTIONS}?type=$questionListType";
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.get(Uri.parse(url),false);
+    NaqModelClassResponse naqModelClassResponse = NaqModelClassResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return naqModelClassResponse;
   }
 
   Future<dynamic> userAnswer(AnswerRequestModel answerRequestModel) async {
@@ -146,6 +161,21 @@ class HTTPManager {
   Future<dynamic> userResponseEmail(UserResponseRequestModel userResponseRequestModel) async {
 
     const url = ApplicationURLs.API_RESPONSE_EMAIL;
+    // ignore: avoid_print
+    print(url);
+    // ignore: avoid_print
+    print(userResponseRequestModel.answerMap);
+
+    final response =
+    await _handler.post(Uri.parse(url), userResponseRequestModel.toJson());
+
+    return response;
+
+  }
+
+  Future<dynamic> userNaqResponseEmail(UserResponseRequestModel userResponseRequestModel) async {
+
+    const url = ApplicationURLs.API_RESPONSE_NAQ;
     // ignore: avoid_print
     print(url);
     // ignore: avoid_print
@@ -196,6 +226,20 @@ class HTTPManager {
     // print(response.toString());
     return response;
   }
+  //NAQ API CALL
+  Future<NaqResponseListModel> naqResponseList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_NAQ_RESPONSE;
+    //// ignore: avoid_print
+     print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    NaqResponseListModel naqResponseListModel = NaqResponseListModel.fromJson(response["single_answer"]);
+    //// ignore: avoid_print
+    // print(response.toString());
+    return naqResponseListModel;
+  }
 
   Future<dynamic> logoutUser(LogoutRequestModel logoutRequestModel) async {
 
@@ -220,6 +264,19 @@ class HTTPManager {
 
     final response =
     await _handler.post(Uri.parse(url),trellisDataRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // print(response.toString());
+    return response;
+  }
+
+  Future<dynamic> trellisTriggerData(TrellisTriggerRequestModel trellisTriggerRequestModel) async {
+
+    String url = ApplicationURLs.API_TRELLIS_RESPONSE_TRIGGER;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisTriggerRequestModel.toJson());
     // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
     // print(response.toString());
     return response;
@@ -311,6 +368,20 @@ class HTTPManager {
     return response;
   }
 
+
+  Future<dynamic> ladderAddFavourite(LadderAddFavouriteItem ladderAddFavouriteItem) async {
+
+    String url = ApplicationURLs.API_LADDER_FAVOURITE;
+
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),ladderAddFavouriteItem.toJson());
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
   Future<dynamic> trellisDelete(TrellisDeleteRequestModel trellisDeleteRequestModel) async {
 
     String url = ApplicationURLs.API_TRELLIS_DELETE;
@@ -367,6 +438,60 @@ class HTTPManager {
 
     final response =
     await _handler.get(Uri.parse(url),false);
+    return response;
+  }
+
+
+  Future<dynamic> stripeTokenApi(String? cardNumber, int? expMonth, int? expYear, String? cvc, String? publishableKey,) async {
+    const url = ApplicationURLs.stripeTokenUrl;
+    final body = {
+      'card[number]': cardNumber,
+      'card[exp_month]': expMonth.toString(),
+      'card[exp_year]': expYear.toString(),
+      'card[cvc]': cvc,
+    };
+
+    // ignore: avoid_print
+    print(url);
+
+    final response = await _handler.stripePost(Uri.parse(url), body, publishableKey!);
+    //TokenObject tokenObject = TokenObject.fromJson(response);
+    return response;
+  }
+
+  Future<dynamic> stripePayment(StripePaymentRequestModel stripePaymentRequestModel) async {
+    const url = ApplicationURLs.API_STRIPE_PAYMENT_URL;
+    // print(stripePaymentRequestModel.user);
+    // print(stripePaymentRequestModel.package);
+
+    // ignore: avoid_print
+    print(url);
+    final response =
+    await _handler.post(Uri.parse(url),stripePaymentRequestModel.toJson());
+    return response;
+  }
+
+  Future<dynamic> cancelSubscription(StripeCancelRequestModel stripeCancelRequestModel) async {
+    const url = ApplicationURLs.API_STRIPE_CANCEL_SUBSCRIPTION_URL;
+    // print(stripePaymentRequestModel.user);
+    // print(stripePaymentRequestModel.package);
+
+    // ignore: avoid_print
+    print(url);
+    final response =
+    await _handler.post(Uri.parse(url),stripeCancelRequestModel.toJson());
+    return response;
+  }
+
+
+  Future<dynamic> subscriptionDetailsRead(ColumnReadRequestModel columnReadRequestModel) async {
+    const url = ApplicationURLs.API_SUBSCRIPTION_DETAILS_READ;
+    // print
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),columnReadRequestModel.toJson());
     return response;
   }
 

@@ -13,6 +13,13 @@ class QuestionStatePrefrence {
     _sharedPreferences.setStringList(textKey, textValue);
   }
 
+  // setNAQAnswerList(String id,List<String> textValue) async {
+  //   _sharedPreferences = await SharedPreferences.getInstance();
+  //   _sharedPreferences.setString(id, idValue);
+  //   _sharedPreferences.setString(typeKey,typeValue);
+  //   _sharedPreferences.setStringList(textKey, textValue);
+  // }
+
   clearAnswerText() async {
     _sharedPreferences = await SharedPreferences.getInstance();
 
