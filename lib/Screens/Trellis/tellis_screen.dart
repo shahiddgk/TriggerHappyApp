@@ -26,6 +26,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/colors.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
+import '../../model/reponse_model/trellis_ladder_data_response.dart';
 import '../../model/reponse_model/trellis_principle_data_response.dart';
 import '../../model/request_model/trellis_principles_request_model.dart';
 import '../dashboard_tiles.dart';
@@ -58,10 +59,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
   bool _isDataLoading = false;
   late bool isPhone;
   late List <dynamic> trellisData;
-  List <dynamic> trellisLadderDataForGoalsAchievements = [];
-  List <dynamic> trellisLadderDataForGoals = [];
-  List <dynamic> trellisLadderDataForGoalsChallenges = [];
-  List <dynamic> trellisLadderDataForAchievements = [];
+  List <TrellisLadderDataModel> trellisLadderDataForGoalsAchievements = [];
+  List <TrellisLadderDataModel> trellisLadderDataForGoals = [];
+  List <TrellisLadderDataModel> trellisLadderDataForGoalsChallenges = [];
+  List <TrellisLadderDataModel> trellisLadderDataForAchievements = [];
   late List <dynamic> trellisIdentityNeedsData;
   List <dynamic> trellisNeedsData = [];
   List <dynamic> trellisIdentityData = [];
@@ -71,6 +72,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
   List <dynamic> trellisTribeData = [];
   // ignore: non_constant_identifier_names
   late Trellis_principle_data_model_class trellis_principle_data_model_class;
+  late TrellisLadderDataModel trellisLadderDataModel;
 
   String initialValueForType = "physical";
   List itemsForType = ["physical","Emotional","Relational","Work","Financial","Spiritual"];
@@ -320,12 +322,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
     });
     HTTPManager().trellisRead(TrellisRequestModel(userId: id,table: 'ladder')).then((value) {
 
-      trellisLadderDataForGoalsAchievements = value['data'];
+      TrellisLadderDataListModel trellisLadderDataListModel  = TrellisLadderDataListModel.fromJson(value['data']);
+      trellisLadderDataForGoalsAchievements = trellisLadderDataListModel.values;
       for(int i=0; i<trellisLadderDataForGoalsAchievements.length;i++) {
-        if(trellisLadderDataForGoalsAchievements[i]['favourite'] == "yes") {
-          if (trellisLadderDataForGoalsAchievements[i]['type'].toString() ==
+        if(trellisLadderDataForGoalsAchievements[i].favourite == "yes") {
+          if (trellisLadderDataForGoalsAchievements[i].type.toString() ==
               "goal") {
-            if (trellisLadderDataForGoalsAchievements[i]['option2'] ==
+            if (trellisLadderDataForGoalsAchievements[i].option2 ==
                 "Challenges") {
               trellisLadderDataForGoalsChallenges.add(
                   trellisLadderDataForGoalsAchievements[i]);
@@ -340,6 +343,9 @@ class _TrellisScreenState extends State<TrellisScreen> {
         }
 
       }
+      trellisLadderDataForGoalsChallenges.sort((a,b)=>b.date!.compareTo(a.date!));
+      trellisLadderDataForGoals.sort((a,b)=>b.date!.compareTo(a.date!));
+      trellisLadderDataForAchievements.sort((a,b)=>b.date!.compareTo(a.date!));
       setState(() {
         _isLoading = false;
       });
@@ -697,7 +703,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                         ]
                     ),
 
-                    ExpansionTileWidgetScreen(isLadderExpanded,"Ladder",isLadderExpanded,"Goals/challenges,Memories/Achievements","",false,(bool value) {
+                    ExpansionTileWidgetScreen(isLadderExpanded,"Ladder Highlights",isLadderExpanded,"Goals/challenges,Memories/Achievements","",false,(bool value) {
                       // ignore: avoid_print
                       print(value);
                       setScreenStatus("Ladder",value);
@@ -840,13 +846,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text("${trellisLadderDataForGoals[index]['option1']} | ${trellisLadderDataForGoals[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                                                      Text("${trellisLadderDataForGoals[index].option1} | ${trellisLadderDataForGoals[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
 
                                                       Row(
                                                         children: [
-                                                      trellisLadderDataForGoals[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                      trellisLadderDataForGoals[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                      showDeletePopup( "goal",trellisLadderDataForGoals[index]['id'].toString(),index,trellisLadderDataForGoals[index]['option2']);
+                                                      showDeletePopup( "goal",trellisLadderDataForGoals[index].id.toString(),index,trellisLadderDataForGoals[index].option2.toString());
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
                                                         ],
                                                       )
@@ -860,7 +866,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   //   ),),
                                                   Align(
                                                       alignment: Alignment.topLeft,
-                                                      child:  Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForGoals[index]['date'].toString()))} | ${trellisLadderDataForGoals[index]['text']} | ${trellisLadderDataForGoals[index]['description']}"))
+                                                      child:  Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForGoals[index].date.toString()))} | ${trellisLadderDataForGoals[index].text} | ${trellisLadderDataForGoals[index].description}"))
                                                 ],
                                               )),
                                         );
@@ -893,13 +899,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text("${trellisLadderDataForGoalsChallenges[index]['option1']} | ${trellisLadderDataForGoalsChallenges[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                                                      Text("${trellisLadderDataForGoalsChallenges[index].option1} | ${trellisLadderDataForGoalsChallenges[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
 
                                                       Row(
                                                         children: [
-                                                          trellisLadderDataForGoalsChallenges[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                          trellisLadderDataForGoalsChallenges[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                           IconButton(onPressed: () {
-                                                            _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index]['id'].toString(),index,trellisLadderDataForGoalsChallenges[index]['option2']);
+                                                            _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index].id.toString(),index,trellisLadderDataForGoalsChallenges[index].option2.toString());
                                                           }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
                                                         ],
                                                       )
@@ -914,7 +920,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   //   ),),
                                                   Align(
                                                       alignment: Alignment.topLeft,
-                                                      child:  Text(" ${trellisLadderDataForGoalsChallenges[index]['text']} "))
+                                                      child:  Text(" ${trellisLadderDataForGoalsChallenges[index].text} "))
                                                 ],
                                               )),
                                         );
@@ -1036,13 +1042,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text("${trellisLadderDataForAchievements[index]['option1']} | ${trellisLadderDataForAchievements[index]['option2']}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                                                      Text("${trellisLadderDataForAchievements[index].option1} | ${trellisLadderDataForAchievements[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
 
                                                       Row(
                                                         children: [
-                                                      trellisLadderDataForAchievements[index]['favourite'] != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                      trellisLadderDataForAchievements[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                        showDeletePopup( "achievements",trellisLadderDataForAchievements[index]['id'].toString(),index,"");
+                                                        showDeletePopup( "achievements",trellisLadderDataForAchievements[index].id.toString(),index,"");
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
                                                         ],
                                                       )
@@ -1050,7 +1056,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   ),
                                                   Align(
                                                       alignment: Alignment.topLeft,
-                                                      child: Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForAchievements[index]['date'].toString()))} | ${trellisLadderDataForAchievements[index]['text']}"))
+                                                      child: Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForAchievements[index].date.toString()))} | ${trellisLadderDataForAchievements[index].text}"))
                                                 ],
                                               )),
                                         );
@@ -2504,7 +2510,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           ),
                           backgroundColor: AppColors.primaryColor,
                         ),
-                        child: const Text("Get My Reward",style: TextStyle(color: AppColors.backgroundColor),),
+                        child: const Text("I Read My Trellis Today",style: TextStyle(color: AppColors.backgroundColor),),
                       ),
                     )
                   ],
@@ -2520,11 +2526,11 @@ class _TrellisScreenState extends State<TrellisScreen> {
     );
   }
 
-  Widget _buildPopupDialog(BuildContext context,String heading,dynamic object, bool oneCategory) {
+  Widget _buildPopupDialog(BuildContext context,String heading,TrellisLadderDataModel trellisLadderDataModel1, bool oneCategory) {
     return  AlertDialog(
       backgroundColor: AppColors.lightGreyColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10)
+          borderRadius: BorderRadius.circular(10)
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2534,7 +2540,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Ladder",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+              const Text("Ladder Highlights",style: TextStyle(fontSize: AppConstants.headingFontSize),),
               Text(heading,style: const TextStyle(fontSize: AppConstants.defaultFontSize,color: AppColors.primaryColor),),
             ],
           ),
@@ -2554,21 +2560,21 @@ class _TrellisScreenState extends State<TrellisScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-                Container(
-                  margin:const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const  Expanded(
-                          flex:1,
-                          child: Text("Type: ",style: TextStyle(fontWeight: FontWeight.bold),)),
-                      Expanded(
-                          flex: 2,
-                          child: Text(object['type'])),
-                    ],
+            Container(
+              margin:const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const  Expanded(
+                      flex:1,
+                      child: Text("Type: ",style: TextStyle(fontWeight: FontWeight.bold),)),
+                  Expanded(
+                      flex: 2,
+                      child: Text(trellisLadderDataModel1.type!)),
+                ],
+              ),
             ),
-                ),
             Container(
               margin:const EdgeInsets.symmetric(vertical: 3),
               child: Row(
@@ -2580,7 +2586,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       child: Text("Category: ",style: TextStyle(fontWeight: FontWeight.bold),)),
                   Expanded(
                       flex: 2,
-                      child: Text(object['option1'])),
+                      child: Text(trellisLadderDataModel1.option1!)),
                 ],
               ),
             ),
@@ -2595,23 +2601,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                       child: Text("Date: ",style: TextStyle(fontWeight: FontWeight.bold),)),
                   Expanded(
                       flex: 2,
-                      child: Text(DateFormat('MM-dd-yy').format(DateTime.parse(object['date'].toString())))),
-                ],
-              ),
-            ),
-            Container(
-              margin:const EdgeInsets.symmetric(vertical: 3),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                 const Expanded(
-                      flex:1,
-                      child: Text("Title: ",style: TextStyle(fontWeight: FontWeight.bold),)),
-
-                  Expanded(
-                      flex: 2,
-                      child: Text(object['text'])),
+                      child: Text(trellisLadderDataModel1.option2! == "Challenges" ? "" :DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataModel1.date.toString())))),
                 ],
               ),
             ),
@@ -2622,11 +2612,27 @@ class _TrellisScreenState extends State<TrellisScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Expanded(
-                    flex:1,
+                      flex:1,
+                      child: Text("Title: ",style: TextStyle(fontWeight: FontWeight.bold),)),
+
+                  Expanded(
+                      flex: 2,
+                      child: Text(trellisLadderDataModel1.text!)),
+                ],
+              ),
+            ),
+            Container(
+              margin:const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Expanded(
+                      flex:1,
                       child:  Text("Description: ",style: TextStyle(fontWeight: FontWeight.bold),)),
                   Expanded(
                       flex: 2,
-                      child: Text(object['description'])),
+                      child: Text(trellisLadderDataModel1.description!)),
                 ],
               ),
             ),
@@ -2635,7 +2641,6 @@ class _TrellisScreenState extends State<TrellisScreen> {
       ),
     );
   }
-
   _saveTrellisTriggerResponse() {
     setState(() {
       _isDataLoading = true;
@@ -2646,7 +2651,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
       setState(() {
         _isDataLoading = false;
       });
-      showToastMessage(context, "Your reward has been added for today", true);
+      showToastMessage(context, "Great job growing your Garden!", true);
     }).catchError((e) {
         showToastMessage(context, e.toString(), false);
         setState(() {

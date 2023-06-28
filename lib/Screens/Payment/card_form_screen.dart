@@ -1,15 +1,19 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:credit_card_form/credit_card_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
+import 'package:flutter_quiz_app/model/reponse_model/stripe_keys_details.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
+import '../../Widgets/option_mcq_widget.dart';
+import '../../model/request_model/logout_user_request.dart';
 import '../../model/request_model/stripe_request_payment_model.dart';
 import '../../network/http_manager.dart';
 import '../PireScreens/widgets/AppBar.dart';
@@ -50,14 +54,18 @@ class _CardFormScreenState extends State<CardFormScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic>? paymentIntent;
   bool isLoading = false;
-  var clientkey = "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";
+
+  bool isError = false;
+  String errorMessage = "";
+  // var clientkey = "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";
   // late CardFieldInputDetails _cardInputDetails;
-  String publishableKey = "pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC";
+  String publishableKey = "";
 
   String? cardNumber;
   String? cardExpiryMonth;
   String? cardExpiryYear;
   String? cardCVC;
+  late StripeKeysDetailsModelClass stripeKeysDetailsModelClass;
 
   // final CardFormEditController cardFormEditController = CardFormEditController();
   final CreditCardController creditCardController = CreditCardController();
@@ -81,12 +89,34 @@ class _CardFormScreenState extends State<CardFormScreen> {
     super.dispose();
   }
 
+  _getStripeKeys() {
+
+    setState(() {
+      isLoading = true;
+      isError = false;
+      errorMessage = "";
+    });
+    HTTPManager().getStripeKeysDetails(LogoutRequestModel(userId: id)).then((value) {
+
+      stripeKeysDetailsModelClass = value;
+      setState(() {
+        publishableKey = stripeKeysDetailsModelClass.data!.stripeLiveKey!;
+        print(publishableKey);
+        isLoading = false;
+      });
+    }).catchError((e) {
+      print(e);
+      setState(() {
+
+        isError = true;
+        errorMessage = e.toString();
+
+        isLoading = false;
+      });
+    });
+  }
+
   _getSubscriptionData() async {
-    //showUpdatePopup(context);
-    // setState(() {
-    //   _isUserDataLoading = true;
-    // });
-    //  print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
@@ -94,9 +124,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
     userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
     userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
 
-    // setState(() {
-    //   _isUserDataLoading = false;
-    // });
   }
 
   _getUserData() async {
@@ -115,7 +142,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
     allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
     userLoggedIn = sharedPreferences.getBool(UserConstants().userLoggedIn)!;
-
+    _getStripeKeys();
     setState(() {
       _isUserDataLoading = false;
     });
@@ -153,179 +180,114 @@ class _CardFormScreenState extends State<CardFormScreen> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                   Text(
-                    widget.packageDetails,
-                    style:const TextStyle(
-                      fontSize: 20.0,
-                      color: AppColors.textWhiteColor,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height/18),
-                  Text(
-                    widget.packageDetails == "Monthly" ? "\$8" : widget.packageDetails == "Day"  ? "\$20" : "\$60" ,
-                    style: const TextStyle(
-                      fontSize: 20.0,
-                      color: AppColors.textWhiteColor,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height/12),
-                  // const SizedBox(height: 30.0),
-                  // const Text(
-                  //   '✔ some text here',
-                  //   style: TextStyle(
-                  //     fontSize: 20.0,
-                  //     color: AppColors.textWhiteColor,
-                  //     fontWeight: FontWeight.normal,
-                  //   ),
-                  // ),
-                  // const Text(
-                  //   '✔ some text here',
-                  //   style: TextStyle(
-                  //     fontSize: 20.0,
-                  //     color: AppColors.textWhiteColor,
-                  //     fontWeight: FontWeight.normal,
-                  //   ),
-                  // ),
-                  // const Text(
-                  //   '✔ some text here',
-                  //   style: TextStyle(
-                  //     fontSize: 20.0,
-                  //     color: AppColors.textWhiteColor,
-                  //     fontWeight: FontWeight.normal,
-                  //   ),
-                  // ),
-                  // const Text(
-                  //   '✔ some text here',
-                  //   style: TextStyle(
-                  //     fontSize: 20.0,
-                  //     color: AppColors.textWhiteColor,
-                  //     fontWeight: FontWeight.normal,
-                  //   ),
-                  // ),
-                  // Container(
-                  //   decoration: BoxDecoration(
-                  //       color: AppColors.greyColor,
-                  //       borderRadius: BorderRadius.circular(30)
-                  //   ),
-                  //   margin: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                  //   alignment: Alignment.center,
-                  //   padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                  //   width: MediaQuery.of(context).size.width,
-                  //   height: 60,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //     children: [
-                  //       ElevatedButton(
-                  //         onPressed: () {},
-                  //         style: ElevatedButton.styleFrom(
-                  //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                  //           shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(25.0),
-                  //           ),
-                  //           backgroundColor: AppColors.primaryColor,
-                  //         ),
-                  //         child:const Text("Free",style: TextStyle(fontSize: 15),),
-                  //       ),
-                  //       ElevatedButton(
-                  //         onPressed: () {},
-                  //         style: ElevatedButton.styleFrom(
-                  //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                  //           shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(25.0),
-                  //           ),
-                  //           backgroundColor: AppColors.primaryColor,
-                  //         ),
-                  //         child:const Column(
-                  //           children: [
-                  //             Text("Annual",style: TextStyle(fontSize: 12),),
-                  //             Text("200 \$",style: TextStyle(fontSize: 12),),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //       ElevatedButton(
-                  //         onPressed: () {},
-                  //         style: ElevatedButton.styleFrom(
-                  //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                  //           shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(25.0),
-                  //           ),
-                  //           backgroundColor: AppColors.primaryColor,
-                  //         ),
-                  //         child:const Column(
-                  //           children: [
-                  //             Text("Monthly",style: TextStyle(fontSize: 12),),
-                  //             Text("20 \$",style: TextStyle(fontSize: 12),),
-                  //           ],
-                  //         ),
-                  //       )
-                  //     ],
-                  //   ),
-                  // ),
-                  Form(
-                    key: _formKey,
-                    child: SingleChildScrollView(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          child: CreditCardForm(
-                            hideCardHolder: true,
-                            controller: creditCardController,
-
-                            theme: CustomCardTheme(),
-                            // ignore: avoid_types_as_parameter_names
-                            onChanged: (CreditCardResult ) {
-                              setState(() {
-                                cardNumber = CreditCardResult.cardNumber;
-                                cardExpiryMonth = CreditCardResult.expirationMonth;
-                                cardExpiryYear = CreditCardResult.expirationYear;
-                                cardCVC = CreditCardResult.cvc;
-                              });
-                              // ignore: avoid_print
-                              print(CreditCardResult.cardNumber);
-                              // ignore: avoid_print
-                              print(CreditCardResult.expirationMonth);
-                              // ignore: avoid_print
-                              print(CreditCardResult.expirationYear);
-                              // ignore: avoid_print
-                              print(CreditCardResult.cardType);
-                              // ignore: avoid_print
-                              print(CreditCardResult.cvc);
-                            },
-                          ),
+                  isError ? Center(
+                    // ignore: avoid_unnecessary_containers
+                    child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: MediaQuery.of(context).size.height/10),
+                            Text(errorMessage,style:const TextStyle(fontSize: 25),),
+                            const SizedBox(height: 5,),
+                            GestureDetector(
+                              onTap: () {
+                                _getStripeKeys();
+                              },
+                              child: OptionMcqAnswer(
+                                  TextButton(onPressed: () {
+                                    _getStripeKeys();
+                                  }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
+                              ),
+                            )
+                          ],
                         )
                     ),
-                  ),
-                  const  SizedBox(height: 16.0),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 100),
-                      backgroundColor: AppColors.primaryColor,
-                    ),
-                    onPressed: () {
+                  ) : Column(
+                     children: [
+                       Text(
+                         widget.packageDetails,
+                         style:const TextStyle(
+                           fontSize: 20.0,
+                           color: AppColors.textWhiteColor,
+                           fontWeight: FontWeight.normal,
+                         ),
+                       ),
+                       SizedBox(height: MediaQuery.of(context).size.height/18),
+                       Text(
+                         widget.packageDetails == "Monthly" ? "\$8" : widget.packageDetails == "Day"  ? "\$20" : "\$60" ,
+                         style: const TextStyle(
+                           fontSize: 20.0,
+                           color: AppColors.textWhiteColor,
+                           fontWeight: FontWeight.normal,
+                         ),
+                       ),
+                       SizedBox(height: MediaQuery.of(context).size.height/12),
+                       Form(
+                         key: _formKey,
+                         child: SingleChildScrollView(
+                             child: Container(
+                               margin: const EdgeInsets.symmetric(horizontal: 10),
+                               child: CreditCardForm(
+                                 hideCardHolder: true,
+                                 controller: creditCardController,
 
-                      if(widget.packageDetails == "Monthly") {
-                        _createCardToke(
-                          cardNumber!, int.parse(cardExpiryMonth.toString()),
-                          int.parse(cardExpiryYear.toString()), cardCVC!,
-                          publishableKey,"month","8");
-                      } else if(widget.packageDetails == "Day"){
-                        _createCardToke(
-                            cardNumber!, int.parse(cardExpiryMonth.toString()),
-                            int.parse(cardExpiryYear.toString()), cardCVC!,
-                            publishableKey,"day","8");
-                      } else {
-                        _createCardToke(
-                            cardNumber!, int.parse(cardExpiryMonth.toString()),
-                            int.parse(cardExpiryYear.toString()), cardCVC!,
-                            publishableKey,"year","60");
-                      }
-                    },
-                    child:const Text('Pay Now',style: TextStyle(color: AppColors.backgroundColor),),
-                  ),
+                                 theme: CustomCardTheme(),
+                                 // ignore: avoid_types_as_parameter_names
+                                 onChanged: (CreditCardResult ) {
+                                   setState(() {
+                                     cardNumber = CreditCardResult.cardNumber;
+                                     cardExpiryMonth = CreditCardResult.expirationMonth;
+                                     cardExpiryYear = CreditCardResult.expirationYear;
+                                     cardCVC = CreditCardResult.cvc;
+                                   });
+                                   // ignore: avoid_print
+                                   print(CreditCardResult.cardNumber);
+                                   // ignore: avoid_print
+                                   print(CreditCardResult.expirationMonth);
+                                   // ignore: avoid_print
+                                   print(CreditCardResult.expirationYear);
+                                   // ignore: avoid_print
+                                   print(CreditCardResult.cardType);
+                                   // ignore: avoid_print
+                                   print(CreditCardResult.cvc);
+                                 },
+                               ),
+                             )
+                         ),
+                       ),
+                       const  SizedBox(height: 16.0),
+                       ElevatedButton(
+                         style: ElevatedButton.styleFrom(
+                           shape: RoundedRectangleBorder(
+                               borderRadius: BorderRadius.circular(20)
+                           ),
+                           padding: const EdgeInsets.symmetric(horizontal: 100),
+                           backgroundColor: AppColors.primaryColor,
+                         ),
+                         onPressed: () {
+
+                           if(widget.packageDetails == "Monthly") {
+                             _createCardToke(
+                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
+                                 int.parse(cardExpiryYear.toString()), cardCVC!,
+                                 publishableKey,"month","8");
+                           } else if(widget.packageDetails == "Day"){
+                             _createCardToke(
+                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
+                                 int.parse(cardExpiryYear.toString()), cardCVC!,
+                                 publishableKey,"day","8");
+                           } else {
+                             _createCardToke(
+                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
+                                 int.parse(cardExpiryYear.toString()), cardCVC!,
+                                 publishableKey,"year","60");
+                           }
+                         },
+                         child:const Text('Pay Now',style: TextStyle(color: AppColors.backgroundColor),),
+                       ),
+                     ],
+                   )
                 ],
               ),
             ),
@@ -347,32 +309,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
         isLoading = true;
       });
       HTTPManager().stripeTokenApi(cardNumber1, expMonth1, expYear1, cvc1, publishableKey).then((value) {
-        // Token? tokenObject;
-        // setState(() {
-        //   tokenObject = value;
-        // });
-        // print("These are the Card Details of API RESPONSE");
-        // print(value);
-        // dynamic user = {
-        //   "userid": id,
-        //   "username": name,
-        //   "useremail": email
-        // };
-        // final user = {
-        //   "userid" : id,
-        //   "useremail" : email,
-        //   "username" : name
-        // };
-        // final plan = {
-        //   "text" : widget.packageDetails == "Monthly" ? "Gold" :"Premium",
-        //   "amount" : widget.packageDetails == "Monthly" ? "20" : "200",
-        //   "interval" : "year"
-        // };
-        // Map<String, dynamic> body = {
-        //   "user": user,
-        //   "token": value,
-        //   "package": plan,
-        // };
+
         // User userObject = User(userid:int.parse(id),username:name.toString(),useremail:email.toString());
         // Package plan =  Package(text:"Premium".toString(), amount :200, interval:"year".toString());
         if(widget.packageDetails == "Monthly") {
@@ -387,7 +324,9 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
       }).catchError((e) {
         // ignore: avoid_print
-        print(e);
+        print(e.toString());
+
+        showToastMessage(context, "Incorrect card details", false);
         setState(() {
           isLoading = false;
         });
@@ -408,12 +347,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
     print(pkgAmount);
     // ignore: avoid_print
     print(pkgInterval);
-    // print(tokenObject1.toString());
-    // print(plan1.toString());
-
-    // setState(() {
-    //   isLoading = true;
-    // });
     HTTPManager().stripePayment(StripePaymentRequestModel(userId: usrId,token: token1,packageAmount: pkgAmount,packageInterval: pkgInterval,packageText: pkgText)).then((value) {
       // ignore: avoid_print
       print(value);

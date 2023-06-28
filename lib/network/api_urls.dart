@@ -10,6 +10,9 @@ class ApplicationURLs {
   static const API_STRIPE_CANCEL_SUBSCRIPTION_URL = "${BASE_URL_APP}subscription_cancel";
   static const API_SUBSCRIPTION_DETAILS_READ = "${BASE_URL_APP}subscription_details";
 
+  //Stripe details key
+  static const API_STRIPE_KEY_DETAILS = "${BASE_URL_APP}payment_settings";
+
   //Authentication
   static const API_REGISTER_USER = "${BASE_URL_APP}signup";
   static const API_REGISTER_USER_WITH_GOOGLE = "${BASE_URL_APP}social_login";

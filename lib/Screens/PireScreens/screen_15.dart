@@ -337,6 +337,8 @@ class _Screen15State extends State<Screen15> {
         });
         if(allowEmail == "yes") {
           showToastMessage(context, value['message'].toString(), true);
+        } else {
+          showToastMessage(context, "Submitted successfully", true);
         }
         Navigator.pushAndRemoveUntil(
             context,

@@ -102,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   SizedBox(height: MediaQuery.of(context).size.height/2.5,),
                   ElevatedButton(onPressed: (){
 
-                    isUserLoggedIn ? Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TreeScreen()))
+                    isUserLoggedIn ? Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TreeScreen(true)))
                         : Navigator.pushReplacement(context,
                         MaterialPageRoute(builder:
                             (context) =>

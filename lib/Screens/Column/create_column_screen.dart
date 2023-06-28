@@ -8,6 +8,7 @@ import 'package:flutter_quiz_app/Screens/Column/Widgets/date_picker_field_for_co
 import 'package:flutter_quiz_app/Screens/Column/Widgets/text_field_widet.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
+import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/model/request_model/session_entry_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -159,73 +160,97 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
           children: [
             Form(
               key: _formKey,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      LogoScreen("Column"),
-                      // SizedBox(width: 20,),
-                      // IconButton(onPressed: (){
-                      //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
-                      // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
-                    ],
-                  ),
-
-                  Container(
-                    padding:const EdgeInsets.symmetric(horizontal: 5),
-                    child: Row(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: RadioListTile(
-                            value: 1,
-                            groupValue: selectedRadio,
-                            title:const Text('Entry'),
-                            onChanged: (int? val) {
-                              setSelectedRadio(val!);
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            value: 2,
-                            groupValue: selectedRadio,
-                            title:const Text('Session'),
-                            onChanged: (int? val) {
-                              setSelectedRadio(val!);
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            value: 3,
-                            groupValue: selectedRadio,
-                            title:const Text('Meeting'),
-                            onChanged: (int? val) {
-                              setSelectedRadio(val!);
-                            },
-                          ),
-                        ),
-                        // Add more RadioListTile widgets for additional options
+                        LogoScreen("Column"),
+                        // SizedBox(width: 20,),
+                        // IconButton(onPressed: (){
+                        //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
+                        // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
                       ],
                     ),
-                  ),
-                  Container(
-                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                      child: TextFieldWidgetForColumnScreen(titleController, 1, true, "Type your Entry/Session Title",)),
 
-                  Container(
-                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                      child: DatePickerFieldForColumn(dateController,"Select date",true)),
-                  Container(
-                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                      child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
-                  Container(
-                      margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                      child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
+                    Container(
+                      padding:const EdgeInsets.symmetric(horizontal: 5),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                listTileTheme:const ListTileThemeData(
+                                  horizontalTitleGap: 1,//here adjust based on your need
+                                ),
+                              ),
+                              child: RadioListTile(
+                                value: 1,
+                                groupValue: selectedRadio,
+                                title:const Text('Entry',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                onChanged: (int? val) {
+                                  setSelectedRadio(val!);
+                                },
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                listTileTheme:const ListTileThemeData(
+                                  horizontalTitleGap: 1,//here adjust based on your need
+                                ),
+                              ),
+                              child: RadioListTile(
+                                value: 2,
+                                groupValue: selectedRadio,
+                                title:const Text('Session',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                onChanged: (int? val) {
+                                  setSelectedRadio(val!);
+                                },
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                listTileTheme:const ListTileThemeData(
+                                  horizontalTitleGap: 1,//here adjust based on your need
+                                ),
+                              ),
+                              child: RadioListTile(
+                                value: 3,
+                                groupValue: selectedRadio,
+                                title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                onChanged: (int? val) {
+                                  setSelectedRadio(val!);
+                                },
+                              ),
+                            ),
+                          ),
+                          // Add more RadioListTile widgets for additional options
+                        ],
+                      ),
+                    ),
+                    Container(
+                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                        child: TextFieldWidgetForColumnScreen(titleController, 1, false, "Type your Entry/Session Title",)),
 
-                ],
+                    Container(
+                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                        child: DatePickerFieldForColumn(dateController,"Select date",true)),
+                    Container(
+                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                        child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
+                    Container(
+                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                        child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
+
+                  ],
+                ),
               ),
             ),
             Align(

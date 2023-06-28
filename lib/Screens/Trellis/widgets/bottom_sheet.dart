@@ -536,7 +536,7 @@ void ladderBottomSheet(
                                             color: isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
                                             border: Border.all(color: AppColors.primaryColor),
                                             borderRadius:const BorderRadius.only(bottomLeft: Radius.circular(30),topLeft:Radius.circular(30), )),
-                                        child: Text("Goals/Challenges",maxLines: 1,style: TextStyle(color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
+                                        child: Text("Goals/Challenges",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
                                       ),
                                     ),
                                   ),
@@ -561,7 +561,7 @@ void ladderBottomSheet(
                                             color: !isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
                                             border: Border.all(color: AppColors.primaryColor),
                                             borderRadius:const BorderRadius.only(bottomRight: Radius.circular(30),topRight:Radius.circular(30), )),
-                                        child: Text("Memories/achievements",maxLines: 1,style: TextStyle(color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
+                                        child: Text("Memories/achievements",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
                                       ),
                                     ),
                                   ),
@@ -632,7 +632,7 @@ void ladderBottomSheet(
                                     child: NameField(titleForGController,"title",1,70,true)),
                                 Container(
                                     margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                    child: NameField(descriptionForGController,"description",4,70,true)),
+                                    child: NameField(descriptionForGController,"description",4,120,true)),
                                 SaveButtonWidgets( (){
                                   onTap();
                                 }),

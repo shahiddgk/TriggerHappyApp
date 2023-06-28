@@ -11,6 +11,8 @@ import 'package:flutter_quiz_app/splash_screen.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
+import 'Screens/AuthScreens/splash_screen_update.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Stripe.publishableKey = 'pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC';
@@ -89,7 +91,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: buildMaterialColor(AppColors.primaryColor),
       ),
-      home: const SplashScreen(),
+      home: const SplashScreenUpdate(),
     );
   }
 

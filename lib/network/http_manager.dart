@@ -4,6 +4,7 @@
 
 import 'package:flutter_quiz_app/model/reponse_model/naq_response_model.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
+import 'package:flutter_quiz_app/model/reponse_model/stripe_keys_details.dart';
 import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
 import 'package:flutter_quiz_app/model/request_model/forgot_password_request.dart';
 import 'package:flutter_quiz_app/model/request_model/login_request.dart';
@@ -32,6 +33,20 @@ import 'api_urls.dart';
 
 class HTTPManager {
   final ResponseHandler _handler = ResponseHandler();
+
+  Future<StripeKeysDetailsModelClass> getStripeKeysDetails(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_STRIPE_KEY_DETAILS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    StripeKeysDetailsModelClass stripeKeysDetailsModelClass = StripeKeysDetailsModelClass.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return stripeKeysDetailsModelClass;
+  }
 
   Future<dynamic> registerUser(RegisterRequestModel registerRequestModel) async {
     const url = ApplicationURLs.API_REGISTER_USER;

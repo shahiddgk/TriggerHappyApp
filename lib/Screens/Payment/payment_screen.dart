@@ -54,9 +54,9 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   final TextEditingController _cvcController = TextEditingController();
   Map<String, dynamic>? paymentIntent;
   bool isLoading = false;
-  var clientkey = "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";
-  // late CardFieldInputDetails _cardInputDetails;
-  String publishableKey = "pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC";
+  // var clientkey = "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";
+  // // late CardFieldInputDetails _cardInputDetails;
+  // String publishableKey = "pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC";
 
   String? cardNumber;
   String? cardExpiryMonth;
@@ -518,35 +518,23 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         Navigator.of(context).push(MaterialPageRoute(builder: (
                             context) => CardFormScreen("Day")));
                       } else if (isAnnualButton) {
-                        if(userPremiumType == "month") {
-                          _cancelSubscription();
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => CardFormScreen("Annual")));
-                        } else {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
                                     CardFormScreen("Annual")));
-                          }
-                        } else {
-                        if(userPremiumType == "year") {
-                          _cancelSubscription();
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  CardFormScreen("Monthly"
-                                  )));
                         } else {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   CardFormScreen("Monthly"
                                   )));
-                        }
-                        // Navigator.of(context).push(MaterialPageRoute(
-                        //     builder: (context) =>
-                        //         CardFormScreen("Monthly"
-                        //         )));
                       }
                     } else {
-                      _cancelSubscription();
+                      if (userPremiumType == "month") {
+                        _cancelSubscription("Annual");
+                      } else if (userPremiumType == "year") {
+                        _cancelSubscription("Monthly");
+                      } else {
+                        _cancelSubscription("");
+                      }
                     }
                     },
                   child: userPremium == "no"
@@ -571,13 +559,13 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
     );
   }
 
-  _cancelSubscription() {
+  _cancelSubscription(String subscriptionType) {
     setState(() {
       isLoading = true;
     });
 
     HTTPManager().cancelSubscription(StripeCancelRequestModel(subscriptionId: userSubscriptionId)).then((value) {
-
+      print("subscription cancel type::$subscriptionType");
       UserStatePrefrence().setAnswerText(
         true,
         userType,
@@ -597,11 +585,21 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
         isDayButton = false;
         isAnnualButton = false;
         isMonthlyButton = false;
+        userPremium = "no";
 
         isLoading = false;
       });
-      showToastMessage(context, "Subscription cancelled", true);
-
+      if(subscriptionType == "Annual") {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CardFormScreen("Annual")));
+      } else if(subscriptionType == "Monthly") {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                CardFormScreen("Monthly"
+                )));
+      } else {
+        showToastMessage(context, "Subscription cancelled", true);
+      }
     }).catchError((e) {
       setState(() {
         isLoading = false;

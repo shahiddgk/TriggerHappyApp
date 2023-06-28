@@ -83,14 +83,21 @@ class _ColumnScreenState extends State<ColumnScreen> {
         columnReadDataModel = columnReadResponseListModel.values;
         columnReadDataModelForAll = columnReadResponseListModel.values;
         columnReadDataModelForSearch = columnReadResponseListModel.values;
+
+        columnReadDataModel.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
+        columnReadDataModelForAll.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
+        columnReadDataModelForSearch.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
       });
       for(int i = 0; i<columnReadDataModel.length; i++) {
         if(columnReadDataModel[i].entryType == "entry") {
           columnReadDataModelForEntry.add(columnReadDataModel[i]);
+          columnReadDataModelForEntry.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
         }else if(columnReadDataModel[i].entryType == "meeting") {
           columnReadDataModelForMeeting.add(columnReadDataModel[i]);
+          columnReadDataModelForMeeting.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
         } else {
           columnReadDataModelForSession.add(columnReadDataModel[i]);
+          columnReadDataModelForSession.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
         }
       }
       setState(() {
@@ -141,7 +148,39 @@ class _ColumnScreenState extends State<ColumnScreen> {
       columnReadDataModelForSearch = columnReadDataModel
           .where((ColumnReadDataModel item) => ("${DateFormat('MM-dd-yy').format(DateTime.parse(item.entryDate.toString()))} ${item.entryTitle.toString()} ${item.entryDecs.toString()}").toLowerCase().contains(query.toLowerCase()))
           .toList();
+      columnReadDataModelForSearch.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
     });
+  }
+
+  showDeletePopup(String? recordId,int index1) {
+
+    showDialog(context: context,
+        builder: (context) {
+          return AlertDialog(
+            title:const Text('Confirm delete?'),
+            content:const SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Text("Are you sure you want to delete!"),
+            ),
+            actions: [
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('Yes'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _deleteColumnData(recordId, index1);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -251,15 +290,19 @@ class _ColumnScreenState extends State<ColumnScreen> {
                                   if(selectedValue == "All") {
                                     columnReadDataModelForSearch = columnReadDataModelForAll;
                                     columnReadDataModel = columnReadDataModelForAll;
+                                    columnReadDataModel.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
                                   } else if(selectedValue == "Entry") {
                                     columnReadDataModelForSearch = columnReadDataModelForEntry;
                                     columnReadDataModel = columnReadDataModelForEntry;
+                                    columnReadDataModel.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
                                   } else if(selectedValue == "Meeting") {
                                     columnReadDataModelForSearch = columnReadDataModelForMeeting;
                                     columnReadDataModel = columnReadDataModelForMeeting;
+                                    columnReadDataModel.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
                                   } else {
                                     columnReadDataModelForSearch = columnReadDataModelForSession;
                                     columnReadDataModel = columnReadDataModelForSession;
+                                    columnReadDataModel.sort((a,b) => b.entryDate!.compareTo(a.entryDate.toString()));
                                   }
                                 });
                               },
@@ -288,7 +331,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
                       const SizedBox(width: 5,),
 
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: SearchTextField((value) {
                           filterSearchResults(value);
                         }, _searchController, 1, false, "search here with title"),
@@ -354,7 +397,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
                   _isDataLoading ? const Center(child: CircularProgressIndicator(),) : columnReadDataModel.isNotEmpty  ? ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      reverse: true,
+                      // reverse: true,
                       itemCount: isSearch ? columnReadDataModelForSearch.length : columnReadDataModel.length,
                       itemBuilder: (context,index) {
                         return GestureDetector(
@@ -385,7 +428,8 @@ class _ColumnScreenState extends State<ColumnScreen> {
                                       ),
                                       GestureDetector(
                                           onTap: () {
-                                            _deleteColumnData(isSearch ? columnReadDataModelForSearch[index].id :columnReadDataModel[index].id,index);
+                                            showDeletePopup(isSearch ? columnReadDataModelForSearch[index].id :columnReadDataModel[index].id,index);
+                                            // _deleteColumnData(isSearch ? columnReadDataModelForSearch[index].id :columnReadDataModel[index].id,index);
                                           },
                                           child: const Icon(Icons.delete,color: AppColors.redColor,)),
                                       // IconButton(onPressed: (){

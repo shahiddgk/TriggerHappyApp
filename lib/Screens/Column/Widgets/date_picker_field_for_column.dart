@@ -5,6 +5,8 @@ import 'package:flutter_quiz_app/Widgets/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
+import '../../../Widgets/constants.dart';
+
 class DatePickerFieldForColumn extends StatefulWidget {
   DatePickerFieldForColumn(this.controller,this.hint,this.isNewDateAvailable,{Key? key}) : super(key: key);
   String hint;
@@ -33,6 +35,7 @@ class _DatePickerFieldForColumnState extends State<DatePickerFieldForColumn> {
           textAlignVertical: TextAlignVertical.center,
           onTap: () => _selectDate(context,widget.isNewDateAvailable),
           readOnly: true,
+          style: TextStyle(fontSize: AppConstants.defaultFontSize),
           controller: widget.controller,
           keyboardType: TextInputType.text,
           validator: (value) {

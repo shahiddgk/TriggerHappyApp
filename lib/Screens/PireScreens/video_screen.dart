@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/pire_subcategory_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -81,94 +82,70 @@ class _VideoScreenState extends State<VideoScreen> {
     });
   }
 
+  Future<bool> _onWillPop() async {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => const PireCategoryScreen()),
+            (Route<dynamic> route) => false
+    );
+    // int count = 0;
+    // Navigator.of(context).popUntil((_) => count++ >= 11);
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     getScreenDetails();
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-          },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (BuildContext context) =>const PireCategoryScreen()),
+                      (Route<dynamic> route) => false
+              );
+            },
+          ),
+          title: Text(_isUserDataLoading ? "" : name),
+          actions:  [
+            PopMenuButton(false,false,id)
+          ],
         ),
-        title: Text(_isUserDataLoading ? "" : name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
-      body: Container(
-        color: AppColors.backgroundColor,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              LogoScreen("PIRE"),
-                _isDataLoading ? const CircularProgressIndicator()
-                    : !isPhone ? Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                            },
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                                  child: Column(
-                                    children: [
-                                      CachedNetworkImage(
-                                        imageUrl: "https://img.youtube.com/vi/dk5vgNpIWMM/0.jpg",
-                                        fit: BoxFit.fitWidth,
-                                        progressIndicatorBuilder: (context, url, downloadProgress) {
-                                          return Container(
-                                              width: 60,
-                                              height: 60,
-                                              padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                                              child: CircularProgressIndicator(
-                                                  value: downloadProgress.progress));
-                                        },
-                                        errorWidget: (context, url, error) => Container(
-                                            alignment: Alignment.center,
-                                            child:const Icon(Icons.error,color: AppColors.redColor,)),
-                                      ),
-                                      Container(
-                                          margin:const EdgeInsets.only(top: 10),
-                                          child: const Text("Welcome to P.I.R.E",style: TextStyle(fontSize: AppConstants.defaultFontSize),)),
-                                    ],
-                                  ),
-
-                                ),
-                                const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                            },
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
+        body: Container(
+          color: AppColors.backgroundColor,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                LogoScreen("PIRE"),
+                  _isDataLoading ? const CircularProgressIndicator()
+                      : !isPhone ? Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                              },
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
                                     width: MediaQuery.of(context).size.width,
                                     margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
                                     child: Column(
                                       children: [
                                         CachedNetworkImage(
-                                          imageUrl: "https://img.youtube.com/vi/jkyP7pjF70k/0.jpg",
+                                          imageUrl: "https://img.youtube.com/vi/dk5vgNpIWMM/0.jpg",
                                           fit: BoxFit.fitWidth,
                                           progressIndicatorBuilder: (context, url, downloadProgress) {
                                             return Container(
@@ -182,144 +159,117 @@ class _VideoScreenState extends State<VideoScreen> {
                                               alignment: Alignment.center,
                                               child:const Icon(Icons.error,color: AppColors.redColor,)),
                                         ),
-                                        Container(
-                                            margin:const EdgeInsets.only(top: 10),
-                                            child: const Text("3 Guidelines to Processing Emotions Effectively",style: TextStyle(fontSize: AppConstants.defaultFontSize),))
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                _launchURL();
+                                              },
+                                              child: Container(
+                                                margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                                height: 35,
+                                                width: 35,
+                                                child: ClipOval(
+                                                  child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                  margin:const EdgeInsets.only(top: 5),
+                                                  child: const Text("Welcome to P.I.R.E",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                            ),
+                                          ],
+                                        )
                                       ],
-                                    )
-                                ),
-                                const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        String? videoId = YoutubePlayer.convertUrlToId(urlThird);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                              child: Column(
-                                children: [
-                                  CachedNetworkImage(
-                                    imageUrl: "https://img.youtube.com/vi/GvlUXJoq90c/0.jpg",
-                                    fit: BoxFit.fitWidth,
-                                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                                      return Container(
-                                          width: 60,
-                                          height: 60,
-                                          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                                          child: CircularProgressIndicator(
-                                              value: downloadProgress.progress));
-                                    },
-                                    errorWidget: (context, url, error) => Container(
-                                        alignment: Alignment.center,
-                                        child:const Icon(Icons.error,color: AppColors.redColor,)),
+                                    ),
+
                                   ),
-                                  Container(
-                                      margin:const EdgeInsets.only(top: 10),
-                                      child: const Text("Choosing a topic",style: TextStyle(fontSize: AppConstants.defaultFontSize),))
+                                  const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
                                 ],
-                              )
-                          ),
-                          const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
-                        ],
-                      ),
-                    ),
-                  ],
-                ) : Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.height/4,
-                                  child: CachedNetworkImage(
-                                    imageUrl: "https://img.youtube.com/vi/dk5vgNpIWMM/0.jpg",
-                                    fit: BoxFit.fitWidth,
-                                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                                      return Container(
-                                          width: 60,
-                                          height: 60,
-                                          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                                          child: CircularProgressIndicator(
-                                              value: downloadProgress.progress));
-                                    },
-                                    errorWidget: (context, url, error) => Container(
-                                        alignment: Alignment.center,
-                                        child:const Icon(Icons.error,color: AppColors.redColor,)),
-                                  ),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _launchURL();
-                                      },
-                                      child: Container(
-                                        margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
-                                        height: 35,
-                                        width: 35,
-                                        child: ClipOval(
-                                          child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Container(
-                                          margin:const EdgeInsets.only(top: 5),
-                                          child: const Text("Welcome to P.I.R.E",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
-                                    ),
-                                  ],
-                                )
-
-                              ],
+                              ),
                             ),
-
                           ),
-                        const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                              },
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                      child: Column(
+                                        children: [
+                                          CachedNetworkImage(
+                                            imageUrl: "https://img.youtube.com/vi/jkyP7pjF70k/0.jpg",
+                                            fit: BoxFit.fitWidth,
+                                            progressIndicatorBuilder: (context, url, downloadProgress) {
+                                              return Container(
+                                                  width: 60,
+                                                  height: 60,
+                                                  padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                                                  child: CircularProgressIndicator(
+                                                      value: downloadProgress.progress));
+                                            },
+                                            errorWidget: (context, url, error) => Container(
+                                                alignment: Alignment.center,
+                                                child:const Icon(Icons.error,color: AppColors.redColor,)),
+                                          ),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  _launchURL();
+                                                },
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                                  height: 35,
+                                                  width: 35,
+                                                  child: ClipOval(
+                                                    child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                    margin:const EdgeInsets.only(top: 5),
+                                                    child: const Text("3 Guidelines to Processing Emotions Effectively",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                  ),
+                                  const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    const Divider(color: AppColors.textWhiteColor,),
-                    GestureDetector(
-                      onTap: () {
-                        String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                             // margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height/4,
-                                    child: CachedNetworkImage(
-                                      imageUrl: "https://img.youtube.com/vi/jkyP7pjF70k/0.jpg",
+                      GestureDetector(
+                        onTap: () {
+                          String? videoId = YoutubePlayer.convertUrlToId(urlThird);
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                                width: MediaQuery.of(context).size.width,
+                                margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                child: Column(
+                                  children: [
+                                    CachedNetworkImage(
+                                      imageUrl: "https://img.youtube.com/vi/GvlUXJoq90c/0.jpg",
                                       fit: BoxFit.fitWidth,
                                       progressIndicatorBuilder: (context, url, downloadProgress) {
                                         return Container(
@@ -331,7 +281,72 @@ class _VideoScreenState extends State<VideoScreen> {
                                       },
                                       errorWidget: (context, url, error) => Container(
                                           alignment: Alignment.center,
-                                          child: const Icon(Icons.error,color: AppColors.redColor,)),
+                                          child:const Icon(Icons.error,color: AppColors.redColor,)),
+                                    ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            _launchURL();
+                                          },
+                                          child: Container(
+                                            margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                            height: 35,
+                                            width: 35,
+                                            child: ClipOval(
+                                              child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                              margin:const EdgeInsets.only(top: 5),
+                                              child: const Text("Choosing a topic",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )
+                            ),
+                            const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                          ],
+                        ),
+                      ),
+                    ],
+                  ) : Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          String? videoId = YoutubePlayer.convertUrlToId(urlFirst);
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.symmetric(vertical: 5),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height/4,
+                                    child: CachedNetworkImage(
+                                      imageUrl: "https://img.youtube.com/vi/dk5vgNpIWMM/0.jpg",
+                                      fit: BoxFit.fitWidth,
+                                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                                        return Container(
+                                            width: 60,
+                                            height: 60,
+                                            padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                                            child: CircularProgressIndicator(
+                                                value: downloadProgress.progress));
+                                      },
+                                      errorWidget: (context, url, error) => Container(
+                                          alignment: Alignment.center,
+                                          child:const Icon(Icons.error,color: AppColors.redColor,)),
                                     ),
                                   ),
                                   Row(
@@ -343,7 +358,7 @@ class _VideoScreenState extends State<VideoScreen> {
                                           _launchURL();
                                         },
                                         child: Container(
-                                          margin: const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                          margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
                                           height: 35,
                                           width: 35,
                                           child: ClipOval(
@@ -354,104 +369,171 @@ class _VideoScreenState extends State<VideoScreen> {
                                       Expanded(
                                         child: Container(
                                             margin:const EdgeInsets.only(top: 5),
-                                            child: const Text("3 Guidelines to Processing Emotions Effectively",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                            child: const Text("Welcome to P.I.R.E",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
                                       ),
                                     ],
                                   )
-                                  // Container(
-                                  //     margin:const EdgeInsets.only(top: 5),
-                                  //     child: const Text(,style: TextStyle(fontSize: AppConstants.defaultFontSize),))
+
                                 ],
-                              )
-                          ),
-                          const Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
-                        ],
+                              ),
+
+                            ),
+                          const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                          ],
+                        ),
                       ),
-                    ),
-                    const Divider(color: AppColors.textWhiteColor,),
-                    GestureDetector(
-                      onTap: () {
-                        String? videoId = YoutubePlayer.convertUrlToId(urlThird);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.height/4,
-                                  child: CachedNetworkImage(
-                                    imageUrl: "https://img.youtube.com/vi/GvlUXJoq90c/0.jpg",
-                                    fit: BoxFit.fitWidth,
-                                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                                      return Container(
-                                          width: 60,
-                                          height: 60,
-                                          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                                          child: CircularProgressIndicator(
-                                              value: downloadProgress.progress));
-                                    },
-                                    errorWidget: (context, url, error) => Container(
-                                        alignment: Alignment.center,
-                                        child:const Icon(Icons.error,color: AppColors.redColor,)),
-                                  ),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                      const Divider(color: AppColors.textWhiteColor,),
+                      GestureDetector(
+                        onTap: () {
+                          String? videoId = YoutubePlayer.convertUrlToId(urlSecond);
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                               // margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                child: Column(
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _launchURL();
-                                      },
-                                      child: Container(
-                                        margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
-                                        height: 35,
-                                        width: 35,
-                                        child: ClipOval(
-                                          child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
-                                        ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: MediaQuery.of(context).size.height/4,
+                                      child: CachedNetworkImage(
+                                        imageUrl: "https://img.youtube.com/vi/jkyP7pjF70k/0.jpg",
+                                        fit: BoxFit.fitWidth,
+                                        progressIndicatorBuilder: (context, url, downloadProgress) {
+                                          return Container(
+                                              width: 60,
+                                              height: 60,
+                                              padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                                              child: CircularProgressIndicator(
+                                                  value: downloadProgress.progress));
+                                        },
+                                        errorWidget: (context, url, error) => Container(
+                                            alignment: Alignment.center,
+                                            child: const Icon(Icons.error,color: AppColors.redColor,)),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Container(
-                                          margin:const EdgeInsets.only(top: 5),
-                                          child: const Text("Choosing a topic",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
-                                    ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            _launchURL();
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                            height: 35,
+                                            width: 35,
+                                            child: ClipOval(
+                                              child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                              margin:const EdgeInsets.only(top: 5),
+                                              child: const Text("3 Guidelines to Processing Emotions Effectively",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                        ),
+                                      ],
+                                    )
+                                    // Container(
+                                    //     margin:const EdgeInsets.only(top: 5),
+                                    //     child: const Text(,style: TextStyle(fontSize: AppConstants.defaultFontSize),))
                                   ],
                                 )
-
-                              ],
                             ),
-
-                          ),
-                          const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
-                        ],
+                            const Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                          ],
+                        ),
                       ),
-                    ),
-                    const Divider(color: AppColors.textWhiteColor,),
-                  ],
-                ),
+                      const Divider(color: AppColors.textWhiteColor,),
+                      GestureDetector(
+                        onTap: () {
+                          String? videoId = YoutubePlayer.convertUrlToId(urlThird);
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(name,id,videoId!)));
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.symmetric(vertical: 5),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height/4,
+                                    child: CachedNetworkImage(
+                                      imageUrl: "https://img.youtube.com/vi/GvlUXJoq90c/0.jpg",
+                                      fit: BoxFit.fitWidth,
+                                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                                        return Container(
+                                            width: 60,
+                                            height: 60,
+                                            padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                                            child: CircularProgressIndicator(
+                                                value: downloadProgress.progress));
+                                      },
+                                      errorWidget: (context, url, error) => Container(
+                                          alignment: Alignment.center,
+                                          child:const Icon(Icons.error,color: AppColors.redColor,)),
+                                    ),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          _launchURL();
+                                        },
+                                        child: Container(
+                                          margin:const EdgeInsets.only(top: 10,right: 10,left: 5),
+                                          height: 35,
+                                          width: 35,
+                                          child: ClipOval(
+                                            child: Image.network("https://yt3.googleusercontent.com/ytc/AGIKgqOMcE11tiMtTs4rMKE29ZdPkuF9vurD2CHqx-NJqz7NuAccNgbu25tHi8bICV5M=s176-c-k-c0x00ffffff-no-rj"),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                            margin:const EdgeInsets.only(top: 5),
+                                            child: const Text("Choosing a topic",style: TextStyle(fontWeight:FontWeight.bold,fontSize: AppConstants.defaultFontSize),)),
+                                      ),
+                                    ],
+                                  )
 
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
-                },
-                child: Container(
-                  margin:const EdgeInsets.symmetric(horizontal: 3),
-                  child: OptionMcqAnswer(
-                      TextButton(onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
-                        }, child: const Text("Proceed",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
+                                ],
+                              ),
+
+                            ),
+                            const  Icon(Icons.play_circle_fill_outlined,size: 60,color: AppColors.primaryColor,)
+                          ],
+                        ),
+                      ),
+                      const Divider(color: AppColors.textWhiteColor,),
+                    ],
                   ),
-                ),
-              )
-            ],
+
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
+                  },
+                  child: Container(
+                    margin:const EdgeInsets.symmetric(horizontal: 3),
+                    child: OptionMcqAnswer(
+                        TextButton(onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
+                          }, child: const Text("Proceed",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

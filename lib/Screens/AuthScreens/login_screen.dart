@@ -23,6 +23,7 @@ import 'package:flutter_quiz_app/model/request_model/login_request.dart';
 import 'package:flutter_quiz_app/model/request_model/register_create_request.dart';
 import 'package:flutter_quiz_app/model/request_model/social_login_request_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
+import 'package:flutter_quiz_app/splash_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -140,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
             title:const Text('Update Available'),
             content:const SingleChildScrollView(
               scrollDirection: Axis.vertical,
-              child: Text("Things added in new version: \n - Premium version added \n - Bugs Fixation \n - Ui Enhancement"),
+              child: Text("Things added in new version: \n - Ladder section added \n - Trellis functionality updated \n - Bridge Tile added \n - Bugs Fixation \n - UI Enhancement"),
               // Html(data: updates,style: {
               //   "#" : Style(
               //     color: AppColors.textWhiteColor,
@@ -856,7 +857,7 @@ class _LoginPageState extends State<LoginPage> {
         // ignore: use_build_context_synchronously
         showToastMessage(context, "Logged in successfully",true);
           // ignore: use_build_context_synchronously
-          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const TreeScreen()));
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const SplashScreen()));
 
       }).catchError((e){
       //  print(e.toString());

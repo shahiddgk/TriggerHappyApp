@@ -50,6 +50,12 @@ class UserStatePrefrence {
     _sharedPreferences.remove(TrellisScreenStatus().rhythmsExpended);
     _sharedPreferences.remove(TrellisScreenStatus().tribeExpended);
 
+    _sharedPreferences.remove("answerList");
+    _sharedPreferences.remove("NaqIndex");
+    _sharedPreferences.remove("answer1forQ1");
+    _sharedPreferences.remove("answer2forQ2");
+    _sharedPreferences.remove("answerIdList");
+
 
   }
 

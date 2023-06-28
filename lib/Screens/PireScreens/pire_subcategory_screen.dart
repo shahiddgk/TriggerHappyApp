@@ -5,12 +5,16 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Bridge/naq_screen_q1.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/youtube_video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/colors.dart';
 import '../../Widgets/constants.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/sub_categoy_border.dart';
+import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/request_model/logout_user_request.dart';
 import '../../network/http_manager.dart';
 import '../Payment/payment_screen.dart';
@@ -19,19 +23,19 @@ import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
 
-class BridgeCategoryScreen extends StatefulWidget {
-  const BridgeCategoryScreen({Key? key}) : super(key: key);
+class PireCategoryScreen extends StatefulWidget {
+  const PireCategoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<BridgeCategoryScreen> createState() => _BridgeCategoryScreenState();
+  State<PireCategoryScreen> createState() => _PireCategoryScreenState();
 }
 
-class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
+class _PireCategoryScreenState extends State<PireCategoryScreen> {
 
   String name = "";
   String id = "";
   bool _isUserDataLoading = true;
-  bool _isLoading = true;
+  bool _isLoading = false;
   String email = "";
   String timeZone = "";
   String userType = "";
@@ -48,6 +52,8 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
   String allowEmail = "";
 
   String naqListLength = "";
+  String bodyScanVideoUrl = "https://youtu.be/whc21PAm4tQ";
+  String favPlaceOnEarth = "https://youtu.be/26ArgGvNTAE";
 
   late bool isPhone;
 
@@ -91,8 +97,8 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
     userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
     userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
 
-    _getNAQResonseList(id);
-
+    // _getNAQResonseList(id);
+    //
     setState(() {
       _isUserDataLoading = false;
     });
@@ -107,7 +113,7 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
       print(value);
       setState(() {
         _isLoading = false;
-       // naqListResponse = value.values;
+        // naqListResponse = value.values;
         naqListLength = value.values.length.toString();
       });
       print("Naq list length");
@@ -121,12 +127,13 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
   }
 
   Future<bool> _onWillPop() async {
-    // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty || mentorDescriptionController.text.isNotEmpty || peerNameController.text.isNotEmpty || peerDescriptionController.text.isNotEmpty || menteeNameController.text.isNotEmpty || menteeDescriptionController.text.isNotEmpty) {
-    //   _setTrellisData();
-    // }
-
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+            (Route<dynamic> route) => false
+    );
+    // int count = 0;
+    // Navigator.of(context).popUntil((_) => count++ >= 11);
     return true;
   }
 
@@ -165,8 +172,8 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              LogoScreen("Bridge"),
-                Container(
+              LogoScreen("PIRE"),
+              Container(
                 margin: const EdgeInsets.only(top: 10),
                 height: MediaQuery.of(context).size.height/1.28,
                 width: MediaQuery.of(context).size.width,
@@ -181,19 +188,19 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                      if(userPremium == "no" && naqListLength != "0") {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
-                      } else {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (
-                            context) => const NaqScreen1()));
-                        }
+                          Navigator.of(context).push(MaterialPageRoute(builder: (
+                              context) => const VideoScreen()));
+
                       },
                       child: OptionMcqAnswerSubCategory(
                           const Card(
                             elevation: 0,
                             color: AppColors.backgroundColor,
-                            child: Center(
-                              child: Text("NAQ",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Center(
+                                child: Text("P.I.R.E. Negative",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                              ),
                             ),
                           )
                       ),
@@ -201,44 +208,71 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
                     GestureDetector(
                       onTap: () {
                         showToastMessage(context, "Coming Soon...",false);
-                        //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+                        //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const PireCategoryScreen()));
                       },
                       child: OptionMcqAnswerSubCategory(
                           const  Card(
                             elevation: 0,
                             color: AppColors.greyColor,
-                            child: Center(
-                              child: Text("Team Assessment",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Center(
+                                child: Text("P.I.R.E. Positive",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                              ),
                             ),
                           )
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        showToastMessage(context, "Coming Soon...",false);
-                        //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+                        // showToastMessage(context, "Coming Soon...",false);
+                        String? videoId = YoutubePlayer.convertUrlToId(bodyScanVideoUrl);
+                        YoutubePlayerController playerController0 = YoutubePlayerController(
+                            initialVideoId: videoId!,
+                            flags: const YoutubePlayerFlags(
+                              autoPlay: false,
+                              controlsVisibleAtStart: false,
+                            )
+
+                        );
+                        videoPopupDialog(context,"Body Scan",playerController0);
                       },
                       child: OptionMcqAnswerSubCategory(
                           const  Card(
                             elevation: 0,
-                            color: AppColors.greyColor,
-                            child: Center(
-                              child: Text("Exec Skill Assessment",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                            color: AppColors.backgroundColor,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Center(
+                                child: Text("Body Scan",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                              ),
                             ),
                           )
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        showToastMessage(context, "Coming Soon...",false);
-                        //   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+                        // showToastMessage(context, "Coming Soon...",false);
+                        String? videoId = YoutubePlayer.convertUrlToId(favPlaceOnEarth);
+                        YoutubePlayerController playerController0 = YoutubePlayerController(
+                            initialVideoId: videoId!,
+                            flags: const YoutubePlayerFlags(
+                              autoPlay: false,
+                              controlsVisibleAtStart: false,
+                            )
+
+                        );
+                        videoPopupDialog(context,"Favourite Place on Earth",playerController0);
                       },
                       child: OptionMcqAnswerSubCategory(
                           const  Card(
                             elevation: 0,
-                            color: AppColors.greyColor,
-                            child: Center(
-                              child: Text("Emotional Maturity",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                            color: AppColors.backgroundColor,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Center(
+                                child: Text("Favourite Place on Earth",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                              ),
                             ),
                           )
                       ),

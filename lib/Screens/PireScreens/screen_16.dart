@@ -67,6 +67,8 @@ class _Screen16State extends State<Screen16> {
         MaterialPageRoute(builder: (BuildContext context) => const VideoScreen()),
             (Route<dynamic> route) => false
     );
+    // int count = 0;
+    // Navigator.of(context).popUntil((_) => count++ >= 11);
       return true;
     }
 
@@ -118,12 +120,14 @@ class _Screen16State extends State<Screen16> {
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (BuildContext context) => const VideoScreen()),
+                          MaterialPageRoute(builder: (BuildContext context) =>const VideoScreen()),
                               (Route<dynamic> route) => false
                       );
                     },
                     child: OptionMcqAnswer(
                        TextButton(onPressed: () {
+                         // int count = 0;
+                         // Navigator.of(context).popUntil((_) => count++ >= 11);
                          Navigator.pushAndRemoveUntil(
                              context,
                              MaterialPageRoute(builder: (BuildContext context) =>const VideoScreen()),

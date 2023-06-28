@@ -96,103 +96,106 @@ class _ColumnDetailsScreenState extends State<ColumnDetailsScreen> {
         padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LogoScreen("Column"),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LogoScreen("Column"),
 
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              color: AppColors.lightGreyColor,
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Text("Type: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
-                        Container(
-                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-                            alignment: Alignment.centerLeft,
-                            margin:const EdgeInsets.symmetric(horizontal: 5),
-                            child: Text(widget.columnReadDataModel.entryType!,textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize,),)),
-
-                      ],
-                    ),
-
-                    Row(
-                      children: [
-                       const Text("Title: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
-                        Expanded(
-                          child: Container(
+              Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                color: AppColors.lightGreyColor,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Text("Type: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          Container(
                               padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
                               alignment: Alignment.centerLeft,
                               margin:const EdgeInsets.symmetric(horizontal: 5),
-                              child: Text(widget.columnReadDataModel.entryTitle!,textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize,),)),
-                        ),
+                              child: Text(widget.columnReadDataModel.entryType!,textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize,),)),
+
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                         const Text("Title: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          Expanded(
+                            child: Container(
+                                padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                                alignment: Alignment.centerLeft,
+                                margin:const EdgeInsets.symmetric(horizontal: 5),
+                                child: Text(widget.columnReadDataModel.entryTitle!,textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize,),)),
+                          ),
 
 
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    Row(
-                      children: [
-                        const Text("Date: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
-                        Container(
-                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-                            alignment: Alignment.centerLeft,
-                            margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                            child: Text(" ${DateFormat('MM-dd-yy').format(DateTime.parse(widget.columnReadDataModel.entryDate!.toString()))}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),)),
+                      Row(
+                        children: [
+                          const Text("Date: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          Container(
+                              padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                              alignment: Alignment.centerLeft,
+                              margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                              child: Text(" ${DateFormat('MM-dd-yy').format(DateTime.parse(widget.columnReadDataModel.entryDate!.toString()))}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),)),
 
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    Row(
-                      children: [
-                       const Text("Note: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
-                        Expanded(
-                          child: Container(
-                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-                            alignment: Alignment.centerLeft,
-                            margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                            child: Text(" ${widget.columnReadDataModel.entryDecs!}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),),),
-                        ),
+                      Row(
+                        children: [
+                         const Text("Note: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          Expanded(
+                            child: Container(
+                              padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                              alignment: Alignment.centerLeft,
+                              margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                              child: Text(" ${widget.columnReadDataModel.entryDecs!}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),),),
+                          ),
 
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    Row(
-                      children: [
-                        const Text("Take Away: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
-                        Expanded(
-                          child: Container(
-                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-                            alignment: Alignment.centerLeft,
-                            margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                            child: Text(" ${widget.columnReadDataModel.entryTakeaway!}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),),),
-                        ),
-                        // OptionMcqAnswer(
-                        //   ListView.builder(
-                        //       shrinkWrap: true,
-                        //       itemCount: takeAwayPointsList.length,
-                        //       itemBuilder: (context,index) {
-                        //         return Container(
-                        //             padding:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        //             alignment: Alignment.centerLeft,
-                        //             margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        //             child: Text(takeAwayPointsList[index],style: const TextStyle(fontSize: AppConstants.defaultFontSize),));
-                        //       }),
-                        // )
-                      ],
-                    ),
-                  ],
+                      Row(
+                        children: [
+                          const Text("Take Away: ",style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          Expanded(
+                            child: Container(
+                              padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                              alignment: Alignment.centerLeft,
+                              margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                              child: Text(" ${widget.columnReadDataModel.entryTakeaway!}",textAlign:TextAlign.start,style: const TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),),),
+                          ),
+                          // OptionMcqAnswer(
+                          //   ListView.builder(
+                          //       shrinkWrap: true,
+                          //       itemCount: takeAwayPointsList.length,
+                          //       itemBuilder: (context,index) {
+                          //         return Container(
+                          //             padding:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                          //             alignment: Alignment.centerLeft,
+                          //             margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                          //             child: Text(takeAwayPointsList[index],style: const TextStyle(fontSize: AppConstants.defaultFontSize),));
+                          //       }),
+                          // )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            )
+              )
 
-          ],
+            ],
+          ),
         ),
       ),
     );

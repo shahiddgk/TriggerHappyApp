@@ -10,6 +10,7 @@ import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
+import 'package:flutter_quiz_app/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
@@ -18,7 +19,9 @@ import '../PireScreens/widgets/PopMenuButton.dart';
 import '../utill/userConstants.dart';
 
 class TreeScreen extends StatefulWidget {
-  const TreeScreen({Key? key}) : super(key: key);
+   TreeScreen(this.isAnimation,{Key? key}) : super(key: key);
+
+  bool isAnimation;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -34,7 +37,9 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
   String id = "";
   bool _isUserDataLoading = true;
   bool _isLoading = true;
+  bool _isLoading2 = true;
   late int countNumber;
+  int countNumber2 = -1;
   bool _showFirstImage = true;
   String errorMessage = "";
   // ignore: prefer_typing_uninitialized_variables
@@ -100,7 +105,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     "Watered stirs up conflict, but love conquers over all wrongs",
     "He who refreshes others, will himself be refreshed",
     "How can you say to your brother, 'let me take the speck out of your eye' when all the time there is a plank in your own eye. First, take the plank out of your own eye, and then you will see clearly to take the speck out of your brother's eye",
-    "How many times have you noticed that it's the little quiet moments in the midst of life that seem to give the rest extra-special meaning?"
+    "How many times have you noticed that it's the little quiet moments in the midst of life that seem to give the rest extra-special meaning?",
     "I am about to do something very bold in this job that I’ve never done before: try",
     "I consider myself a good person...but I'm gonna try to make him cry",
     "I do not think much of a man who is not wiser today than he was yesterday",
@@ -385,6 +390,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     setState(() {
       sharedPreferences.setString("Score", "");
       _isLoading = true;
+      _isLoading2 = true;
     });
 
     HTTPManager().treeGrowth(LogoutRequestModel(userId: id)).then((value)  {
@@ -396,6 +402,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
 
       setState(() {
         sharedPreferences.setString("Score", count.toString());
+        countNumber2 = count;
       });
 
      //  if(count == 0) {
@@ -407,11 +414,13 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
       setState(() {
         errorMessage = "";
         _isLoading = false;
+        _isLoading2 = false;
       });
     //  showToastMessage(context, value['message'].toString(),true);
     }).catchError((e) {
       setState(() {
         _isLoading = false;
+        _isLoading2 = false;
         errorMessage = e.toString();
       });
       showToastMessage(context, e.toString(),false);
@@ -437,129 +446,148 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     });
   }
 
+  Future<bool> _onWillPop() async {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+            (Route<dynamic> route) => false
+    );
+    // int count = 0;
+    // Navigator.of(context).popUntil((_) => count++ >= 11);
+    return true;
+  }
+
 
   @override
   Widget build(BuildContext context) {
     getScreenDetails();
-    return Scaffold(
-      appBar: _isUserDataLoading
-          ? AppBarWidget().appBar(context,false,false,"","",false)
-          : AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-          onPressed: () {
-            // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-            //   _setTrellisData();
-            // }
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text(_isUserDataLoading ? "" : name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (BuildContext context) =>const SplashScreen()),
+                      (Route<dynamic> route) => false
+              );
             },
-            child: _isLoading ? Container(
-              color: Colors.white,
-              child:const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ) : errorMessage != "" ? Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(errorMessage,style:const TextStyle(fontSize: 25),),
-                  const SizedBox(height: 5,),
-                  GestureDetector(
-                    onTap: () {
-                      _getTreeGrowth();
-                    },
-                    child: OptionMcqAnswer(
-                        TextButton(onPressed: () {
-                          _getTreeGrowth();
-                        }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
-                    ),
-                  )
-                ],
-              ),
-            ) : Container(
-              color: Colors.white,
-              alignment: Alignment.bottomCenter,
-              child:AnimatedBuilder(
-                animation: controllerForward,
-                builder: (context, child) => FadeScaleTransition(
-                  animation: controllerForward,
-                  child: child,
+          ),
+          title: Text(_isUserDataLoading ? "" : name),
+          actions:  [
+            PopMenuButton(false,false,id)
+          ],
+        ),
+        body: Stack(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
+              },
+              child: _isLoading2 ? Container(
+                color: Colors.white,
+                child:const Center(
+                  child: CircularProgressIndicator(),
                 ),
-                child:url == "" ? Container(
+              ) : errorMessage != "" ? Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(errorMessage,style:const TextStyle(fontSize: 25),),
+                    const SizedBox(height: 5,),
+                    GestureDetector(
+                      onTap: () {
+                        _getTreeGrowth();
+                      },
+                      child: OptionMcqAnswer(
+                          TextButton(onPressed: () {
+                            _getTreeGrowth();
+                          }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
+                      ),
+                    )
+                  ],
+                ),
+              ) : Container(
+                height: MediaQuery.of(context).size.height,
+                color: Colors.white,
+                alignment: Alignment.bottomCenter,
+                child:  widget.isAnimation ? AnimatedBuilder(
+                  animation: controllerForward,
+                  builder: (context, child) => FadeScaleTransition(
+                    animation: controllerForward,
+                    child: child,
+                  ),
+                  child:url == "" ? Container(
+                    color: Colors.white,
+                    child:const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ) : Image.asset(url,fit: BoxFit.fill,),
+
+                  // CachedNetworkImage(
+                  //     imageUrl: url,
+                  //     fit: BoxFit.fill,
+                  //     progressIndicatorBuilder: (context, url, downloadProgress) {
+                  //       return Container(
+                  //                        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
+                  //                         child: CircularProgressIndicator(
+                  //                             value: downloadProgress.progress));
+                  //                   },
+                  //     errorWidget: (context, url, error) => Container(
+                  //         alignment: Alignment.center,
+                  //         child: Icon(Icons.error,color: AppColors.redColor,)),
+                  //   ),
+                ) : _isLoading2 && countNumber2 == -1 ? Container(
                   color: Colors.white,
                   child:const Center(
                     child: CircularProgressIndicator(),
                   ),
-                ) : Image.asset(url,fit: BoxFit.fill,),
-
-                // CachedNetworkImage(
-                //     imageUrl: url,
-                //     fit: BoxFit.fill,
-                //     progressIndicatorBuilder: (context, url, downloadProgress) {
-                //       return Container(
-                //                        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                //                         child: CircularProgressIndicator(
-                //                             value: downloadProgress.progress));
-                //                   },
-                //     errorWidget: (context, url, error) => Container(
-                //         alignment: Alignment.center,
-                //         child: Icon(Icons.error,color: AppColors.redColor,)),
-                //   ),
+                ) :  Image.asset(!isPhone ? "assets/apple_tree/apple_ipad/$countNumber2.png" : "assets/apple_tree/apple_mobile/$countNumber2.png",fit: BoxFit.fill,),
               ),
             ),
-          ),
-           GestureDetector(
-             onTap: () {
-               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-             },
-             child: Padding(
-               padding: const EdgeInsets.only(bottom: 40),
-               child: Align(
-                 alignment: Alignment.bottomCenter,
-                 child: Visibility(
-                  visible: showTapHereButton,
-                    child: Card(
-                      color: AppColors.primaryColor,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                            child: const Text("Tap to proceed!",style: TextStyle(fontWeight: FontWeight.normal,fontSize: AppConstants.headingFontSize),))),
-          ),
+             GestureDetector(
+               onTap: () {
+                 Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
+               },
+               child: Padding(
+                 padding: const EdgeInsets.only(bottom: 40),
+                 child: Align(
+                   alignment: Alignment.bottomCenter,
+                   child: Visibility(
+                    visible: showTapHereButton,
+                      child: Card(
+                        color: AppColors.primaryColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                              child: const Text("Tap to proceed!",style: TextStyle(fontWeight: FontWeight.normal,fontSize: AppConstants.headingFontSize),))),
+            ),
+                 ),
                ),
              ),
-           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-            },
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                  padding:const EdgeInsets.symmetric(horizontal: 10),
-                  margin:const EdgeInsets.only(top: 20),
-                  child: Text(element.toString(),style:const TextStyle(fontSize: AppConstants.defaultFontSize),textAlign: TextAlign.center,)),
-            ),
-          )
-        ],
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
+              },
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                    padding:const EdgeInsets.symmetric(horizontal: 10),
+                    margin:const EdgeInsets.only(top: 20),
+                    child: Text(element.toString(),style:const TextStyle(fontSize: AppConstants.defaultFontSize),textAlign: TextAlign.center,)),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
