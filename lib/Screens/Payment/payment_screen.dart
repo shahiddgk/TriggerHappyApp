@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 import 'dart:io';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -33,8 +33,6 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   String name = "";
   String id = "";
   bool _isUserDataLoading = true;
- // bool _isLoading = true;
- // late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   String email = "";
   String timeZone = "";
@@ -54,9 +52,6 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   final TextEditingController _cvcController = TextEditingController();
   Map<String, dynamic>? paymentIntent;
   bool isLoading = false;
-  // var clientkey = "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";
-  // // late CardFieldInputDetails _cardInputDetails;
-  // String publishableKey = "pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC";
 
   String? cardNumber;
   String? cardExpiryMonth;
@@ -85,9 +80,6 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-
-    // Stripe.publishableKey = 'pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC';
-
     super.initState();
   }
 
@@ -148,6 +140,29 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
     userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
     userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
 
+    if(userPremium == "yes" && userPremiumType == "month") {
+      setState(() {
+        isFreeButton = false;
+        isDayButton = false;
+        isAnnualButton = false;
+        isMonthlyButton = true;
+      });
+    } else if(userPremium == "yes" && userPremiumType == "year") {
+      setState(() {
+        isFreeButton = false;
+        isDayButton = false;
+        isAnnualButton = true;
+        isMonthlyButton = false;
+      });
+    } else {
+      setState(() {
+        isFreeButton = true;
+        isDayButton = false;
+        isAnnualButton = false;
+        isMonthlyButton = false;
+      });
+    }
+
     // setState(() {
     //   _isUserDataLoading = false;
     // });
@@ -206,29 +221,31 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  'Burgeon',
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    color: AppColors.backgroundColor,
-                    fontWeight: FontWeight.bold,
+            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/18),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Burgeon',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      color: AppColors.backgroundColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8.0),
-                if(isFreeButton)
-                const Text(
-                  'Free',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
+                  const SizedBox(height: 3.0),
+                  Text(
+                    userPremiumType == "year" ? "Premium Annual" : userPremiumType == "month" ? "Premium monthly" : "Free Plan",
+                    style:const TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.backgroundColor,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                ),
-                if(isDayButton)
+                  const SizedBox(height: 8.0),
+                  if(isFreeButton)
                   const Text(
                     'Free',
                     style: TextStyle(
@@ -237,317 +254,366 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                if(isAnnualButton)
-                  const Text(
-                    'Annual',
+                  if(isDayButton)
+                    const Text(
+                      'Free',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: AppColors.textWhiteColor,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  if(isAnnualButton)
+                    const Text(
+                      'Annual',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: AppColors.textWhiteColor,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  if(isMonthlyButton)
+                    const Text(
+                      'Monthly',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: AppColors.textWhiteColor,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  SizedBox(height: MediaQuery.of(context).size.height/25),
+                  Visibility(
+                      visible: userPremium == "no" && isFreeButton,
+                      child: const Text(
+                    'Active Plan',
                     style: TextStyle(
                       fontSize: 20.0,
+                      color: AppColors.selectedAnswerColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) ),
+
+                  Visibility(
+                      visible: isMonthlyButton && userPremiumType == "month",
+                      child: const Text(
+                        'Active Plan',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: AppColors.selectedAnswerColor,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ) ),
+
+                  Visibility(
+                      visible: isAnnualButton && userPremiumType == "year",
+                      child: const Text(
+                        'Active Plan',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: AppColors.selectedAnswerColor,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ) ),
+                   SizedBox(height: MediaQuery.of(context).size.height/25),
+
+                  Image.asset("assets/plan_subscription_text.png",),
+                  const SizedBox(height: 30.0),
+                  isMonthlyButton || isAnnualButton ? const Text(
+                    '✔ P.I.R.E Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) : const Text(
+                    '✔ P.I.R.E',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
                       color: AppColors.textWhiteColor,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                if(isMonthlyButton)
-                  const Text(
-                    'Monthly',
+                  const SizedBox(height: 10,),
+                  isMonthlyButton || isAnnualButton ? const Text(
+                    '✔ Trellis Unlimited',
+                    textAlign: TextAlign.start,
                     style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) :  const Text(
+                    '✔ Trellis',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
                       color: AppColors.textWhiteColor,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                SizedBox(height: MediaQuery.of(context).size.height/25),
-                Visibility(
-                    visible: userPremium == "no" && isFreeButton,
-                    child: const Text(
-                  'Active Plan',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: AppColors.selectedAnswerColor,
-                    fontWeight: FontWeight.normal,
+                  const SizedBox(height: 10,),
+                  isMonthlyButton || isAnnualButton ? const Text(
+                    '✔ Bridge Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) :  const Text(
+                    '✔ Bridge',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                ) ),
-
-                Visibility(
-                    visible: isMonthlyButton && userPremiumType == "month",
-                    child: const Text(
-                      'Active Plan',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: AppColors.selectedAnswerColor,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ) ),
-
-                Visibility(
-                    visible: isAnnualButton && userPremiumType == "year",
-                    child: const Text(
-                      'Active Plan',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: AppColors.selectedAnswerColor,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ) ),
-                 SizedBox(height: MediaQuery.of(context).size.height/25),
-
-                Image.asset("assets/plan_subscription_text.png",),
-                const SizedBox(height: 30.0),
-                isMonthlyButton || isAnnualButton ? const Text(
-                  '✔ P.I.R.E Unlimited',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ) : const Text(
-                  '✔ P.I.R.E',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                isMonthlyButton || isAnnualButton ? const Text(
-                  '✔ Trellis Unlimited',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ) :  const Text(
-                  '✔ Trellis',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                isAnnualButton || isMonthlyButton ? const Text(
-                  '✔ Garden Unlimited',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ) : const Text(
-                  '',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.hoverColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                const SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   isAnnualButton || isMonthlyButton ? const Text(
-                  '✔ Column Unlimited',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: AppColors.textWhiteColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ) : const Text(
+                    '✔ Garden Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) : const Text(
                     '',
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: 18.0,
-                      color: AppColors.backgroundColor,
+                      color: AppColors.hoverColor,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                if(isFreeButton)
-                  const SizedBox(height: 2,),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.subscriptionGreyColor,
-                    borderRadius: BorderRadius.circular(30)
-                  ),
-                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 30),
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                  width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isFreeButton = true;
-                            isDayButton = false;
-                            isAnnualButton = false;
-                            isMonthlyButton = false;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          backgroundColor: isFreeButton ? AppColors.primaryColor : AppColors.backgroundColor,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("  Free  ",style: TextStyle(fontSize: 12,color: isFreeButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                            //Text("",style: TextStyle(fontSize: 12,color: isFreeButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                          ],
-                        ),
-                      ),
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     setState(() {
-                      //       isFreeButton = false;
-                      //       isDayButton = true;
-                      //       isAnnualButton = false;
-                      //       isMonthlyButton = false;
-                      //     });
-                      //   },
-                      //   style: ElevatedButton.styleFrom(
-                      //     padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.circular(25.0),
-                      //     ),
-                      //     backgroundColor: isDayButton ? AppColors.primaryColor : AppColors.backgroundColor,
-                      //   ),
-                      //   child: Column(
-                      //     children: [
-                      //       Text("Day",style: TextStyle(fontSize: 12,color: isDayButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                      //       Text("20 \$",style: TextStyle(fontSize: 12,color: isDayButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                      //     ],
-                      //   ),
-                      // ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isFreeButton = false;
-                            isDayButton = false;
-                            isAnnualButton = false;
-                            isMonthlyButton = true;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          backgroundColor: isMonthlyButton ? AppColors.primaryColor : AppColors.backgroundColor,
-                        ),
-                        child: Column(
-                          children: [
-                            Text("Monthly",style: TextStyle(fontSize: 12,color: isMonthlyButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                            Text("\$8",style: TextStyle(fontSize: 12,color: isMonthlyButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isFreeButton = false;
-                            isDayButton = false;
-                            isAnnualButton = true;
-                            isMonthlyButton = false;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          backgroundColor: isAnnualButton ? AppColors.primaryColor : AppColors.backgroundColor,
-                        ),
-                        child: Column(
-                          children: [
-                             Text("Annual",style: TextStyle(fontSize: 12,color: isAnnualButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                             Text("\$60",style: TextStyle(fontSize: 12,color: isAnnualButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
-                          ],
-                        ),
-                      ),
-
-                    ],
-                  ),
-                ),
-                // Form(
-                //   key: _formKey,
-                //   child: SingleChildScrollView(
-                //       child: CreditCardForm(
-                //         hideCardHolder: true,
-                //         controller: creditCardController,
-                //         theme: CreditCardLightTheme(),
-                //         onChanged: (CreditCardResult ) {
-                //           setState(() {
-                //             cardNumber = CreditCardResult.cardNumber;
-                //             cardExpiryMonth = CreditCardResult.expirationMonth;
-                //             cardExpiryYear = CreditCardResult.expirationYear;
-                //             cardCVC = CreditCardResult.cvc;
-                //           });
-                //           print(CreditCardResult.cardNumber);
-                //           print(CreditCardResult.expirationMonth);
-                //           print(CreditCardResult.expirationYear);
-                //           print(CreditCardResult.cardType);
-                //           print(CreditCardResult.cvc);
-                //         },
-                //       )
-                //   ),
-                // ),
-                const  SizedBox(height: 16.0),
-                if(!isFreeButton)
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)
+                  const SizedBox(height: 10,),
+                    isAnnualButton || isMonthlyButton ? const Text(
+                    '✔ Column Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
                     ),
-                  padding: const EdgeInsets.symmetric(horizontal: 100),
-                    backgroundColor: AppColors.primaryColor,
+                  ) : const Text(
+                      '',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: AppColors.backgroundColor,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  const SizedBox(height: 10,),
+                  isMonthlyButton || isAnnualButton ? const Text(
+                    '✔ Post Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) :  const Text(
+                    '',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                  onPressed: () {
-                    if(userPremium == "no") {
-                      if (isFreeButton) {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (
-                            context) => CardFormScreen("Free")));
-                      } else if (isDayButton) {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (
-                            context) => CardFormScreen("Day")));
-                      } else if (isAnnualButton) {
+                  if(isFreeButton)
+                    const SizedBox(height: 2,),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.subscriptionGreyColor,
+                      borderRadius: BorderRadius.circular(30)
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 30),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                    width: MediaQuery.of(context).size.width,
+                    height: 60,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isFreeButton = true;
+                              isDayButton = false;
+                              isAnnualButton = false;
+                              isMonthlyButton = false;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            backgroundColor: isFreeButton ? AppColors.primaryColor : AppColors.backgroundColor,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("  Free  ",style: TextStyle(fontSize: 12,color: isFreeButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                              //Text("",style: TextStyle(fontSize: 12,color: isFreeButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                            ],
+                          ),
+                        ),
+                        // ElevatedButton(
+                        //   onPressed: () {
+                        //     setState(() {
+                        //       isFreeButton = false;
+                        //       isDayButton = true;
+                        //       isAnnualButton = false;
+                        //       isMonthlyButton = false;
+                        //     });
+                        //   },
+                        //   style: ElevatedButton.styleFrom(
+                        //     padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(25.0),
+                        //     ),
+                        //     backgroundColor: isDayButton ? AppColors.primaryColor : AppColors.backgroundColor,
+                        //   ),
+                        //   child: Column(
+                        //     children: [
+                        //       Text("Day",style: TextStyle(fontSize: 12,color: isDayButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                        //       Text("20 \$",style: TextStyle(fontSize: 12,color: isDayButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                        //     ],
+                        //   ),
+                        // ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isFreeButton = false;
+                              isDayButton = false;
+                              isAnnualButton = false;
+                              isMonthlyButton = true;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            backgroundColor: isMonthlyButton ? AppColors.primaryColor : AppColors.backgroundColor,
+                          ),
+                          child: Column(
+                            children: [
+                              Text("Monthly",style: TextStyle(fontSize: 12,color: isMonthlyButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                              Text("\$8",style: TextStyle(fontSize: 12,color: isMonthlyButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isFreeButton = false;
+                              isDayButton = false;
+                              isAnnualButton = true;
+                              isMonthlyButton = false;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            backgroundColor: isAnnualButton ? AppColors.primaryColor : AppColors.backgroundColor,
+                          ),
+                          child: Column(
+                            children: [
+                               Text("Annual",style: TextStyle(fontSize: 12,color: isAnnualButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                               Text("\$60",style: TextStyle(fontSize: 12,color: isAnnualButton ? AppColors.backgroundColor: AppColors.textWhiteColor),),
+                            ],
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+                  // Form(
+                  //   key: _formKey,
+                  //   child: SingleChildScrollView(
+                  //       child: CreditCardForm(
+                  //         hideCardHolder: true,
+                  //         controller: creditCardController,
+                  //         theme: CreditCardLightTheme(),
+                  //         onChanged: (CreditCardResult ) {
+                  //           setState(() {
+                  //             cardNumber = CreditCardResult.cardNumber;
+                  //             cardExpiryMonth = CreditCardResult.expirationMonth;
+                  //             cardExpiryYear = CreditCardResult.expirationYear;
+                  //             cardCVC = CreditCardResult.cvc;
+                  //           });
+                  //           print(CreditCardResult.cardNumber);
+                  //           print(CreditCardResult.expirationMonth);
+                  //           print(CreditCardResult.expirationYear);
+                  //           print(CreditCardResult.cardType);
+                  //           print(CreditCardResult.cvc);
+                  //         },
+                  //       )
+                  //   ),
+                  // ),
+                  const  SizedBox(height: 16.0),
+                  if(!isFreeButton)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                    padding: const EdgeInsets.symmetric(horizontal: 100),
+                      backgroundColor: AppColors.primaryColor,
+                    ),
+                    onPressed: () {
+
+                      print("cancel button clicked");
+                      print(userPremium);
+                      if(userPremium == "no") {
+                        if (isFreeButton) {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (
+                              context) => CardFormScreen("Free",false)));
+                        } else if (isDayButton) {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (
+                              context) => CardFormScreen("Day",false)));
+                        } else if (isAnnualButton) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      CardFormScreen("Annual",false)));
+                          } else {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
-                                    CardFormScreen("Annual")));
-                        } else {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  CardFormScreen("Monthly"
-                                  )));
-                      }
-                    } else {
-                      if (userPremiumType == "month") {
-                        _cancelSubscription("Annual");
-                      } else if (userPremiumType == "year") {
-                        _cancelSubscription("Monthly");
+                                    CardFormScreen("Monthly",false
+                                    )));
+                        }
                       } else {
-                        _cancelSubscription("");
+                        if ( isAnnualButton && userPremiumType == "month") {
+                          _cancelSubscription("Annual");
+                        } else if (isMonthlyButton && userPremiumType == "year") {
+                          _cancelSubscription("Monthly");
+                        } else {
+                          _cancelSubscription("");
+                        }
                       }
-                    }
-                    },
-                  child: userPremium == "no"
-                      ? const Text('Upgrade Now',style: TextStyle(color: AppColors.backgroundColor),)
-                      : isDayButton && userPremiumType == "day"
-                      ?  const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
-                      :  isMonthlyButton && userPremiumType == "month"
-                      ?  const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
-                      : isAnnualButton && userPremiumType == "year"
-                      ? const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
-                      : const Text('Upgrade Now',style: TextStyle(color: AppColors.backgroundColor),),
-                ),
-              ],
+                      },
+                    child: userPremium == "no"
+                        ? const Text('Upgrade Now',style: TextStyle(color: AppColors.backgroundColor),)
+                        : isDayButton && userPremiumType == "day"
+                        ?  const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
+                        :  isMonthlyButton && userPremiumType == "month"
+                        ?  const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
+                        : isAnnualButton && userPremiumType == "year"
+                        ? const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
+                        : const Text('Upgrade Now',style: TextStyle(color: AppColors.backgroundColor),),
+                  ),
+                ],
+              ),
             ),
           ),
           Align(
@@ -560,54 +626,67 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   }
 
   _cancelSubscription(String subscriptionType) {
-    setState(() {
-      isLoading = true;
-    });
+    if (subscriptionType == "Annual") {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CardFormScreen("Annual",true)));
+    } else if (subscriptionType == "Monthly") {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) =>
+              CardFormScreen("Monthly",true
+              )));
+    } else {
+      //showToastMessage(context, "Subscription cancelled", true);
 
-    HTTPManager().cancelSubscription(StripeCancelRequestModel(subscriptionId: userSubscriptionId)).then((value) {
-      print("subscription cancel type::$subscriptionType");
-      UserStatePrefrence().setAnswerText(
-        true,
-        userType,
-        name,
-        email,
-        id,
-        timeZone,
-        allowEmail,
-        "no",
-        "",
-        "",
-        "",
-      );
+
       setState(() {
-        userPremiumType = "";
-        isFreeButton = true;
-        isDayButton = false;
-        isAnnualButton = false;
-        isMonthlyButton = false;
-        userPremium = "no";
-
-        isLoading = false;
+        isLoading = true;
       });
-      if(subscriptionType == "Annual") {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CardFormScreen("Annual")));
-      } else if(subscriptionType == "Monthly") {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-                CardFormScreen("Monthly"
-                )));
-      } else {
-        showToastMessage(context, "Subscription cancelled", true);
-      }
-    }).catchError((e) {
-      setState(() {
-        isLoading = false;
-      });
-      // ignore: avoid_print
-      print(e);
 
-    });
+      HTTPManager().cancelSubscription(
+          StripeCancelRequestModel(subscriptionId: userSubscriptionId)).then((
+          value) {
+        print("subscription cancel type::$subscriptionType");
+        UserStatePrefrence().setAnswerText(
+          true,
+          userType,
+          name,
+          email,
+          id,
+          timeZone,
+          allowEmail,
+          "no",
+          "",
+          "",
+          "",
+        );
+        setState(() {
+          userPremiumType = "";
+          isFreeButton = true;
+          isDayButton = false;
+          isAnnualButton = false;
+          isMonthlyButton = false;
+          userPremium = "no";
+
+          isLoading = false;
+        });
+        if (subscriptionType == "Annual") {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CardFormScreen("Annual",true)));
+        } else if (subscriptionType == "Monthly") {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>
+                  CardFormScreen("Monthly",true
+                  )));
+        } else {
+          showToastMessage(context, "Subscription cancelled", true);
+        }
+      }).catchError((e) {
+        setState(() {
+          isLoading = false;
+        });
+        print(e);
+      });
+    }
   }
 
   // _createCardToke(String cardNumber1,int expMonth1,int expYear1,String cvc1,String publishableKey1) {

@@ -1,12 +1,10 @@
-// ignore_for_file: unnecessary_import, avoid_print
+// ignore_for_file: unnecessary_import, avoid_print, prefer_final_fields
 
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/Bridge/naq_screen_q1.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/youtube_video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -15,10 +13,8 @@ import '../../Widgets/constants.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/sub_categoy_border.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
-import '../../model/request_model/logout_user_request.dart';
-import '../../network/http_manager.dart';
-import '../Payment/payment_screen.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
+import '../Widgets/footer_widget.dart';
 import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
@@ -104,27 +100,27 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
     });
   }
 
-  _getNAQResonseList(String id) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    HTTPManager().naqResponseList(LogoutRequestModel(userId: id)).then((value) {
-      print(value);
-      setState(() {
-        _isLoading = false;
-        // naqListResponse = value.values;
-        naqListLength = value.values.length.toString();
-      });
-      print("Naq list length");
-      print(naqListLength);
-    }).catchError((e){
-      print(e);
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
+  // _getNAQResonseList(String id) {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   HTTPManager().naqResponseList(LogoutRequestModel(userId: id)).then((value) {
+  //     print(value);
+  //     setState(() {
+  //       _isLoading = false;
+  //       // naqListResponse = value.values;
+  //       naqListLength = value.values.length.toString();
+  //     });
+  //     print("Naq list length");
+  //     print(naqListLength);
+  //   }).catchError((e){
+  //     print(e);
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   });
+  // }
 
   Future<bool> _onWillPop() async {
     Navigator.pushAndRemoveUntil(
@@ -175,7 +171,7 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
               LogoScreen("PIRE"),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height/1.28,
+                height:!isPhone ? MediaQuery.of(context).size.height/1.27  : MediaQuery.of(context).size.height/1.43,
                 width: MediaQuery.of(context).size.width,
                 child: _isLoading ? const Center(child: CircularProgressIndicator(),) : GridView.count(
                   padding:  EdgeInsets.symmetric(vertical:10,horizontal: MediaQuery.of(context).size.width/5),
@@ -199,7 +195,7 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Center(
-                                child: Text("P.I.R.E. Negative",style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                child: Text("P.I.R.E. Challenge",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
                               ),
                             ),
                           )
@@ -271,7 +267,7 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Center(
-                                child: Text("Favourite Place on Earth",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                child: Text("Favorite Place on Earth",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
                               ),
                             ),
                           )
@@ -279,7 +275,8 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                     ),
                   ],
                 ),
-              )
+              ),
+              const FooterWidget(),
             ],
           ),
         ),

@@ -89,7 +89,7 @@ class _ColumnDetailsScreenState extends State<ColumnDetailsScreen> {
           IconButton(onPressed: (){
 
           }, icon:const Icon(Icons.search,)),
-          PopMenuButton(false,false,id)
+          PopMenuButton(false,true,id)
         ],
       ),
       body: Container(

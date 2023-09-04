@@ -442,12 +442,13 @@ class _LadderBottomSheetState extends State<LadderBottomSheet> {
 
 
 void ladderBottomSheet(
+    bool isEdit,
     BuildContext context,
     bool isGoals,
     String heading, String type,
-    String initialValueForType,
+    String initialValueForType1,
     List itemsForType,
-    String initialValueForGoals,
+    String initialValueForGoals1,
     List itemsForGoals,
     Function onTap,
     Function(String value) goalsValue,
@@ -466,8 +467,24 @@ void ladderBottomSheet(
   String initialValueForMGoals = "Goals";
   List itemsForGoals = <String>["Goals","Challenges"];
 
-  String initialValueForType = "physical";
-  List itemsForType = ["physical","Emotional","Relational","Work","Financial","Spiritual"];
+  String initialValueForType = "Physical";
+  List itemsForType = ["Physical","Emotional","Relational","Work","Financial","Spiritual"];
+
+  if(isEdit) {
+    if(isGoals) {
+      initialValueForMGoals = initialValueForGoals1;
+      initialValueForType = initialValueForType1;
+
+      if(initialValueForMGoals == "Challenges") {
+        isChallenges = false;
+      } else {
+        isChallenges = true;
+      }
+    } else {
+      initialValueForMType = initialValueForType1;
+    }
+
+  }
 
   showModalBottomSheet(
       enableDrag: false,
@@ -513,7 +530,60 @@ void ladderBottomSheet(
                             ),
                             Container(
                               margin:const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                              child: Row(
+                              child: isEdit ? Row(
+                                children: [
+                                  if(isGoals)
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+
+                                        print(isGoals);
+                                        setState(() {
+                                          // isGoalsTabActive = true;
+                                          isGoals = true;
+                                          sharedPreferences.setBool("IsGoals", true);
+                                        });
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        //width: MediaQuery.of(context).size.width/2,
+                                        padding:const EdgeInsets.symmetric(vertical: 10),
+                                        decoration: BoxDecoration(
+                                            color: isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
+                                            border: Border.all(color: AppColors.primaryColor),
+                                            borderRadius:const BorderRadius.all(Radius.circular(30))),
+                                        child: Text("Goals/Challenges",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
+                                      ),
+                                    ),
+                                  ),
+                                  if(!isGoals)
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                        print(isGoals);
+                                        setState(() {
+                                          // isGoalsTabActive = false;
+                                          isGoals = false;
+                                          sharedPreferences.setBool("IsGoals", false);
+                                        });
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        // width: MediaQuery.of(context).size.width/2,
+                                        padding:const EdgeInsets.symmetric(vertical: 10),
+                                        decoration: BoxDecoration(
+                                            color: !isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
+                                            border: Border.all(color: AppColors.primaryColor),
+                                            borderRadius:const BorderRadius.all(Radius.circular(30))),
+                                        child: Text("Memories/achievements",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ) : Row(
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
@@ -544,8 +614,6 @@ void ladderBottomSheet(
                                     child: GestureDetector(
                                       onTap: () async {
                                         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
                                         print(isGoals);
                                         setState(() {
                                           // isGoalsTabActive = false;
@@ -616,7 +684,7 @@ void ladderBottomSheet(
                                       });
                                     }
                                     setState(() {
-                                      initialValueForGoals = value;
+                                      initialValueForGoals1 = value;
                                     });
                                     goalsValue(value);
                                   }
@@ -706,10 +774,13 @@ void needsBottomSheet(BuildContext context,String heading, List<Widget> fields )
   );
 }
 
-void tribeBottomSheet(BuildContext context,String heading,bool isMentor,bool isPeer,bool isMentee,Widget isMentorField,Widget isPeerField,Widget isMenteeField,Function onTap) {
-  // bool isMentorVisible = true;
-  // bool isPeerVisible = false;
-  // bool isMenteeVisible = false;
+void tribeBottomSheet(BuildContext context,String heading,bool isMentor,bool isPeer,bool isMentee,Widget isMentorField,Widget isPeerField,Widget isMenteeField,Function(String) onOptionSelected,Function onTap) {
+  String initialValue = "Mentor";
+  List itemsForType = <String>["Mentor","Peer","Mentee"];
+
+  print(isMentor);
+  print(isPeer);
+  print(isMentee);
 
   showModalBottomSheet(
       enableDrag: false,
@@ -720,6 +791,7 @@ void tribeBottomSheet(BuildContext context,String heading,bool isMentor,bool isP
       ) ,
       context: context,
       builder: (builder){
+
         return StatefulBuilder(
           builder: (BuildContext context,StateSetter setState) {
             return Padding(
@@ -752,62 +824,98 @@ void tribeBottomSheet(BuildContext context,String heading,bool isMentor,bool isP
                               )
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap:() {
-                                  setState((){
-                                    isMentor = true;
-                                    isPeer = false;
-                                    isMentee = false;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: isMentor ? AppColors.primaryColor : AppColors.lightGreyColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Text("Mentor",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap:() {
-                                  setState((){
-                                    isMentor = false;
-                                    isPeer = true;
-                                    isMentee = false;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: isPeer ? AppColors.primaryColor : AppColors.lightGreyColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Text("Peer",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap:() {
-                                  setState((){
-                                    isMentor = false;
-                                    isPeer = false;
-                                    isMentee = true;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: isMentee ? AppColors.primaryColor : AppColors.lightGreyColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Text("Mentee",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                ),
-                              )
-                            ],
-                          ),
+                          DropDownField(
+
+                              initialValue, itemsForType.map((item) {
+                            return  DropdownMenuItem(
+                              value: item.toString(),
+                              child: Text(item.toString()),
+                            );
+                          }).toList(), (value) {
+                            // setState(() {
+                            //   initialValueForType = value;
+                            // });
+                            onOptionSelected(value);
+                            if(value == "Peer") {
+                            setState((){
+                                      isMentor = false;
+                                      isPeer = true;
+                                      isMentee = false;
+                                    });
+                            } else if(value == "Mentee") {
+                              setState((){
+                                isMentor = false;
+                                isPeer = false;
+                                isMentee = true;
+                              });
+                            } else {
+                              setState((){
+                                isMentor = true;
+                                isPeer = false;
+                                isMentee = false;
+                              });
+                            }
+                            print(value);
+                          }),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //   children: [
+                          //     GestureDetector(
+                          //       onTap:() {
+                          //         onOptionSelected("Mentor");
+                          //         setState((){
+                          //           isMentor = true;
+                          //           isPeer = false;
+                          //           isMentee = false;
+                          //         });
+                          //       },
+                          //       child: Container(
+                          //         padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                          //         decoration: BoxDecoration(
+                          //           color: isMentor ? AppColors.primaryColor : AppColors.lightGreyColor,
+                          //           borderRadius: BorderRadius.circular(10),
+                          //         ),
+                          //         child: const Text("Mentor",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                          //       ),
+                          //     ),
+                          //     GestureDetector(
+                          //       onTap:() {
+                          //         setState((){
+                          //           onOptionSelected("Peer");
+                          //           isMentor = false;
+                          //           isPeer = true;
+                          //           isMentee = false;
+                          //         });
+                          //       },
+                          //       child: Container(
+                          //         padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                          //         decoration: BoxDecoration(
+                          //           color: isPeer ? AppColors.primaryColor : AppColors.lightGreyColor,
+                          //           borderRadius: BorderRadius.circular(10),
+                          //         ),
+                          //         child: const Text("Peer",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                          //       ),
+                          //     ),
+                          //     GestureDetector(
+                          //       onTap:() {
+                          //         setState((){
+                          //           onOptionSelected("Mentee");
+                          //           isMentor = false;
+                          //           isPeer = false;
+                          //           isMentee = true;
+                          //         });
+                          //       },
+                          //       child: Container(
+                          //         padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                          //         decoration: BoxDecoration(
+                          //           color: isMentee ? AppColors.primaryColor : AppColors.lightGreyColor,
+                          //           borderRadius: BorderRadius.circular(10),
+                          //         ),
+                          //         child: const Text("Mentee",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
                           Visibility(
                               visible: isMentor,
                               child: isMentorField),

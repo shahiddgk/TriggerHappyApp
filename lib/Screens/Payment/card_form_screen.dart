@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, avoid_print
 
 import 'dart:convert';
 import 'dart:io';
@@ -7,7 +7,6 @@ import 'package:credit_card_form/credit_card_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/model/reponse_model/stripe_keys_details.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,8 +22,9 @@ import '../utill/userConstants.dart';
 
 // ignore: must_be_immutable
 class CardFormScreen extends StatefulWidget {
-   CardFormScreen(this.packageDetails,{Key? key}) : super(key: key);
+   CardFormScreen(this.packageDetails,this.isUpgrade,{Key? key}) : super(key: key);
    String packageDetails;
+   bool isUpgrade;
 
   @override
   State<CardFormScreen> createState() => _CardFormScreenState();
@@ -57,14 +57,12 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
   bool isError = false;
   String errorMessage = "";
-  // var clientkey = "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";
-  // late CardFieldInputDetails _cardInputDetails;
   String publishableKey = "";
 
-  String? cardNumber;
-  String? cardExpiryMonth;
-  String? cardExpiryYear;
-  String? cardCVC;
+  String cardNumber = "";
+  String cardExpiryMonth = "";
+  String cardExpiryYear = "";
+  String cardCVC = "";
   late StripeKeysDetailsModelClass stripeKeysDetailsModelClass;
 
   // final CardFormEditController cardFormEditController = CardFormEditController();
@@ -74,7 +72,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
   void initState() {
     _getUserData();
     _getSubscriptionData();
-    // Stripe.publishableKey = 'pk_live_51NAYCKLyPobj6EzkyRLf3pT2kzmHjAahmtahWsUfAEY5EV4ECruU6zlPTaTIwEGlQ7Tvip9hagaU8krn4mF5uHrl00sfo3RvfC';
     // TODO: implement initState
     super.initState();
   }
@@ -241,15 +238,10 @@ class _CardFormScreenState extends State<CardFormScreen> {
                                      cardExpiryYear = CreditCardResult.expirationYear;
                                      cardCVC = CreditCardResult.cvc;
                                    });
-                                   // ignore: avoid_print
                                    print(CreditCardResult.cardNumber);
-                                   // ignore: avoid_print
                                    print(CreditCardResult.expirationMonth);
-                                   // ignore: avoid_print
                                    print(CreditCardResult.expirationYear);
-                                   // ignore: avoid_print
                                    print(CreditCardResult.cardType);
-                                   // ignore: avoid_print
                                    print(CreditCardResult.cvc);
                                  },
                                ),
@@ -266,24 +258,42 @@ class _CardFormScreenState extends State<CardFormScreen> {
                            backgroundColor: AppColors.primaryColor,
                          ),
                          onPressed: () {
+                                if(cardNumber != "" && cardCVC != ""&& cardExpiryYear != ""&& cardExpiryMonth != "") {
+                                  if (widget.packageDetails == "Monthly") {
+                                      _createCardToke(
+                                          cardNumber,
+                                          int.parse(cardExpiryMonth.toString()),
+                                          int.parse(cardExpiryYear.toString()),
+                                          cardCVC,
+                                          publishableKey,
+                                          "month",
+                                          "8");
 
-                           if(widget.packageDetails == "Monthly") {
-                             _createCardToke(
-                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
-                                 int.parse(cardExpiryYear.toString()), cardCVC!,
-                                 publishableKey,"month","8");
-                           } else if(widget.packageDetails == "Day"){
-                             _createCardToke(
-                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
-                                 int.parse(cardExpiryYear.toString()), cardCVC!,
-                                 publishableKey,"day","8");
-                           } else {
-                             _createCardToke(
-                                 cardNumber!, int.parse(cardExpiryMonth.toString()),
-                                 int.parse(cardExpiryYear.toString()), cardCVC!,
-                                 publishableKey,"year","60");
-                           }
-                         },
+                                  } else if (widget.packageDetails == "Day") {
+
+                                      _createCardToke(
+                                          cardNumber,
+                                          int.parse(cardExpiryMonth.toString()),
+                                          int.parse(cardExpiryYear.toString()),
+                                          cardCVC,
+                                          publishableKey,
+                                          "day",
+                                          "8");
+
+                                  } else {
+                                      _createCardToke(
+                                          cardNumber,
+                                          int.parse(cardExpiryMonth.toString()),
+                                          int.parse(cardExpiryYear.toString()),
+                                          cardCVC,
+                                          publishableKey,
+                                          "year",
+                                          "60");
+                                  }
+                                } else {
+                                  showToastMessage(context, "Field cannot be empty", false);
+                                }
+                              },
                          child:const Text('Pay Now',style: TextStyle(color: AppColors.backgroundColor),),
                        ),
                      ],
@@ -299,6 +309,40 @@ class _CardFormScreenState extends State<CardFormScreen> {
         ],
       ),
     );
+  }
+
+  _cancelSubscription() {
+      setState(() {
+        isLoading = true;
+      });
+
+      HTTPManager()
+          .cancelSubscription(
+              StripeCancelRequestModel(subscriptionId: userSubscriptionId))
+          .then((value) {
+        // UserStatePrefrence().setAnswerText(
+        //   true,
+        //   userType,
+        //   name,
+        //   email,
+        //   id,
+        //   timeZone,
+        //   allowEmail,
+        //   "no",
+        //   "",
+        //   "",
+        //   "",
+        // );
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+        setState(() {
+          isLoading = false;
+        });
+      }).catchError((e) {
+        setState(() {
+          isLoading = false;
+        });
+        print(e);
+      });
   }
 
 
@@ -323,10 +367,15 @@ class _CardFormScreenState extends State<CardFormScreen> {
         // });
 
       }).catchError((e) {
-        // ignore: avoid_print
-        print(e.toString());
+        final jsonData = jsonDecode(e.toString());
 
-        showToastMessage(context, "Incorrect card details", false);
+        final error = jsonData['error'];
+        final errorMessage = error['message'];
+
+        // Print the values
+        print('Error Message: $errorMessage');
+
+        showToastMessage(context, errorMessage.toString(), false);
         setState(() {
           isLoading = false;
         });
@@ -335,20 +384,13 @@ class _CardFormScreenState extends State<CardFormScreen> {
   }
 
   _sendPaymentRequest (String usrId,String token1,String pkgText,String pkgAmount,String pkgInterval,) {
-    // ignore: avoid_print
     print("Params For payment api");
-    // ignore: avoid_print
     print(usrId);
-    // ignore: avoid_print
     print(token1);
-    // ignore: avoid_print
     print(pkgText);
-    // ignore: avoid_print
     print(pkgAmount);
-    // ignore: avoid_print
     print(pkgInterval);
     HTTPManager().stripePayment(StripePaymentRequestModel(userId: usrId,token: token1,packageAmount: pkgAmount,packageInterval: pkgInterval,packageText: pkgText)).then((value) {
-      // ignore: avoid_print
       print(value);
       setState(() {
         isLoading = false;
@@ -366,7 +408,11 @@ class _CardFormScreenState extends State<CardFormScreen> {
         value['data']['stripe_customer_id'].toString(),
         value['data']['stripe_subscription_id'].toString(),
       );
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+      if (widget.isUpgrade) {
+        _cancelSubscription();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+      }
       showToastMessage(context, "Subscription successful", true);
     }).catchError((e) {
       setState(() {

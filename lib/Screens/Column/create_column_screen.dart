@@ -119,8 +119,23 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
     });
   }
 
+  getScreenDetails() {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getScreenDetails();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -153,112 +168,203 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
           child: const Icon(Icons.save,color: AppColors.backgroundColor,size: 30,),
         ),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Stack(
-          children: [
-            Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        LogoScreen("Column"),
-                        // SizedBox(width: 20,),
-                        // IconButton(onPressed: (){
-                        //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
-                        // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
-                      ],
-                    ),
-
-                    Container(
-                      padding:const EdgeInsets.symmetric(horizontal: 5),
-                      child: Row(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus( FocusNode());
+        },
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Stack(
+            children: [
+              Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                listTileTheme:const ListTileThemeData(
-                                  horizontalTitleGap: 1,//here adjust based on your need
-                                ),
-                              ),
-                              child: RadioListTile(
-                                value: 1,
-                                groupValue: selectedRadio,
-                                title:const Text('Entry',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                onChanged: (int? val) {
-                                  setSelectedRadio(val!);
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                listTileTheme:const ListTileThemeData(
-                                  horizontalTitleGap: 1,//here adjust based on your need
-                                ),
-                              ),
-                              child: RadioListTile(
-                                value: 2,
-                                groupValue: selectedRadio,
-                                title:const Text('Session',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                onChanged: (int? val) {
-                                  setSelectedRadio(val!);
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                listTileTheme:const ListTileThemeData(
-                                  horizontalTitleGap: 1,//here adjust based on your need
-                                ),
-                              ),
-                              child: RadioListTile(
-                                value: 3,
-                                groupValue: selectedRadio,
-                                title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                onChanged: (int? val) {
-                                  setSelectedRadio(val!);
-                                },
-                              ),
-                            ),
-                          ),
-                          // Add more RadioListTile widgets for additional options
+                          LogoScreen("Column"),
+                          // SizedBox(width: 20,),
+                          // IconButton(onPressed: (){
+                          //   bottomSheet(context,"Trellis","Welcome to Trellis, the part of the Brugeon app designed to help you flourish and live life intentionally. Trellis is a light structure that provides structure and focus, and helps propel you towards your desired outcomes. Invest at least five minutes a day in reviewing and meditating on your Trellis. If you don't have any answers yet, spend your time meditating, praying, or journaling on the questions/sections. If you have partial answers, keep taking your time daily to consider the questions and your answers. By consistently returning to your Trellis, you will become more clear and focused on creating the outcomes you desire. Enjoy your Trellis!","");
+                          // }, icon: const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,))
                         ],
                       ),
-                    ),
-                    Container(
-                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        child: TextFieldWidgetForColumnScreen(titleController, 1, false, "Type your Entry/Session Title",)),
 
-                    Container(
-                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        child: DatePickerFieldForColumn(dateController,"Select date",true)),
-                    Container(
-                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
-                    Container(
-                        margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                        child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
+                      Container(
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
+                        child:!isPhone ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 30,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    listTileTheme:const ListTileThemeData(
+                                      horizontalTitleGap: 1,//here adjust based on your need
+                                    ),
+                                  ),
+                                  child: RadioListTile(
+                                    value: 1,
+                                    groupValue: selectedRadio,
+                                    title:const Text('Entry',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                    onChanged: (int? val) {
+                                      setSelectedRadio(val!);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: SizedBox(
+                                height: 30,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    listTileTheme:const ListTileThemeData(
+                                      horizontalTitleGap: 1,//here adjust based on your need
+                                    ),
+                                  ),
+                                  child: RadioListTile(
+                                    value: 2,
+                                    groupValue: selectedRadio,
+                                    title:const Text('Session',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                    onChanged: (int? val) {
+                                      setSelectedRadio(val!);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: SizedBox(
+                                height: 30,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    listTileTheme:const ListTileThemeData(
+                                      horizontalTitleGap: 1,//here adjust based on your need
+                                    ),
+                                  ),
+                                  child: RadioListTile(
+                                    value: 3,
+                                    groupValue: selectedRadio,
+                                    title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                    onChanged: (int? val) {
+                                      setSelectedRadio(val!);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],) : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 30,
+                                  child: Theme(
+                                    data: Theme.of(context).copyWith(
+                                      listTileTheme:const ListTileThemeData(
+                                        horizontalTitleGap: 1,//here adjust based on your need
+                                      ),
+                                    ),
+                                    child: RadioListTile(
+                                      value: 1,
+                                      groupValue: selectedRadio,
+                                      title:const Text('Entry',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                      onChanged: (int? val) {
+                                        setSelectedRadio(val!);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 30,
+                                  child: Theme(
+                                    data: Theme.of(context).copyWith(
+                                      listTileTheme:const ListTileThemeData(
+                                        horizontalTitleGap: 1,//here adjust based on your need
+                                      ),
+                                    ),
+                                    child: RadioListTile(
+                                      value: 2,
+                                      groupValue: selectedRadio,
+                                      title:const Text('Session',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                      onChanged: (int? val) {
+                                        setSelectedRadio(val!);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],),
+                            SizedBox(
+                              height: 30,
+                              width: MediaQuery.of(context).size.width/2,
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  listTileTheme:const ListTileThemeData(
+                                    horizontalTitleGap: 1,//here adjust based on your need
+                                  ),
+                                ),
+                                child: RadioListTile(
+                                  value: 3,
+                                  groupValue: selectedRadio,
+                                  title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                  onChanged: (int? val) {
+                                    setSelectedRadio(val!);
+                                  },
+                                ),
+                              ),
+                            ),
+                            // Add more RadioListTile widgets for additional options
+                          ],
+                        ),
+                      ),
+                      Container(
+                          margin:const EdgeInsets.symmetric(horizontal: 5),
+                          child: TextFieldWidgetForColumnScreen(titleController, 1, false, "Type your Entry/Session Title",)),
 
-                  ],
+                      Container(
+                          margin:const EdgeInsets.symmetric(horizontal: 5),
+                          child: DatePickerFieldForColumn(dateController,"Select date",true)),
+                      Container(
+                          margin:const EdgeInsets.symmetric(horizontal: 5),
+                          child: TextFieldWidgetForColumnScreen(descriptionController, 6, false, "Type your notes", )),
+                      Container(
+                          margin:const EdgeInsets.symmetric(horizontal: 5),
+                          child: TextFieldWidgetForColumnScreen(takeAwaysController, 6, false, "add any take-a-ways  here", )),
+
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: _isLoading ? const CircularProgressIndicator() : Container(),
-            )
-          ],
-        )
+              Align(
+                alignment: Alignment.center,
+                child: _isLoading ? const CircularProgressIndicator() : Container(),
+              )
+            ],
+          )
+        ),
       ),
     );
   }

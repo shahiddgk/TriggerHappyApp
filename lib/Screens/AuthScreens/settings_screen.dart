@@ -238,7 +238,7 @@ class _SettingsState extends State<Settings> {
                                       builder: (context) => const Screen3()));
                                 } else if(widget.type == "Posts") {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => const Posts()));
+                                      builder: (context) =>  const Posts()));
                                 } else if(widget.type == "Garden") {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const GardenScreen()));
                                 }

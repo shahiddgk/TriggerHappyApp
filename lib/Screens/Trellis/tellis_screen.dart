@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, duplicate_ignore
+// ignore_for_file: avoid_print, duplicate_ignore, unused_element
 
 import 'dart:io';
 
@@ -12,6 +12,7 @@ import 'package:flutter_quiz_app/Screens/Trellis/widgets/save_button_widgets.dar
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
+import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/model/request_model/read_trellis_model.dart';
 import 'package:flutter_quiz_app/model/request_model/trellis_data_saving_request.dart';
 import 'package:flutter_quiz_app/model/request_model/trellis_delete_request_model.dart';
@@ -27,8 +28,11 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../Widgets/colors.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
 import '../../model/reponse_model/trellis_ladder_data_response.dart';
+import '../../model/reponse_model/trellis_new_tribe_insertion.dart';
 import '../../model/reponse_model/trellis_principle_data_response.dart';
+import '../../model/reponse_model/tribe_new_read_data_response.dart';
 import '../../model/request_model/trellis_principles_request_model.dart';
+import '../Payment/payment_screen.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
 
@@ -50,6 +54,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
   String timeZone = "";
   String userType = "";
 
+  String selectedValueFromBottomSheet = "Mentor";
+
   String userPremium = "";
   String userPremiumType = "";
   String userCustomerId = "";
@@ -70,6 +76,12 @@ class _TrellisScreenState extends State<TrellisScreen> {
   List <Trellis_principle_data_model_class> trellisPrinciplesData = [];
   List <Trellis_principle_data_model_class> trellisRhythmsData = [];
   List <dynamic> trellisTribeData = [];
+
+  List <TribeDataResponse> trellisAllTribeData = [];
+  List <TribeDataResponse> trellisMenteeTribeData = [];
+  List <TribeDataResponse> trellisMentorTribeData = [];
+  List <TribeDataResponse> trellisPeerTribeData = [];
+  
   // ignore: non_constant_identifier_names
   late Trellis_principle_data_model_class trellis_principle_data_model_class;
   late TrellisLadderDataModel trellisLadderDataModel;
@@ -189,12 +201,41 @@ class _TrellisScreenState extends State<TrellisScreen> {
     setState(() {
       _isUserDataLoading = false;
     });
-
+    _getTrellisNewDataRead();
     _getTrellisReadData();
     _getPrinciplesData();
     _getIdentityData();
     _getNeedsData();
     _getTribeData();
+  }
+
+  _getTrellisNewDataRead() {
+    setState(() {
+      _isLoading = true;
+    });
+    HTTPManager().trellisNewDataRead(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        trellisAllTribeData = value.values;
+        _isLoading = false;
+      });
+      print("Trellis New Data Read");
+      print(trellisAllTribeData);
+      for(int i = 0; i<trellisAllTribeData.length; i++ ) {
+        if(trellisAllTribeData[i].type == "peer") {
+          trellisPeerTribeData.add(trellisAllTribeData[i]);
+        } else if(trellisAllTribeData[i].type == "mentor") {
+          trellisMentorTribeData.add(trellisAllTribeData[i]);
+        } else {
+          trellisMenteeTribeData.add(trellisAllTribeData[i]);
+        }
+      }
+
+    }).catchError((e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print(e.toString());
+    });
   }
 
   _getScreenStatus() async {
@@ -493,6 +534,39 @@ class _TrellisScreenState extends State<TrellisScreen> {
         _isLoading = false;
       });
     });
+  }
+
+  showDeletePopupForTribe(String type,String tribeDataId,int indexItem) {
+
+    showDialog(context: context,
+        builder: (context) {
+          return AlertDialog(
+            title:const Text('Confirm delete?'),
+            content:const SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Text("Are you sure you want to delete!"),
+            ),
+            actions: [
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              // ignore: deprecated_member_use
+              TextButton(
+                child:const Text('Yes'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _deleteNewTribe(type,tribeDataId,indexItem);
+                  // Invoke the update now callback
+                  // onUpdateNowPressed(deviceType);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   showDeletePopup(String type,String recordId,int index1,String goalsOrChallenges) {
@@ -1919,7 +1993,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
                                 AddButton(userPremium == "no" ? trellisNeedsData.length>= isNeedsLength : false,() {
                                   needsBottomSheet(context, "Needs", <Widget>[
-                                    NameField(needsController,"needs",5,70,true),
+                                    NameField(needsController,"needs",5,140,true),
                                     SaveButtonWidgets( (){
                                       _setTrellisNeedsData();
                                     }),
@@ -2082,7 +2156,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
-                                AddButton(userPremium == "no" ? trellisTribeData.isNotEmpty : false,() {
+                                AddButton(false,() {
+                                  setState(() {
+                                    selectedValueFromBottomSheet = "Mentor";
+                                    mentorNameController.text = '';
+                                    peerNameController.text = '';
+                                    menteeNameController.text = '';
+                                  });
                                   tribeBottomSheet(context,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
                                     children: [
                                       Align(
@@ -2107,7 +2187,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(mentorNameController," name of mentor-Type what thy provide you",1,70,false))),
+                                              child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false))),
                                       // Container(
                                       //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
                                       //     child: Focus(
@@ -2143,7 +2223,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(peerNameController," name of peer-Type what thy provide you",1,70,false))),
+                                              child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false))),
                                       // Container(
                                       //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
                                       //     child: Focus(
@@ -2179,7 +2259,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(menteeNameController," name of mentee-Type what thy provide you",1,70,false))),
+                                              child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false))),
                                       // Container(
                                       //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
                                       //     child: Focus(
@@ -2191,7 +2271,38 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       //       // },
                                       //         child: NameField(menteeDescriptionController,"Description",1,70,false))),
                                     ],
-                                  ),(){_setTribeData();},);
+                                  ),(selectedValue) {
+                                    print('Selected value From Bottom Sheet: $selectedValue');
+                                    mentorNameController.clear();
+                                    peerNameController.clear();
+                                    menteeNameController.clear();
+                                    setState(() {
+                                      selectedValueFromBottomSheet = selectedValue;
+                                    });
+                                    // Do something with the selected value
+                                  },(){
+                                    if(userPremium == "no") {
+
+                                      if(selectedValueFromBottomSheet == "Peer" && trellisPeerTribeData.isEmpty  ) {
+                                        _addNewTribeData(id, peerNameController.text, "Peer");
+                                      } else if(selectedValueFromBottomSheet == "Mentee" && trellisMenteeTribeData.isEmpty) {
+                                        _addNewTribeData(id, menteeNameController.text, "Mentee");
+                                      } else if(selectedValueFromBottomSheet == "Mentor" && trellisMentorTribeData.isEmpty) {
+                                        _addNewTribeData(id, mentorNameController.text, "Mentor");
+                                      }else {
+                                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+                                      }
+
+                                    } else {
+                                          if (selectedValueFromBottomSheet == "Peer") {
+                                            _addNewTribeData(id, peerNameController.text, "Peer");
+                                          } else if (selectedValueFromBottomSheet == "Mentee") {
+                                            _addNewTribeData(id, menteeNameController.text, "Mentee");
+                                          } else {
+                                            _addNewTribeData(id, mentorNameController.text, "Mentor");
+                                          }
+                                        }
+                                      },);
                                   // needsBottomSheet(context, "Tribe", <Widget>[
                                   //   Row(
                                   //     mainAxisSize: MainAxisSize.min,
@@ -2376,122 +2487,224 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   // ]);
                                 }),
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                                  child: trellisTribeData.isEmpty ? const Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Text("")) : ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: trellisTribeData.length,
-                                      itemBuilder:(context,index) {
-                                        return GestureDetector(
-                                          // onTap: () {
-                                          //   showDialog(
-                                          //     context: context,
-                                          //     builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements"),
-                                          //   );
-                                          // },
-                                          child: Container(
-                                              margin:const EdgeInsets.symmetric(vertical: 5),
-                                              decoration: BoxDecoration(
-                                                  color: AppColors.backgroundColor,
-                                                  borderRadius: BorderRadius.circular(10)
-                                              ),
-                                              padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
-                                              child: Column(
+                                    margin:const EdgeInsets.symmetric(vertical: 5),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.backgroundColor,
+                                        borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    padding:const EdgeInsets.only(top:5,left: 10,right: 10,bottom: 5),
+                                    child: Column(
+                                      children: [
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.person,color: AppColors.primaryColor,),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
+                                          ],
+                                        ),
+                                       trellisMentorTribeData.isEmpty ?const Text("No mentor available") : ListView.builder(
+                                            shrinkWrap: true,
+                                            physics:const NeverScrollableScrollPhysics(),
+                                            itemCount: trellisMentorTribeData.length,
+                                            itemBuilder: (context, index) {
+                                              return Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      const Row(
-                                                        children: [
-                                                          Icon(Icons.person,color: AppColors.primaryColor,),
-                                                          SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
-                                                        ],
-                                                      ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          _deleteRecord("tribe", trellisTribeData[index]['id'],index,"");
-                                                        },
-                                                        icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    alignment: Alignment.centerLeft,
-                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        Text(trellisTribeData[index]['mentor'].toString()),
-                                                        // SizedBox(height: 5,),
-                                                        // Text(trellisTribeData[index]['mentor_desc'].toString())
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  const Row(
-                                                    children: [
-                                                      Icon(Icons.person,color: AppColors.primaryColor,),
-                                                      SizedBox(
-                                                        width: 5,
-                                                      ),
-                                                      Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    alignment: Alignment.centerLeft,
-                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        Text(trellisTribeData[index]['peer'].toString()),
-                                                        // SizedBox(height: 5,),
-                                                        // Text(trellisTribeData[index]['peer_desc'].toString())
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  const  Row(
-                                                    children: [
-                                                      Icon(Icons.person,color: AppColors.primaryColor,),
-                                                      SizedBox(
-                                                        width: 5,
-                                                      ),
-                                                      Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    alignment: Alignment.centerLeft,
-                                                    padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        Text(trellisTribeData[index]['mentee'].toString()),
-                                                        // SizedBox(height: 5,),
-                                                        // Text(trellisTribeData[index]['mentee_desc'].toString())
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  // Align(alignment: Alignment.topRight,
-                                                  //   child: IconButton(
-                                                  //     onPressed: () {
-                                                  //       _deleteRecord("tribe", trellisTribeData[index]['id'],index);
-                                                  //     },
-                                                  //     icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                  //   ),),
-                                                  // Align(
-                                                  //     alignment: Alignment.topLeft,
-                                                  //     child: Text("${trellisTribeData[index]['mentor'].toString()} | ${trellisTribeData[index]['mentor_desc'].toString()} , ${trellisTribeData[index]['peer'].toString()} | ${trellisTribeData[index]['peer_desc'].toString()} , ${trellisTribeData[index]['mentee'].toString()} | ${trellisTribeData[index]['mentee_desc'].toString()}"))
+                                                  Expanded(
+                                                      child: Text("• ${trellisMentorTribeData[index].text} ")),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      showDeletePopupForTribe("Mentor",trellisMentorTribeData[index].id.toString(),index);
+                                                      // _deleteNewTribe("Mentor",trellisMentorTribeData[index].id.toString(),index);
+                                                    },
+                                                    icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                  )
                                                 ],
-                                              )),
-                                        );
-                                      }
-                                  ),
-                                ),
+                                              );
+                                            }),
+                                      ],
+                                    )),
+                                Container(
+                                    margin:const EdgeInsets.symmetric(vertical: 5),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.backgroundColor,
+                                        borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    padding:const EdgeInsets.only(top:5,left: 10,right: 10,bottom: 5),
+                                    child: Column(
+                                      children: [
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.person,color: AppColors.primaryColor,),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
+                                          ],
+                                        ),
+                                        trellisPeerTribeData.isEmpty ?const Text("No peer available") : ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: trellisPeerTribeData.length,
+                                            physics:const NeverScrollableScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(child: Text("• ${trellisPeerTribeData[index].text}")),
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDeletePopupForTribe("Peer",trellisPeerTribeData[index].id.toString(),index);
+                                                  // _deleteNewTribe("Peer",trellisPeerTribeData[index].id.toString(),index);
+                                                },
+                                                icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                              )
+                                            ],
+                                          );
+                                        }),
+
+                                      ],
+                                    )),
+                                Container(
+                                    margin:const EdgeInsets.symmetric(vertical: 5),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.backgroundColor,
+                                        borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    padding:const EdgeInsets.only(top:5,left: 10,right: 10,bottom: 5),
+                                    child: Column(
+                                      children: [
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.person,color: AppColors.primaryColor,),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
+                                          ],
+                                        ),
+                                        trellisMenteeTribeData.isEmpty ?const Text("No mentee available") :  ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: trellisMenteeTribeData.length,
+                                            physics:const NeverScrollableScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              return Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Expanded(child: Text("• ${trellisMenteeTribeData[index].text}")),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      showDeletePopupForTribe("Mentee",trellisMenteeTribeData[index].id.toString(),index);
+                                                    },
+                                                    icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                  )
+                                                ],
+                                              );
+                                            }),
+                                      ],
+                                    )),
+                                // Container(
+                                //   margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                //   child: trellisTribeData.isEmpty ? const Align(
+                                //       alignment: Alignment.topLeft,
+                                //       child: Text("")) : ListView.builder(
+                                //       shrinkWrap: true,
+                                //       itemCount: trellisTribeData.length,
+                                //       itemBuilder:(context,index) {
+                                //         return GestureDetector(
+                                //           // onTap: () {
+                                //           //   showDialog(
+                                //           //     context: context,
+                                //           //     builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements"),
+                                //           //   );
+                                //           // },
+                                //           child: Container(
+                                //               margin:const EdgeInsets.symmetric(vertical: 5),
+                                //               decoration: BoxDecoration(
+                                //                   color: AppColors.backgroundColor,
+                                //                   borderRadius: BorderRadius.circular(10)
+                                //               ),
+                                //               padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
+                                //               child: Column(
+                                //                 children: [
+                                //                   Row(
+                                //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //                     children: [
+                                //                       const Row(
+                                //                         children: [
+                                //                           Icon(Icons.person,color: AppColors.primaryColor,),
+                                //                           SizedBox(
+                                //                             width: 5,
+                                //                           ),
+                                //                           Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
+                                //                         ],
+                                //                       ),
+                                //                       IconButton(
+                                //                         onPressed: () {
+                                //                           _deleteRecord("tribe", trellisTribeData[index]['id'],index,"");
+                                //                         },
+                                //                         icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                //                       )
+                                //                     ],
+                                //                   ),
+                                //                   Container(
+                                //                     alignment: Alignment.centerLeft,
+                                //                     padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                //                     child: Column(
+                                //                       crossAxisAlignment: CrossAxisAlignment.start,
+                                //                       mainAxisAlignment: MainAxisAlignment.start,
+                                //                       children: [
+                                //                         Text(trellisTribeData[index]['mentor'].toString()),
+                                //                       ],
+                                //                     ),
+                                //                   ),
+                                //                   const Row(
+                                //                     children: [
+                                //                       Icon(Icons.person,color: AppColors.primaryColor,),
+                                //                       SizedBox(
+                                //                         width: 5,
+                                //                       ),
+                                //                       Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
+                                //                     ],
+                                //                   ),
+                                //                   Container(
+                                //                     alignment: Alignment.centerLeft,
+                                //                     padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                //                     child: Column(
+                                //                       crossAxisAlignment: CrossAxisAlignment.start,
+                                //                       mainAxisAlignment: MainAxisAlignment.start,
+                                //                       children: [
+                                //                         Text(trellisTribeData[index]['peer'].toString()),
+                                //                       ],
+                                //                     ),
+                                //                   ),
+                                //                   const  Row(
+                                //                     children: [
+                                //                       Icon(Icons.person,color: AppColors.primaryColor,),
+                                //                       SizedBox(
+                                //                         width: 5,
+                                //                       ),
+                                //                       Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
+                                //                     ],
+                                //                   ),
+                                //                   Container(
+                                //                     alignment: Alignment.centerLeft,
+                                //                     padding:const EdgeInsets.only(left: 5,right: 5,bottom: 10),
+                                //                     child: Column(
+                                //                       crossAxisAlignment: CrossAxisAlignment.start,
+                                //                       mainAxisAlignment: MainAxisAlignment.start,
+                                //                       children: [
+                                //                         Text(trellisTribeData[index]['mentee'].toString()),
+                                //                       ],
+                                //                     ),
+                                //                   ),
+                                //                 ],
+                                //               )),
+                                //         );
+                                //       }
+                                //   ),
+                                // ),
                               ],
                             ),
                           )
@@ -2641,6 +2854,57 @@ class _TrellisScreenState extends State<TrellisScreen> {
       ),
     );
   }
+
+  _addNewTribeData(String userIdd,String fieldValue,String type) {
+
+    if(fieldValue.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager().trellisNewTribeDataAdd(TrellisNewDataAddRequestModel(
+          userId: userIdd, text: fieldValue, type: type)).then((value) {
+
+        TribeDataResponse tribeDataResponse = TribeDataResponse(
+          id: value['post_data']['id'].toString(),
+        userId: value['post_data']['user_id'].toString(),
+        type: value['post_data']['type'].toString(),
+        text: value['post_data']['text'].toString(),
+        createdAt: "",);
+
+        if(type == "Peer") {
+          trellisPeerTribeData.add(tribeDataResponse);
+        } else if(type == "Mentee") {
+          trellisMenteeTribeData.add(tribeDataResponse);
+        } else {
+          trellisMentorTribeData.add(tribeDataResponse);
+        }
+        setState(() {
+          mentorNameController.text = '';
+          peerNameController.text = '';
+          menteeNameController.text = '';
+
+          _isDataLoading = false;
+        });
+
+        Navigator.of(context).pop();
+        showToastMessage(context, "Added Successfully", true);
+      }).catchError((e) {
+        print(e.toString());
+        setState(() {
+          _isDataLoading = false;
+        });
+        showToastMessage(context, e.toString(), false);
+      });
+    } else {
+      setState(() {
+        _isDataLoading = false;
+      });
+      showToastMessage(context, "Please Enter data in the field", false);
+    }
+
+  }
+
+
   _saveTrellisTriggerResponse() {
     setState(() {
       _isDataLoading = true;
@@ -2659,6 +2923,37 @@ class _TrellisScreenState extends State<TrellisScreen> {
         });
       print(e);
     });
+  }
+
+  _deleteNewTribe(String type,String tribeDataId,int indexItem) {
+    setState(() {
+      _isDataLoading = true;
+    });
+
+    HTTPManager().trellisNewTribeDelete(TribeNewDataTrellisDeleteRequestModel(recordId: tribeDataId)).then((value) {
+
+      print(value);
+      if(type == "Peer") {
+        trellisPeerTribeData.removeAt(indexItem);
+      } else if(type == "Mentee") {
+        trellisMenteeTribeData.removeAt(indexItem);
+      } else {
+        trellisMentorTribeData.removeAt(indexItem);
+      }
+      setState(() {
+        _isDataLoading = false;
+      });
+
+      showToastMessage(context, "Deleted successfully", true);
+
+    }).catchError((e) {
+      print(e.toString());
+      setState(() {
+        _isDataLoading = false;
+      });
+      showToastMessage(context, e.toString(), false);
+    });
+
   }
 
   _deleteRecord(String type,String recordId,int index,String goalsOrChallenges) {

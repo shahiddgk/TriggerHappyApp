@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/Widgets/video_player_in_pop_up.dart';
 import 'package:html/parser.dart' as parser;
@@ -34,6 +33,15 @@ class _QuestionTextWidgetState extends State<QuestionTextWidget> {
     super.initState();
   }
 
+  //here goes the function
+  String? _parseHtmlString(String htmlString) {
+    final document = parser.parse(htmlString);
+    final String? parsedString = parser.parse(document.body?.text).documentElement?.text;
+
+    return parsedString;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -43,14 +51,15 @@ class _QuestionTextWidgetState extends State<QuestionTextWidget> {
           flex: 6,
           child: Padding(
             padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 5),
-            child: Html(data: widget.questionText!,style: {
-              "#" : Style(
-                  color: AppColors.textWhiteColor,
-                  fontSize: FontSize(AppConstants.defaultFontSize),
-                  textAlign: TextAlign.start,
-
-              ),
-            },),
+            child: Text(_parseHtmlString(widget.questionText!)!,textAlign: TextAlign.start,style:const TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize),)
+            // Html(data: widget.questionText!,style: {
+            //   "#" : Style(
+            //       color: AppColors.textWhiteColor,
+            //       fontSize: FontSize(AppConstants.defaultFontSize),
+            //       textAlign: TextAlign.start,
+            //
+            //   ),
+            // },),
           ),
         ),
         Visibility(

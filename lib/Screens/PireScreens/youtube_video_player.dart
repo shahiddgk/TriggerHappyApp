@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import '../../Widgets/colors.dart';
 import '../../Widgets/constants.dart';
 import '../utill/userConstants.dart';
 
+// ignore: must_be_immutable
 class YoutubeVideoScreen extends StatefulWidget {
   YoutubeVideoScreen(this.videoType,{Key? key}) : super(key: key);
 

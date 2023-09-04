@@ -2,13 +2,10 @@
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../splash_screen.dart';
-import '../TreeScreen/tree_screen.dart';
 import '../utill/userConstants.dart';
 import 'login_screen.dart';
 
@@ -61,7 +58,7 @@ class _SplashScreenUpdateState extends State<SplashScreenUpdate> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
+      body: const Center(
         child: CircularProgressIndicator(),
       ),
     );

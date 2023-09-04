@@ -19,3 +19,19 @@ class TrellisDeleteRequestModel {
     return data;
   }
 }
+
+class TribeNewDataTrellisDeleteRequestModel {
+  String? recordId;
+
+  TribeNewDataTrellisDeleteRequestModel({ this.recordId});
+
+  TribeNewDataTrellisDeleteRequestModel.fromJson(Map<String, dynamic> json) {
+    recordId = json['record_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['record_id'] = recordId;
+    return data;
+  }
+}

@@ -1,20 +1,27 @@
 
+// ignore_for_file: must_be_immutable, avoid_print, depend_on_referenced_packages
+
 import 'dart:io';
 import 'dart:math';
 
 import 'package:animations/animations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
+import 'package:flutter_quiz_app/network/api_urls.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:flutter_quiz_app/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
 import '../../Widgets/option_mcq_widget.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
+import '../../model/request_model/post_request_model.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
 import '../utill/userConstants.dart';
 
@@ -32,16 +39,18 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
 
   late AnimationController controllerBlink;
   late AnimationController controllerForward;
+  final confettiController = ConfettiController();
 
   String name = "";
   String id = "";
   bool _isUserDataLoading = true;
-  bool _isLoading = true;
   bool _isLoading2 = true;
-  late int countNumber;
+  int countNumber = -1;
   int countNumber2 = -1;
   bool _showFirstImage = true;
   String errorMessage = "";
+  bool isTomato = false;
+  bool isRose = false;
   // ignore: prefer_typing_uninitialized_variables
   late final _random;
   // ignore: prefer_typing_uninitialized_variables
@@ -49,6 +58,8 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
   String url = "";
   late bool isPhone;
   bool showTapHereButton = false;
+  String treeType = "apple";
+  late SkippedReminderNotification skippedReminderNotification;
 
   bool get isForwardAnimation =>
       controllerForward.status == AnimationStatus.forward ||
@@ -96,7 +107,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     "Fear leads to anger, anger leads to hate, hate leads to suffering",
     "Feeling empowered always leads to creativity and connectivity giving life to all",
     "Folks are sally about as happy as they make up their minds to be",
-    "Forgiveness is not an occasional act: it is a permanent attitude"
+    "Forgiveness is not an occasional act: it is a permanent attitude",
     "Forgiving isn't something you do for someone else. It's something you do for yourself",
     "Get that corn out of my face!",
     "Give yourself a gift, the present moment",
@@ -127,7 +138,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     "In a way, you’ve already won in this world because you’re the only one who can be you",
     "It is a rough road that leads to the heights of greatness",
     "It is more civilized to make fun of life than to bewail it",
-    "It is not good to have zeal without knowledge or to be hasty and miss the way"
+    "It is not good to have zeal without knowledge or to be hasty and miss the way",
     "It is the nature of the wise to resist pleasures, but the foolish to be a slave to them",
     "It’s better to know how to learn than learn how to know",
     "It’s not about what it is it’s about what it can become",
@@ -136,19 +147,19 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     "Knowing that we can be loved exactly as we are gives us all the best opportunity for growing into the healthiest of people",
     "Leadership is about vision, seeing what’s needed or missing, and helping people act",
     "Learn to grieve well, then do it do it regularly",
-    "Let another praise you and not your own lips"
+    "Let another praise you and not your own lips",
     "Let no man pull you low enough to hate him",
     "Life is a daring adventure or nothing at all",
     "Life is not a problem to be solved, but a reality to be experienced",
     "Life is ten percent what happens to you and ninety percent how you respond to it",
     "Life is very short and anxious for those who forget the past, neglect the present, and fear the future",
     "Listening is where love begins: listening to ourselves and then to our neighbors",
-    "Little by little we human beings are confronted with situations that give us more and more clues that we are not perfect. "
+    "Little by little we human beings are confronted with situations that give us more and more clues that we are not perfect. ",
     "Love and success, always in that order. It's that simple AND that difficult",
     "Love is like infinity: You can't have more or less infinity, and you can't compare two things to see if they're 'equally infinite.' Infinity just is, and that's the way I think love is, too",
     "Man conquers the world by conquering himself",
     "Many of life's failures are people who did not realize how close they were to success when they gave up",
-    "Me think, why waste time say lot word, when few word do trick?"
+    "Me think, why waste time say lot word, when few word do trick?",
     "Most people want to avoid pain, and discipline is usually painful",
     "My mission in life is not merely to survive, but to thrive; and to do so with some passion, some compassion, some humor, and some style",
     "No Man Is an Island",
@@ -165,7 +176,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     "Raise up a child in the way that they should go and when they are old they will not depart",
     "Rise up this matter is in your hands. We will support you, so take courage and do it",
     "Sometimes I get so bored, I just want to scream. And then sometimes, I actually do scream. I just sort of feel out what the situation calls for",
-    "Sometimes I'll start a sentence and I don't even know where it's going. I just hope I find it along the way. Like an improv conversation",
+    "Sometimes I'll start a sentence and I don't even know where it's going. I just hope I find it along the way. Like an improve conversation",
     "Sometimes the questions are complicated and the answers are simple",
     "Sometimes we must let go of our pride and do what is requested of us",
     "Sometimes you will never know the value of a moment, until it becomes a memory",
@@ -278,6 +289,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     _random = Random();
     element = quoteList[_random.nextInt(quoteList.length)];
     _getUserData();
+
     controllerBlink = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
@@ -305,7 +317,6 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
 
   getScreenDetails() {
     setState(() {
-      _isLoading = true;
     });
     if(MediaQuery.of(context).size.width<= 500) {
       isPhone = true;
@@ -313,13 +324,175 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
       isPhone = false;
     }
     setState(() {
-      _isLoading = false;
     });
   }
+
+
+  // showPopupDialogueForTreeSelection() {
+  //
+  //   showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (context) {
+  //         return  StatefulBuilder(
+  //           builder: (BuildContext context, void Function(void Function()) setState) {
+  //             return SafeArea(
+  //               child: AlertDialog(
+  //                 title:const Text('Choose a plant to continue',textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+  //                 content: SizedBox(
+  //                   height: MediaQuery.of(context).size.height/2.9,
+  //                   child: SingleChildScrollView(
+  //                     scrollDirection: Axis.vertical,
+  //                     child: Column(
+  //                       children: [
+  //                         Container(
+  //                           margin:const EdgeInsets.symmetric(vertical: 10),
+  //                           child: Row(
+  //                             children: [
+  //                               Expanded(child: GestureDetector(
+  //                                 onTap: () {
+  //                                   setState(() {
+  //                                     isTomato = true;
+  //                                     isRose = false;
+  //                                   });
+  //                                 },
+  //                                 child: Container(
+  //                                   decoration: BoxDecoration(
+  //                                       borderRadius: BorderRadius.circular(5),
+  //                                       border: Border.all(color: isTomato ? AppColors.primaryColor : AppColors.backgroundColor)
+  //                                   ),
+  //                                   child: Column(
+  //                                     children: [
+  //                                       Container(
+  //                                         height: MediaQuery.of(context).size.height/4.5,
+  //                                         decoration: BoxDecoration(
+  //                                           borderRadius: BorderRadius.circular(15),
+  //                                         ),
+  //                                         child: Image.asset("assets/seed.png"),
+  //                                       ),
+  //                                       Container(
+  //                                         decoration: BoxDecoration(
+  //                                           color: isTomato ? AppColors.primaryColor : AppColors.backgroundColor,
+  //                                           borderRadius:const BorderRadius.only(bottomLeft: Radius.circular(5),bottomRight: Radius.circular(5)),
+  //                                           border: Border.all(color: AppColors.primaryColor)
+  //                                         ),
+  //                                         child: Row(
+  //                                           mainAxisAlignment: MainAxisAlignment.center,
+  //                                           crossAxisAlignment: CrossAxisAlignment.center,
+  //                                           children: [
+  //                                             Text("Seed 1",style: TextStyle(color: isTomato ? AppColors.backgroundColor : AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize ),)
+  //                                           ],
+  //                                         ),
+  //                                       )
+  //                                     ],
+  //                                   ),
+  //                                 ),
+  //                               )),
+  //                              const SizedBox(width: 3,),
+  //                               Expanded(child: GestureDetector(
+  //                                 onTap: () {
+  //                                   setState(() {
+  //                                     isRose = true;
+  //                                     isTomato = false;
+  //                                   });
+  //                                 },
+  //                                 child: Container(
+  //                                   decoration: BoxDecoration(
+  //                                       borderRadius: BorderRadius.circular(5),
+  //                                       border: Border.all(color:isRose ? AppColors.primaryColor : AppColors.backgroundColor)
+  //                                   ),
+  //                                   child: Column(
+  //                                     mainAxisSize: MainAxisSize.min,
+  //                                     children: [
+  //                                       Container(
+  //                                         height: MediaQuery.of(context).size.height/4.5,
+  //                                         decoration: BoxDecoration(
+  //                                           borderRadius: BorderRadius.circular(15),
+  //                                         ),
+  //                                         child: Image.asset("assets/seed2.png"),
+  //                                       ),
+  //                                       Container(
+  //                                         decoration: BoxDecoration(
+  //                                             color: isRose ? AppColors.primaryColor : AppColors.backgroundColor,
+  //                                             borderRadius:const BorderRadius.only(bottomLeft: Radius.circular(5),bottomRight: Radius.circular(5)),
+  //                                             border: Border.all(color: AppColors.primaryColor)
+  //                                         ),
+  //                                         child: Row(
+  //                                           mainAxisAlignment: MainAxisAlignment.center,
+  //                                           crossAxisAlignment: CrossAxisAlignment.center,
+  //                                           children: [
+  //                                             Text("Seed 2",style: TextStyle(color: isRose ? AppColors.backgroundColor : AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize ),)
+  //                                           ],
+  //                                         ),
+  //                                       )
+  //                                     ],
+  //                                   ),
+  //                                 ),
+  //                               ))
+  //                             ],
+  //                           ),
+  //                         ),
+  //                         Center(
+  //                           child: ElevatedButton(
+  //                             onPressed: (){
+  //                               if(isTomato || isRose) {
+  //                                 if(isTomato) {
+  //                                   _setTreeType('tomato');
+  //                                 } else {
+  //                                   _setTreeType('rose');
+  //                                 }
+  //                               } else {
+  //                                 showToastMessage(context, "Please select a seed to proceed", false);
+  //                               }
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               shape: RoundedRectangleBorder(
+  //                                   borderRadius: BorderRadius.circular(10)
+  //                               ),
+  //                               minimumSize: Size(MediaQuery.of(context).size.width/2, 30), // Set the minimum width and height
+  //                               padding: EdgeInsets.zero, // Remove any default padding
+  //                             ),
+  //                             child:const SingleChildScrollView(
+  //                                 scrollDirection: Axis.vertical,
+  //                                 child: Text("Continue",style: TextStyle(color: AppColors.backgroundColor,fontSize: AppConstants.defaultFontSize),)),)
+  //                         )
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       });
+  // }
+
+  // _setTreeType(String treeGrowth) {
+  //   setState(() {
+  //     _isSeedDataSetting = true;
+  //   });
+  //   HTTPManager().setTreeGrowthType(SetTreeGrowthTypeRequestModel(userId: id,gardenType: treeGrowth)).then((value) {
+  //     // showToastMessage(context, "Yo", true);
+  //     setState(() {
+  //       _isSeedDataSetting = false;
+  //     });
+  //     Navigator.of(context).pop();
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>TreeScreen(false)));
+  //     // _changeImage(0);
+  //   }).catchError((e) {
+  //     print(e);
+  //     showToastMessage(context, e.toString(), false);
+  //     setState(() {
+  //       _isSeedDataSetting = false;
+  //     });
+  //   });
+  //
+  // }
 
   @override
   void dispose() {
    // controllerReverse.dispose();
+    confettiController.dispose();
     controllerForward.dispose();
     controllerBlink.dispose();
     super.dispose();
@@ -327,8 +500,23 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
 
 
   void _changeImage(int count) {
-    // print("COUNT NUMBER");
-    // print(count);
+    if(count >= 37) {
+      print("COUNT NUMBER");
+      print(count);
+      setState(() {
+        countNumber2 = 37;
+        countNumber = 37;
+        // countNumber2 = 38;
+      });
+    } else {
+      print("COUNT NUMBER");
+      print(count);
+      setState(() {
+        countNumber2 = count;
+        countNumber = count;
+        // countNumber2 = 38;
+      });
+    }
 
     if(count == 0) {
       setState(() {
@@ -337,12 +525,70 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
       });
       // print(countNumber);
       if(!isPhone) {
-        url = "assets/apple_tree/apple_ipad/$countNumber.png";
+        if( treeType == "apple") {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+        } else if(treeType == "tomato") {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+        } else {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+        }
       } else {
-        url = "assets/apple_tree/apple_mobile/$countNumber.png";
+        if( treeType == "apple") {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+        } else if(treeType == "tomato") {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+        } else {
+          url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+        }
       }
-      // print(url);
-    } else {
+      print("THIS IS THE URL");
+      print(url);
+    }
+    // else if(count >= 37 && treeType == "apple" ) {
+    //
+    //   setState(() {
+    //     count = 37;
+    //      controllerForward.reverse();
+    //     // widget.isAnimation = false;
+    //     if(!isPhone) {
+    //       if( treeType == "apple") {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+    //       } else if(treeType == "tomato") {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+    //       } else {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+    //       }
+    //     } else {
+    //       if( treeType == "apple") {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+    //       } else if(treeType == "tomato") {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+    //       } else {
+    //         url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+    //       }
+    //
+    //     }
+    //
+    //     Future.delayed(const Duration(seconds: 3)).then((value) {
+    //       Future.delayed(const Duration(seconds: 5)).then((value) {
+    //
+    //         setState(() {
+    //           showTapHereButton = true;
+    //         });
+    //       });
+    //       setState(() {
+    //         countNumber2 = 38;
+    //         _showFirstImage = false;
+    //         confettiController.play();
+    //         widget.isAnimation = false;
+    //         //print(countNumber);
+    //         print("THIS IS THE URL");
+    //         print(url);
+    //       });
+    //     });
+    //   });
+    // }
+    else {
       setState(() {
         controllerForward.reverse();
         if (_showFirstImage) {
@@ -352,11 +598,25 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
         }
         // print(countNumber);
         if(!isPhone) {
-          url = "assets/apple_tree/apple_ipad/$countNumber.png";
+          if( treeType == "apple") {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+          } else if(treeType == "tomato") {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+          } else {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+          }
         } else {
-          url = "assets/apple_tree/apple_mobile/$countNumber.png";
+          if( treeType == "apple") {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+          } else if(treeType == "tomato") {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+          } else {
+            url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+          }
+
         }
-        // print(url);
+        print("THIS IS THE URL");
+        print(url);
         Future.delayed(const Duration(seconds: 3)).then((value) {
           Future.delayed(const Duration(seconds: 5)).then((value) {
 
@@ -372,12 +632,27 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
               countNumber = count;
             }
             //print(countNumber);
+
             if(!isPhone) {
-              url = "assets/apple_tree/apple_ipad/$countNumber.png";
+              if( treeType == "apple") {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+              } else if(treeType == "tomato") {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+              } else {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+              }
             } else {
-              url = "assets/apple_tree/apple_mobile/$countNumber.png";
+              if( treeType == "apple") {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+              } else if(treeType == "tomato") {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+              } else {
+                url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+              }
+
             }
-            //print(url);
+            print("THIS IS THE URL");
+            print(url);
             controllerForward.forward();
           });
         });
@@ -389,37 +664,30 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       sharedPreferences.setString("Score", "");
-      _isLoading = true;
       _isLoading2 = true;
     });
 
-    HTTPManager().treeGrowth(LogoutRequestModel(userId: id)).then((value)  {
-
-
-
+    HTTPManager().treeGrowthSimple(LogoutRequestModel(userId: id)).then((value)  {
       int count = value["response_count"];
      // countNumber = value["response_count"];
-
+      String type = value["garden_type"];
       setState(() {
         sharedPreferences.setString("Score", count.toString());
-        countNumber2 = count;
+        sharedPreferences.setString("TreeType", type.toString());
+        // countNumber2 = count;
+        treeType = value["garden_type"];
       });
 
-     //  if(count == 0) {
-     //    countNumber = 0;
-     // //   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-     //  } else {
         _changeImage(count);
+      _getSkippedReminderList();
       //}
       setState(() {
         errorMessage = "";
-        _isLoading = false;
         _isLoading2 = false;
       });
     //  showToastMessage(context, value['message'].toString(),true);
     }).catchError((e) {
       setState(() {
-        _isLoading = false;
         _isLoading2 = false;
         errorMessage = e.toString();
       });
@@ -440,10 +708,245 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     // print("Data getting called");
     // print(name);
     // print(id);
+
     _getTreeGrowth();
+    // _setTreeType('apple');
     setState(() {
       _isUserDataLoading = false;
     });
+  }
+
+  _getSkippedReminderList() {
+    setState(() {
+      // sharedPreferences.setString("Score", "");
+      _isLoading2 = true;
+    });
+    HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        skippedReminderNotification = value;
+        // sharedPreferences.setString("Score", "");
+        _isLoading2 = false;
+      });
+      print("SKIPPED REMINDER LIST");
+      print(value);
+      for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+
+        DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime!.toString());
+        String formattedDate = DateFormat('MM-dd-yy').format(date);
+         String formattedTime = DateFormat("hh:mm a").format(date);
+
+        String title = "Hi $name. Did you....";
+        showPopupDialogueForReminder(skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate,formattedTime);
+      }
+
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        // sharedPreferences.setString("Score", "");
+        _isLoading2 = false;
+      });
+    });
+  }
+
+  showPopupDialogueForReminder(String notificationId,String title,String description,String date,String time) {
+    bool isDataLoading = false;
+    bool isYesDataLoading = false;
+    bool isNoDataLoading = false;
+
+    bool isPhone;
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return  StatefulBuilder(
+            builder: (BuildContext context, void Function(void Function()) setState) {
+              return WillPopScope(
+                onWillPop: _onWillPopForAlert,
+                child: AlertDialog(
+                  backgroundColor: AppColors.naqFieldColor,
+                  contentPadding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  content: SizedBox(
+                    height: MediaQuery.of(context).size.height/4,
+                    width: !isPhone ? MediaQuery.of(context).size.height/4 : MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height/12,
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                alignment: Alignment.topCenter,
+                                decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
+                                    color: AppColors.alertDialogueHeaderColor),
+                                // margin:const EdgeInsets.symmetric(vertical: 10),
+                                child: Container(
+                                    margin:!isPhone ? const EdgeInsets.symmetric(vertical: 30) : const EdgeInsets.symmetric(vertical: 10),
+                                    height: 50,
+                                    width: 50,
+                                    child: Image.asset('assets/bimage.png',)),
+                              ),
+                              // Align(
+                              //   alignment: Alignment.topRight,
+                              //   child: IconButton(onPressed: () {
+                              //     Navigator.of(context).pop();
+                              //   }, icon: const Icon(Icons.close)),
+                              // )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.topLeft,
+                          height: MediaQuery.of(context).size.height/10,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding:const EdgeInsets.symmetric(horizontal: 5),
+                                      margin:const EdgeInsets.symmetric(vertical: 5),
+                                      child:  Text("Date: $date",textAlign: TextAlign.start,style: TextStyle(fontSize:!isPhone ? AppConstants.headingFontSizeForEntriesAndSession : AppConstants.defaultFontSize,),),
+                                    ),
+                                    Container(
+                                      padding:const EdgeInsets.symmetric(horizontal: 5),
+                                      margin:const EdgeInsets.symmetric(vertical: 5),
+                                      child:  Text("Time: $time",textAlign: TextAlign.start,style: TextStyle(fontSize:!isPhone ? AppConstants.headingFontSizeForEntriesAndSession : AppConstants.defaultFontSize,),),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding:const EdgeInsets.symmetric(horizontal: 5),
+                                  margin:const EdgeInsets.symmetric(vertical: 5),
+                                  child:  Text(title,textAlign: TextAlign.start,style: TextStyle(fontSize:!isPhone ? AppConstants.headingFontSizeForEntriesAndSession : AppConstants.defaultFontSize,color: AppColors.alertDialogueColor),),
+                                ),
+                                Container(
+                                  padding:const EdgeInsets.symmetric(horizontal: 5),
+                                  margin:const EdgeInsets.symmetric(vertical: 5),
+                                  child:  Text(description,textAlign: TextAlign.start,style: TextStyle(fontSize:!isPhone ? AppConstants.headingFontSizeForEntriesAndSession : AppConstants.defaultFontSize),),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration:const BoxDecoration(
+                                border: Border(
+                                    top: BorderSide(
+                                      color: AppColors.primaryColor,
+                                    )
+                                )
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(onPressed: () {
+                                  setState(() {
+                                    isNoDataLoading = true;
+                                  });
+                                  // _notificationSnoozeReminderStatusData(notificationId,"yes");
+                                  HTTPManager().postReminderStopData(ReminderNotificationForStopRequestModel(notificationId: notificationId,reminderStop: "no")).then((value) {
+                                    setState(() {
+                                      isNoDataLoading = false;
+                                    });
+                                    // if(onAppOpen) {
+                                    //   Navigator.of(context).pop();
+                                    // }
+                                    Navigator.of(context).pop();
+                                    print("Notification Stop API");
+                                    print(value);
+                                  }).catchError((e) {
+                                    setState(() {
+                                      isNoDataLoading = false;
+                                    });
+                                    showToastMessage(context, e.toString(), false);
+                                  });
+                                }, child:isNoDataLoading ? const SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: Center(child: CircularProgressIndicator(),)) : const Text("No",style: TextStyle(color: AppColors.textWhiteColor),)),
+                                const SizedBox(
+                                    height: 30,
+                                    child:  VerticalDivider(color: AppColors.primaryColor,thickness: 2,)),
+                                TextButton(onPressed: () {
+                                  setState(() {
+                                    isYesDataLoading = true;
+                                  });
+                                  // _notificationSnoozeReminderStatusData(notificationId,"yes");
+                                  HTTPManager().postReminderStopData(ReminderNotificationForStopRequestModel(notificationId: notificationId,reminderStop: "yes")).then((value) {
+                                    setState(() {
+                                      isYesDataLoading = false;
+                                    });
+                                    // if(onAppOpen) {
+                                    //   Navigator.of(context).pop();
+                                    // }
+                                    Navigator.of(context).pop();
+                                    print("Notification Stop API");
+                                    print(value);
+                                  }).catchError((e) {
+                                    setState(() {
+                                      isYesDataLoading = false;
+                                    });
+                                    showToastMessage(context, e.toString(), false);
+                                  });
+                                }, child:isYesDataLoading ? const SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: Center(child: CircularProgressIndicator(),)) : const Text("Yes",style: TextStyle(color: AppColors.textWhiteColor),)),
+                                const SizedBox(
+                                    height: 30,
+                                    child:  VerticalDivider(color: AppColors.primaryColor,thickness: 2,)),
+                                TextButton(onPressed: () {
+                                  setState(() {
+                                    isDataLoading = true;
+                                  });
+                                  // _notificationSnoozeReminderStatusData(notificationId,"yes");
+                                  HTTPManager().postReminderSnoozeData(ReminderNotificationForSnoozeRequestModel(notificationId: notificationId,snooze: "yes")).then((value) {
+                                    setState(() {
+                                      isDataLoading = false;
+                                    });
+                                    // if(onAppOpen) {
+                                    //   Navigator.of(context).pop();
+                                    // }
+                                    showToastMessage(context, "Reminder Snoozed!", true);
+                                    Navigator.of(context).pop();
+                                    print("Notification Snooze API");
+                                    print(value);
+                                  }).catchError((e) {
+                                    setState(() {
+                                      isDataLoading = false;
+                                    });
+                                    showToastMessage(context, e.toString(), false);
+                                  });
+                                }, child:isDataLoading ? const SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: Center(child: CircularProgressIndicator(),)) : const Text("Snooze",style: TextStyle(color: AppColors.textWhiteColor),)),
+                              ],
+                            )
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        });
   }
 
   Future<bool> _onWillPop() async {
@@ -455,6 +958,17 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     // int count = 0;
     // Navigator.of(context).popUntil((_) => count++ >= 11);
     return true;
+  }
+
+  Future<bool> _onWillPopForAlert() async {
+    // Navigator.pushAndRemoveUntil(
+    //     context,
+    //     MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+    //         (Route<dynamic> route) => false
+    // );
+    // int count = 0;
+    // Navigator.of(context).popUntil((_) => count++ >= 11);
+    return false;
   }
 
 
@@ -486,8 +1000,14 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
-              },
+                // showPopupDialogueForReminder("","asdwasdwasdwasdwasdwadwa ....","sadwasdwasdwasdwasdwasdwadswaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",true);
+                // if(countNumber2 > 37 && treeType == "apple") {
+                //     showPopupDialogueForTreeSelection();
+                // } else {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const Dashboard()));
+                  // }
+                 },
               child: _isLoading2 ? Container(
                 color: Colors.white,
                 child:const Center(
@@ -514,9 +1034,9 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
                 ),
               ) : Container(
                 height: MediaQuery.of(context).size.height,
-                color: Colors.white,
+                color: treeType != "apple" ? AppColors.skyColorForTreeSection : AppColors.backgroundColor,
                 alignment: Alignment.bottomCenter,
-                child:  widget.isAnimation ? AnimatedBuilder(
+                child: countNumber2 != 110 ? widget.isAnimation ? AnimatedBuilder(
                   animation: controllerForward,
                   builder: (context, child) => FadeScaleTransition(
                     animation: controllerForward,
@@ -527,32 +1047,101 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
                     child:const Center(
                       child: CircularProgressIndicator(),
                     ),
-                  ) : Image.asset(url,fit: BoxFit.fill,),
-
-                  // CachedNetworkImage(
-                  //     imageUrl: url,
-                  //     fit: BoxFit.fill,
-                  //     progressIndicatorBuilder: (context, url, downloadProgress) {
-                  //       return Container(
-                  //                        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/3),
-                  //                         child: CircularProgressIndicator(
-                  //                             value: downloadProgress.progress));
-                  //                   },
-                  //     errorWidget: (context, url, error) => Container(
-                  //         alignment: Alignment.center,
-                  //         child: Icon(Icons.error,color: AppColors.redColor,)),
-                  //   ),
+                  ) : CachedNetworkImage(
+                    imageUrl: url,
+                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                        Container(
+                          margin: const EdgeInsets.only(
+                              top: 100,
+                              bottom: 100
+                          ),
+                          child: CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                              color: AppColors.primaryColor
+                          ),
+                        ),
+                    errorWidget: (context, url, error) =>  const Center(child: Icon(Icons.error)),
+                  ),
                 ) : _isLoading2 && countNumber2 == -1 ? Container(
                   color: Colors.white,
                   child:const Center(
                     child: CircularProgressIndicator(),
                   ),
-                ) :  Image.asset(!isPhone ? "assets/apple_tree/apple_ipad/$countNumber2.png" : "assets/apple_tree/apple_mobile/$countNumber2.png",fit: BoxFit.fill,),
+                ) : CachedNetworkImage(
+                  imageUrl: url,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Container(
+                        margin: const EdgeInsets.only(
+                            top: 100,
+                            bottom: 100
+                        ),
+                        child: CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                            color: AppColors.primaryColor
+                        ),
+                      ),
+                  errorWidget: (context, url, error) =>  const Center(child: Icon(Icons.error)),
+                ) : Container(
+                  alignment: Alignment.center,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ConfettiWidget(
+                        blastDirection: -pi /2,
+                        confettiController: confettiController,
+                        shouldLoop: true,
+                        emissionFrequency: 0.10,
+                        blastDirectionality: BlastDirectionality.explosive,
+                        numberOfParticles: 10,
+                        minBlastForce: 5,
+                        maxBlastForce: 30,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Container(
+                              margin:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/6),
+                              // height: MediaQuery.of(context).size.height/4,
+                              // width: MediaQuery.of(context).size.width/2,
+                              padding: EdgeInsets.all(MediaQuery.of(context).size.width/10),
+                              decoration:const BoxDecoration(
+                                color: AppColors.primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Image.asset("assets/congrats_cups.png",fit: BoxFit.fill,),
+                            ),
+                          ),
+                          const SizedBox(height: 20,),
+                          const Text("Congratulations",style: TextStyle(fontSize: AppConstants.headingFontSizeForEntriesAndSession,fontWeight: FontWeight.bold),),
+                          const SizedBox(height: 5,),
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const  Text("You have complete ",style: TextStyle(fontSize: AppConstants.columnDetailsScreenFontSize),),
+                             treeType == 'apple'? const Text("Level1: Seedling ",style: TextStyle(color:AppColors.primaryColor,fontSize: AppConstants.columnDetailsScreenFontSize),) : const Text("Level2: Plant ",style: TextStyle(color:AppColors.primaryColor,fontSize: AppConstants.columnDetailsScreenFontSize),),
+                            ],
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                )
               ),
             ),
              GestureDetector(
                onTap: () {
-                 Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
+                 // showPopupDialogueForReminder("","asdwasdwasdwasdwasdwadwa ....","sadwasdwasdwasdwasdwasdwadswaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",true);
+                 // if(countNumber2 > 37 && treeType == "apple" ) {
+                 //     showPopupDialogueForTreeSelection();
+                 // } else {
+                 Navigator.of(context).push(MaterialPageRoute(
+                     builder: (context) => const Dashboard()));
+                 // }
                },
                child: Padding(
                  padding: const EdgeInsets.only(bottom: 40),
@@ -576,16 +1165,45 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
              ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Dashboard()));
+                // showPopupDialogueForReminder("","asdwasdwasdwasdwasdwadwa ....","sadwasdwasdwasdwasdwasdwadswaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",true);
+                // if(countNumber2 > 37 && treeType == "apple") {
+                //     showPopupDialogueForTreeSelection();
+                // } else {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const Dashboard()));
+                // }
               },
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    padding:const EdgeInsets.symmetric(horizontal: 10),
-                    margin:const EdgeInsets.only(top: 20),
-                    child: Text(element.toString(),style:const TextStyle(fontSize: AppConstants.defaultFontSize),textAlign: TextAlign.center,)),
+              child: Visibility(
+                visible: countNumber2 < 38,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      Container(
+                          padding:const EdgeInsets.symmetric(horizontal: 10),
+                          margin:const EdgeInsets.only(top: 20),
+                          child: Text(element.toString(),style:const TextStyle(fontSize: AppConstants.defaultFontSizeForWeekDays),textAlign: TextAlign.center,)),
+                      Container(
+                          padding:const EdgeInsets.symmetric(horizontal: 10),
+                          margin:const EdgeInsets.only(top: 20),
+                          child:treeType == 'apple'? const Text("Level1:Seedling",style: TextStyle(fontSize: AppConstants.headingFontSizeForEntriesAndSession,color: AppColors.primaryColor),textAlign: TextAlign.center,) : const Text("Level2:Plant",style: TextStyle(fontSize: AppConstants.headingFontSizeForEntriesAndSession,color: AppColors.primaryColor),textAlign: TextAlign.center,)),
+                    ],
+                  ),
+                ),
               ),
-            )
+            ),
+            Center(
+              child: ConfettiWidget(
+                blastDirection: -pi /2,
+                confettiController: confettiController,
+                shouldLoop: true,
+                emissionFrequency: 0.10,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 10,
+                minBlastForce: 5,
+                maxBlastForce: 30,
+              ),
+            ),
           ],
         ),
       ),

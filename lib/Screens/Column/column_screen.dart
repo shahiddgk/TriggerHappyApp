@@ -206,7 +206,7 @@ class _ColumnScreenState extends State<ColumnScreen> {
           //     isSearch = !isSearch ;
           //   });
           // }, icon: Icon(isSearch ? Icons.search_off: Icons.search,)),
-          PopMenuButton(false,false,id)
+          PopMenuButton(false,true,id)
         ],
       ),
       floatingActionButton: Container(

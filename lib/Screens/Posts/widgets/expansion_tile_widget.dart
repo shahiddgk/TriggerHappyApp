@@ -64,13 +64,13 @@ class ExpansionTileWidget extends StatelessWidget {
               //   switchToggleFunction();
               //   },
               // )
-                Switch(
-                    hoverColor: AppColors.textWhiteColor,
-                    activeColor: AppColors.textWhiteColor,
-                    value: switchValue,
-                    onChanged: (value) {
-                  switchToggleFunction();
-                })
+              //   Switch(
+              //       hoverColor: AppColors.textWhiteColor,
+              //       activeColor: AppColors.textWhiteColor,
+              //       value: switchValue,
+              //       onChanged: (value) {
+              //     switchToggleFunction();
+              //   })
               ],
             ),
           )

@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_element
 
 import 'dart:convert';
 import 'dart:io';
@@ -6,7 +6,6 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
 import 'package:flutter_quiz_app/model/request_model/response_email_request.dart';
@@ -16,8 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Widgets/colors.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../model/reponse_model/naq__response_model.dart';
-import '../../model/reponse_model/naq_response_model.dart';
-import '../../model/reponse_model/question_answer_response_model.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
@@ -286,7 +283,7 @@ class _NaqScreen1State extends State<NaqScreen1> {
           ),
           title: Text(_isUserDataLoading ? "" : name),
           actions:  [
-            PopMenuButton(false,false,id)
+            PopMenuButton(false,true,id)
           ],
         ),
         body: Stack(
@@ -833,8 +830,6 @@ class _NaqScreen1State extends State<NaqScreen1> {
     List answerTextList = [];
   List questionIdList = [];
   String? answer;
-
-  int numberExecution = 0;
 
     for (int i = 0; i < naqModelClassResponse.questions.length; i++) {
       for (int j = 0; j < naqModelClassResponse.questions[i].length; j++ ) {

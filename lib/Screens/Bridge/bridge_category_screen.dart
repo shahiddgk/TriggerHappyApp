@@ -15,6 +15,7 @@ import '../../model/request_model/logout_user_request.dart';
 import '../../network/http_manager.dart';
 import '../Payment/payment_screen.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
+import '../Widgets/footer_widget.dart';
 import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
@@ -103,12 +104,12 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
       _isLoading = true;
     });
 
-    HTTPManager().naqResponseList(LogoutRequestModel(userId: id)).then((value) {
+    HTTPManager().naqResponseExistingList(LogoutRequestModel(userId: id)).then((value) {
       print(value);
       setState(() {
         _isLoading = false;
        // naqListResponse = value.values;
-        naqListLength = value.values.length.toString();
+        naqListLength = value['exist'].toString();
       });
       print("Naq list length");
       print(naqListLength);
@@ -156,7 +157,7 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
           ),
           title: Text(_isUserDataLoading ? "" : name),
           actions:  [
-            PopMenuButton(false,false,id)
+            PopMenuButton(false,true,id)
           ],
         ),
         body: SingleChildScrollView(
@@ -168,7 +169,7 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
               LogoScreen("Bridge"),
                 Container(
                 margin: const EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height/1.28,
+                height:!isPhone ? MediaQuery.of(context).size.height/1.27  : MediaQuery.of(context).size.height/1.43,
                 width: MediaQuery.of(context).size.width,
                 child: _isLoading ? const Center(child: CircularProgressIndicator(),) : GridView.count(
                   padding:  EdgeInsets.symmetric(vertical:10,horizontal: MediaQuery.of(context).size.width/5),
@@ -181,7 +182,7 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                      if(userPremium == "no" && naqListLength != "0") {
+                      if(userPremium == "no" && naqListLength == "yes") {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
                       } else {
                         Navigator.of(context).push(MaterialPageRoute(builder: (
@@ -245,7 +246,8 @@ class _BridgeCategoryScreenState extends State<BridgeCategoryScreen> {
                     ),
                   ],
                 ),
-              )
+              ),
+              const FooterWidget(),
             ],
           ),
         ),

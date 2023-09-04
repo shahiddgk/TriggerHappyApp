@@ -35,7 +35,7 @@ class _DatePickerFieldForColumnState extends State<DatePickerFieldForColumn> {
           textAlignVertical: TextAlignVertical.center,
           onTap: () => _selectDate(context,widget.isNewDateAvailable),
           readOnly: true,
-          style: TextStyle(fontSize: AppConstants.defaultFontSize),
+          style: const TextStyle(fontSize: AppConstants.defaultFontSize),
           controller: widget.controller,
           keyboardType: TextInputType.text,
           validator: (value) {

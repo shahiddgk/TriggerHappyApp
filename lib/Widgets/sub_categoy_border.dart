@@ -1,8 +1,11 @@
-import 'package:flutter/cupertino.dart';
+
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
 
+// ignore: must_be_immutable
 class OptionMcqAnswerSubCategory extends StatefulWidget {
   OptionMcqAnswerSubCategory(this.RadioListTile,{Key? key}) : super(key: key);
   Widget RadioListTile;

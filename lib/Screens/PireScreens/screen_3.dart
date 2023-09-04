@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_4.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -24,7 +23,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../Widgets/constants.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../Widgets/toast_message.dart';
-import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
 
 class Screen3 extends StatefulWidget {

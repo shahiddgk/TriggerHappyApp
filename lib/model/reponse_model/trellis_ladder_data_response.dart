@@ -10,6 +10,7 @@ class TrellisLadderDataModel {
   String? date;
   String? text;
   String? description;
+  bool? isExpired;
 
   TrellisLadderDataModel(
       {this.id,
@@ -20,7 +21,8 @@ class TrellisLadderDataModel {
         this.option2,
         this.date,
         this.text,
-        this.description});
+        this.description,
+      this.isExpired});
 
   TrellisLadderDataModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -32,6 +34,7 @@ class TrellisLadderDataModel {
     date = json['date'];
     text = json['text'];
     description = json['description'];
+    isExpired = false;
   }
 
   Map<String, dynamic> toJson() {
@@ -45,6 +48,7 @@ class TrellisLadderDataModel {
     data['date'] = this.date;
     data['text'] = this.text;
     data['description'] = this.description;
+    isExpired = this.isExpired;
     return data;
   }
 }

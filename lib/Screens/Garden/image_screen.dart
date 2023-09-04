@@ -1,19 +1,21 @@
 
+// ignore_for_file: avoid_print
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
-import '../../Widgets/option_mcq_widget.dart';
 import '../PireScreens/widgets/AppBar.dart';
 import '../PireScreens/widgets/PopMenuButton.dart';
 import '../utill/userConstants.dart';
 
 // ignore: must_be_immutable
 class ImageScreen extends StatefulWidget {
-   ImageScreen(this.responseScore,{Key? key}) : super(key: key);
+   ImageScreen(this.imageUrl,{Key? key}) : super(key: key);
 
-   String responseScore;
+   String imageUrl;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -54,61 +56,85 @@ class _ImageScreenState extends State<ImageScreen> {
     email = sharedPreferences.getString(UserConstants().userEmail)!;
     timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
     userType = sharedPreferences.getString(UserConstants().userType)!;
-    _getTreeGrowth();
+    // _getTreeGrowth();
     setState(() {
       _isUserDataLoading = false;
     });
   }
 
-  _getTreeGrowth() {
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    // HTTPManager().treeGrowth(LogoutRequestModel(userId: id)).then((value) {
-    //   int count = value["response_count"];
-    //   countNumber = value["response_count"];
-
-      // ignore: unrelated_type_equality_checks
-      if(widget.responseScore == "0") {
-        setState(() {
-          countNumber = "1";
-        });
-        //print(countNumber);
-        if(!isPhone) {
-          url = "assets/apple_tree/apple_ipad/$countNumber.png";
-        } else {
-          url = "assets/apple_tree/apple_mobile/$countNumber.png";
-        }
-       // print(url);
-      } else {
-        setState(() {
-            countNumber = widget.responseScore;
-         // print(countNumber);
-            if(!isPhone) {
-              url = "assets/apple_tree/apple_ipad/$countNumber.png";
-            } else {
-              url = "assets/apple_tree/apple_mobile/$countNumber.png";
-            }
-         // print(url);
-        });
-      }
-
-      setState(() {
-        errorMessage = "";
-        _isLoading = false;
-      });
-      //  showToastMessage(context, value['message'].toString(),true);
-    // }).catchError((e) {
-    //   setState(() {
-    //     _isLoading = false;
-    //     errorMessage = e.toString();
-    //   });
-    //   showToastMessage(context, e.toString(),false);
-    // });
-
-  }
+  // _getTreeGrowth() {
+  //
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   // HTTPManager().treeGrowth(LogoutRequestModel(userId: id)).then((value) {
+  //   //   int count = value["response_count"];
+  //   //   countNumber = value["response_count"];
+  //
+  //     // // ignore: unrelated_type_equality_checks
+  //     // if(widget.responseScore == "0") {
+  //     //   setState(() {
+  //     //     countNumber = "1";
+  //     //   });
+  //     //   //print(countNumber);
+  //     //   if(!isPhone) {
+  //     //     if( widget.responseTreeType == "apple") {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+  //     //     } else if(widget.responseTreeType == "tomato") {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+  //     //     } else {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+  //     //     }
+  //     //   } else {
+  //     //     if( widget.responseTreeType == "apple") {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+  //     //     } else if(widget.responseTreeType == "tomato") {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+  //     //     } else {
+  //     //       url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+  //     //     }
+  //     //   }
+  //     //  print(url);
+  //     // } else {
+  //     //   setState(() {
+  //     //       countNumber = widget.responseScore;
+  //     //    // print(countNumber);
+  //     //       if(!isPhone) {
+  //     //         if( widget.responseTreeType == "apple") {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_ipad/$countNumber.png";
+  //     //         } else if(widget.responseTreeType == "tomato") {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_ipad/$countNumber.png";
+  //     //         } else {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_ipad/$countNumber.png";
+  //     //         }
+  //     //       } else {
+  //     //         if( widget.responseTreeType == "apple") {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}apple_tree/apple_mobile/$countNumber.png";
+  //     //         } else if(widget.responseTreeType == "tomato") {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}tomato_tree/tomato_mobile/$countNumber.png";
+  //     //         } else {
+  //     //           url = "${ApplicationURLs.BASE_URL_FOR_MOBILE_IMAGES}rose_tree/rose_mobile/$countNumber.png";
+  //     //         }
+  //     //       }
+  //     //    print(url);
+  //     //   });
+  //     // }
+  //     //
+  //     // setState(() {
+  //     //   errorMessage = "";
+  //     //   _isLoading = false;
+  //     // });
+  //     //  showToastMessage(context, value['message'].toString(),true);
+  //   // }).catchError((e) {
+  //   //   setState(() {
+  //   //     _isLoading = false;
+  //   //     errorMessage = e.toString();
+  //   //   });
+  //   //   showToastMessage(context, e.toString(),false);
+  //   // });
+  //
+  // }
 
   getScreenDetails() {
     setState(() {
@@ -141,34 +167,29 @@ class _ImageScreenState extends State<ImageScreen> {
           child:const Center(
             child: CircularProgressIndicator(),
           ),
-        ) : errorMessage != "" ? Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(errorMessage,style:const TextStyle(fontSize: 25),),
-              const SizedBox(height: 5,),
-              GestureDetector(
-                onTap: () {
-                  _getTreeGrowth();
-                },
-                child: OptionMcqAnswer(
-                    TextButton(onPressed: () {
-                      _getTreeGrowth();
-                    }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
-                ),
-              )
-            ],
-          ),
         ) : Container(
           color: Colors.white,
           alignment: Alignment.bottomCenter,
-          child:url == "" ? Container(
+          child:widget.imageUrl == "" ? Container(
               color: Colors.white,
               child:const Center(
                 child: CircularProgressIndicator(),
               ),
-            ) : Image.asset(url,fit: BoxFit.fill,),
+            ) : CachedNetworkImage(
+            imageUrl: widget.imageUrl,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 100,
+                      bottom: 100
+                  ),
+                  child: CircularProgressIndicator(
+                      value: downloadProgress.progress,
+                      color: AppColors.primaryColor
+                  ),
+                ),
+            errorWidget: (context, url, error) =>  const Center(child: Icon(Icons.error,color: AppColors.redColor,)),
+          )
           // Center(
           //     child: CachedNetworkImage(
           //       imageUrl: url,

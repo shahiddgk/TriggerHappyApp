@@ -43,6 +43,7 @@ class _LogoScreenState extends State<LogoScreen> {
             :  widget.screen == "Ladder" ?  Text("Burgeon-Ladder",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             :  widget.screen == "NAQ" ?  isPhone ? Text("Neurological Alignment \nQuotient",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),) : Text("Neurological Alignment Quotient",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             :  widget.screen == "Bridge" ?  Text("Burgeon-Bridge",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
+            :  widget.screen == "Post" ?  Text("Burgeon-Post",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
             :Text("Burgeon",style: TextStyle(fontSize: !isPhone ? AppConstants.logoFontSizeForIpad : AppConstants.logoFontSizeForMobile,fontWeight: FontWeight.w700,color: AppColors.primaryColor),)
       // Image.asset(widget.screen == "" ? "assets/trigger_logo.png"
       //     : widget.screen == "PIRE" ? "assets/burgeon_pire.png"

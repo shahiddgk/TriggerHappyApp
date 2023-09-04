@@ -49,7 +49,7 @@ class ResponseHandler {
       responseJson = response.body;
       // ignore: avoid_print
       print(responseJson);
-      if(response.statusCode!= 200) throw FetchDataException(responseJson['message'].toString());
+      if(response.statusCode!= 200) throw FetchDataException(responseJson);
       return responseJson;
     } on TimeoutException {
       throw FetchDataException("Slow internet connection");

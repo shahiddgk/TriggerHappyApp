@@ -1,6 +1,9 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
+import 'package:flutter_quiz_app/model/reponse_model/history_response_model.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -32,7 +35,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String userType = "";
    bool _isLoading = true;
   late bool isPhone;
-  List historyResponseModel = [];
+  late List<HistoryResponseModel> historyResponseModel;
   String errorMessage = "";
 
   @override
@@ -82,11 +85,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     HTTPManager().responseHistory(LogoutRequestModel(userId: id)).then((value) {
 
       setState(() {
-        historyResponseModel = value["response_history"];
+        historyResponseModel = value.values;
         errorMessage = "";
         _isLoading = false;
       });
+      historyResponseModel.sort((a,b) => b.date!.compareTo(a.date!));
 
+      print("History List Model");
+      print(historyResponseModel);
     }).catchError((e) {
       //print(e);
       setState(() {
@@ -108,53 +114,60 @@ class _HistoryScreenState extends State<HistoryScreen> {
             PopMenuButton(false,false,id)
           ],
         ),
-       body: Column(
-       //  mainAxisAlignment: MainAxisAlignment.center,
-         crossAxisAlignment: CrossAxisAlignment.center,
-         children: [
-           LogoScreen("Garden"),
-           _isLoading ? const Center(
-             child: CircularProgressIndicator(),
-           ) : errorMessage != "" ? Center(
-             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.center,
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Text(errorMessage,style:const TextStyle(fontSize: 25),),
-                 const SizedBox(height: 5,),
-                 GestureDetector(
-                   onTap: () {
-                     getResponseHistory();
-                   },
-                   child: OptionMcqAnswer(
-                       TextButton(onPressed: () {
-                         getResponseHistory();
-                       }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
-                   ),
-                 )
-               ],
-             ),
-           ) : historyResponseModel.isEmpty ? OptionMcqAnswer(
-               const Text( "No data available",style: TextStyle(fontSize:25,color: AppColors.textWhiteColor),)
-           )  : ListView.builder(
-               itemCount: historyResponseModel.length,
-               shrinkWrap: true,
-               itemBuilder: (context, index) {
-                 return GestureDetector(
-                   onTap: () {
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ImageScreen(historyResponseModel[index]['score']!.toString())));
-                   },
-                   child: Container(
-                     margin: const EdgeInsets.symmetric(horizontal: 10),
+       body: SingleChildScrollView(
+         scrollDirection: Axis.vertical,
+         child: Column(
+         //  mainAxisAlignment: MainAxisAlignment.center,
+           crossAxisAlignment: CrossAxisAlignment.center,
+           children: [
+             LogoScreen("Garden"),
+             _isLoading ? const Center(
+               child: CircularProgressIndicator(),
+             ) : errorMessage != "" ? Center(
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.center,
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   Text(errorMessage,style:const TextStyle(fontSize: 25),),
+                   const SizedBox(height: 5,),
+                   GestureDetector(
+                     onTap: () {
+                       getResponseHistory();
+                     },
                      child: OptionMcqAnswer(
-                       Container(
-                           padding: const EdgeInsets.symmetric(vertical: 10),
-                           child: Text( historyResponseModel[index]['date']!,style:const TextStyle(fontSize:AppConstants.defaultFontSize,color: AppColors.textWhiteColor))),
+                         TextButton(onPressed: () {
+                           getResponseHistory();
+                         }, child: const Text("Reload",style: TextStyle(fontSize:25,color: AppColors.redColor)),)
                      ),
-                   ),
-                 );
-               }),
-         ],
+                   )
+                 ],
+               ),
+             ) : historyResponseModel.isEmpty ? OptionMcqAnswer(
+                 const Text( "No data available",style: TextStyle(fontSize:25,color: AppColors.textWhiteColor),)
+             )  : Container(
+               margin:const EdgeInsets.only(bottom: 40),
+               child: ListView.builder(
+                   itemCount: historyResponseModel.length,
+                   shrinkWrap: true,
+                  physics:const NeverScrollableScrollPhysics(),
+                   itemBuilder: (context, index) {
+                     return GestureDetector(
+                       onTap: () {
+                         Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ImageScreen(historyResponseModel[index].score!.toString())));
+                       },
+                       child: Container(
+                         margin: const EdgeInsets.symmetric(horizontal: 10),
+                         child: OptionMcqAnswer(
+                           Container(
+                               padding: const EdgeInsets.symmetric(vertical: 10),
+                               child: Text( historyResponseModel[index].date!,style:const TextStyle(fontSize:AppConstants.defaultFontSize,color: AppColors.textWhiteColor))),
+                         ),
+                       ),
+                     );
+                   }),
+             ),
+           ],
+         ),
        ),
     );
   }

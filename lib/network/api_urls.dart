@@ -2,13 +2,19 @@
 
 class ApplicationURLs {
 
-  static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
-  static const BASE_URL_FOR_MOBILE_IMAGES = "https://dashboard.burgeon.app/uploads/mobile_tree/";
-  static const BASE_URL_FOR_IPAD_IMAGES = "https://dashboard.burgeon.app/uploads/ipad_tree/";
+  static const BASE_URL_FOR_TEST_PAYMENT = "https://staging.burgeon.app/api/";
+
+  //Staging Base URL
+  //  static const BASE_URL_APP = "https://staging.burgeon.app/api/";
+  //Live Base URL
+   static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
+  static const BASE_URL_FOR_MOBILE_IMAGES = "https://dashboard.burgeon.app/uploads/";
+  // static const BASE_URL_FOR_IPAD_IMAGES = "https://dashboard.burgeon.app/uploads/ipad_tree/";
   static const stripeTokenUrl = "https://api.stripe.com/v1/tokens";
   static const API_STRIPE_PAYMENT_URL = "${BASE_URL_APP}stripe_payment";
   static const API_STRIPE_CANCEL_SUBSCRIPTION_URL = "${BASE_URL_APP}subscription_cancel";
   static const API_SUBSCRIPTION_DETAILS_READ = "${BASE_URL_APP}subscription_details";
+
 
   //Stripe details key
   static const API_STRIPE_KEY_DETAILS = "${BASE_URL_APP}payment_settings";
@@ -17,6 +23,7 @@ class ApplicationURLs {
   static const API_REGISTER_USER = "${BASE_URL_APP}signup";
   static const API_REGISTER_USER_WITH_GOOGLE = "${BASE_URL_APP}social_login";
   static const API_TREE_GROWTH = "${BASE_URL_APP}growth_tree";
+  static const API_SET_LEVE_SWITCH = "${BASE_URL_APP}level_switch";
   static const API_CHANGE_PASSWORD = "${BASE_URL_APP}change_password";
   static const API_CHANGE_PROFILE = "${BASE_URL_APP}update_profile";
   static const API_LOGIN = "${BASE_URL_APP}login";
@@ -24,7 +31,7 @@ class ApplicationURLs {
   static const API_ANSWER = "${BASE_URL_APP}user_response";
   static const API_DELETE = "${BASE_URL_APP}delete_user";
   static const API_FORGOT_PASSWORD = "${BASE_URL_APP}forgot_password";
-  static const API_RESPONSE_EMAIL = "${BASE_URL_APP}response_submit_mail";
+  static const API_RESPONSE_PIRE = "${BASE_URL_APP}response_submit_pire";
   static const API_EMAIL_RESPONSE = "${BASE_URL_APP}get_email";
   static const API_RESPONSE_HISTORY = "${BASE_URL_APP}response_history";
   static const API_LOGOUT = "${BASE_URL_APP}logout";
@@ -32,12 +39,18 @@ class ApplicationURLs {
   //Trellis Api's
   static const API_TRELLIS = "${BASE_URL_APP}trellis";
   static const API_TRELLIS_RESPONSE_TRIGGER = "${BASE_URL_APP}trellis_trigger";
+  static const API_LADDER_RESPONSE_TRIGGER = "${BASE_URL_APP}ladder_trigger";
   static const API_TRIBE = "${BASE_URL_APP}tribe";
   static const API_TRELLIS_LADDER = "${BASE_URL_APP}ladder";
   static const API_TRELLIS_IDENTITY = "${BASE_URL_APP}identity";
   static const API_TRELLIS_PRINCIPLES = "${BASE_URL_APP}principles";
   static const API_TRELLIS_READ = "${BASE_URL_APP}trellis_read";
   static const API_TRELLIS_DELETE = "${BASE_URL_APP}trellis_delete";
+  static const API_LADDER_EDIT_RESPONSE = "${BASE_URL_APP}ladder_update";
+
+  static const API_TRELLIS_NEW_DATA_READ = "${BASE_URL_APP}new_tribe_read";
+  static const API_NEW_TRELLIS_TRIBE_DELETE = "${BASE_URL_APP}new_tribe_delete";
+  static const API_NEW_TRELLIS_TRIBE_INSERTION = "${BASE_URL_APP}new_tribe_insert";
 
   static const API_LADDER_FAVOURITE = "${BASE_URL_APP}add_fav_ladder";
 
@@ -49,5 +62,35 @@ class ApplicationURLs {
 
   //Naq  Api's
   static const API_NAQ_RESPONSE = "${BASE_URL_APP}naq_response";
+  static const API_NAQ_DATA_EXIST_RESPONSE = "${BASE_URL_APP}naq_data_exist";
+
   static const API_RESPONSE_NAQ = "${BASE_URL_APP}response_submit_naq";
+
+  //Garden Api's
+  static const API_GARDEN_NEW_HISTORY = "${BASE_URL_APP}new_response_history";
+  static const API_GARDEN_HISTORY_DETAILS = "${BASE_URL_APP}history_details";
+
+  static const API_LEVEL_HISTORY = "${BASE_URL_APP}level_history";
+  static const API_LEVEL_HISTORY_DETAILS = "${BASE_URL_APP}level_history_details";
+
+  static const API_GARDEN_LEVELS = "${BASE_URL_APP}garden_levels";
+
+  //Post Api's
+  static const API_POST_INSERT = "${BASE_URL_APP}insert_reminder";
+  static const API_POST_READ = "${BASE_URL_APP}read_reminder";
+  static const API_POST_EDIT = "${BASE_URL_APP}edit_reminder";
+  static const API_POST_DELETE = "${BASE_URL_APP}delete_reminder";
+  static const API_POST_UPDATE_STATUS = "${BASE_URL_APP}update_reminder_status";
+  static const API_POST_SNOOZE_REMINDER = "${BASE_URL_APP}snooze_reminder";
+  static const API_POST_STOP_REMINDER = "${BASE_URL_APP}reminder_stop";
+  static const API_SKIP_REMINDERS_LIST = "${BASE_URL_APP}skip_reminders";
+
+
+  //Tree Section Seed Option
+  static const API_GARDEN_SEED = "${BASE_URL_APP}garden_seed";
+
+  //User Activity
+  static const API_USER_ACTIVITY_DETAIL = "${BASE_URL_APP}user_activity";
+
+
 }

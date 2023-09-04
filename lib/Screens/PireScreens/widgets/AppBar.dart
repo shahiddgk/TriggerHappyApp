@@ -14,7 +14,7 @@ class AppBarWidget{
       centerTitle: true,
       title: Text(name),
       actions:  [
-        if(isSettingVisible)
+        if(true)
          IconButton(onPressed: (){
            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> StripePayment(false)));
          }, icon:const Icon(Icons.workspace_premium,color: AppColors.totalQuestionColor,)),

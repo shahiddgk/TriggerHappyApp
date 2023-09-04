@@ -69,7 +69,7 @@ class _PopMenuButtonState extends State<PopMenuButton> {
             //   value: 1,
             //   child: Text("Instruction"),
             // ),
-            if(widget.isSetting)
+            if(true)
             const PopupMenuItem<int>(
               value: 2,
               child: Text("Settings",style: TextStyle(fontSize: AppConstants.defaultFontSize),),

@@ -35,7 +35,7 @@ class _TextFieldWidgetForColumnScreenState extends State<TextFieldWidgetForColum
         const SizedBox(height: 1,),
         TextFormField(
           controller: widget._NameFieldController,
-          textInputAction: TextInputAction.done,
+          textInputAction: widget.maxLength !=6 ? TextInputAction.done : null,
           style: TextStyle(fontSize:widget.title ?AppConstants.headingFontSizeForEntriesAndSession  : AppConstants.defaultFontSize),
           validator: (value) {
             if(value!.trim().isEmpty) {

@@ -13,6 +13,9 @@ class UserConstants {
   late String userPremiumType = "userPremiumType" ;
   late String userSubscriptionId = "userSubscriptionId" ;
   late String userCustomerId = "userCustomerId" ;
+  late String userGardenLevel = "userGardenLevel" ;
+  late String userGardenName = "userGardenName" ;
+
 }
 
 class TrellisScreenStatus {

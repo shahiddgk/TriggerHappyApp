@@ -8,7 +8,6 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/AuthScreens/forgot_password.dart';
-import 'package:flutter_quiz_app/Screens/TreeScreen/tree_screen.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/Screens/utill/UserState.dart';
@@ -30,6 +29,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Widgets/constants.dart';
+import '../utill/userConstants.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _getPckageInfo();
+    // _getPckageInfo();
     _valueDropDownController = SingleValueDropDownController();
     _initData();
 
@@ -141,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
             title:const Text('Update Available'),
             content:const SingleChildScrollView(
               scrollDirection: Axis.vertical,
-              child: Text("Things added in new version: \n - Ladder section added \n - Trellis functionality updated \n - Bridge Tile added \n - Bugs Fixation \n - UI Enhancement"),
+              child: Text("Things added in new version: \n - Trellis functionality updated \n - Trellis Ui updated \n - Ladder Ui updated \n - Bugs Fixation "),
               // Html(data: updates,style: {
               //   "#" : Style(
               //     color: AppColors.textWhiteColor,
@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
       launch('https://apps.apple.com/us/app/your-app/id1666301888');
     }
     // After update, dismiss the update pop-up
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const LoginPage()), (route) => false);
+    // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const LoginPage()), (route) => false);
   }
 
   void onRemindMeLaterPressed() {
@@ -828,14 +828,8 @@ class _LoginPageState extends State<LoginPage> {
             _emailController.text=="";
             _passwordController.text=="";
 
-            // sharedPreferences.setBool(TrellisScreenStatus().nameExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().purposeExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().ladderExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().oPExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().rhythmsExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().needsExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().identityExpended, false);
-            // sharedPreferences.setBool(TrellisScreenStatus().tribeExpended, false);
+            sharedPreferences.setString(UserConstants().userGardenLevel, value['user_session']['current_level']);
+            sharedPreferences.setString(UserConstants().userGardenName, value['user_session']['current_tree']);
 
             UserStatePrefrence().setAnswerText(
                 value['user_session']['user_logged_in'],
