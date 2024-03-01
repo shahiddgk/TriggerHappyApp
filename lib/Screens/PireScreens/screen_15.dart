@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, unused_field
 
 import 'dart:convert';
 
@@ -48,6 +48,8 @@ class _Screen15State extends State<Screen15> {
   bool isAnswerLoading = false;
   late SharedPreferences _sharedPreferences;
   final GoogleSignIn googleSignIn = GoogleSignIn();
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   String id3 = "";
   String type3 = "";
@@ -99,6 +101,9 @@ class _Screen15State extends State<Screen15> {
     // ignore: avoid_print
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -189,7 +194,15 @@ class _Screen15State extends State<Screen15> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+            //         (Route<dynamic> route) => false
+            // );
+          }, true, true, true, id, false,true,badgeCount1,false,badgeCountShared),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();
@@ -230,7 +243,7 @@ class _Screen15State extends State<Screen15> {
                    Align(
                        alignment: Alignment.topLeft,
                        child: QuestionTextWidget(widget.questionListResponse[10].title,widget.questionListResponse[10].videoUrl,(){
-                         String urlQ1 = "https://youtu.be/G4UOqUucvXc";
+                         String urlQ1 = "https://www.youtube.com/watch?v=RDgeJuHX22M";
                          String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
                          YoutubePlayerController youtubePlayerController = YoutubePlayerController(
                              initialVideoId: videoId!,
@@ -338,15 +351,15 @@ class _Screen15State extends State<Screen15> {
         if(allowEmail == "yes") {
           showToastMessage(context, value['message'].toString(), true);
         } else {
-          showToastMessage(context, "Submitted successfully", true);
+          showToastMessage(context, "Pire Submitted successfully", true);
         }
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (BuildContext context) => Screen16(_groupValue)),
+            MaterialPageRoute(builder: (BuildContext context) => Screen16(_groupValue,value['response_id'])),
                 (Route<dynamic> route) => false
         );
         // Navigator.of(context).push(
-        //     MaterialPageRoute(builder: (context) => Screen16(_groupValue)));
+        //     MaterialPageRoute(builder: (context) => Screen16(_groupValue));
       }).catchError((e) {
         setState(() {
           isAnswerLoading = false;

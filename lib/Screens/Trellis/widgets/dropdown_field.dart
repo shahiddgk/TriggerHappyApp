@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
+import 'package:flutter_quiz_app/Widgets/constants.dart';
 
 class DropDownField extends StatefulWidget {
   DropDownField(this.initialValue,this.items,this.onValueChange,{Key? key}) : super(key: key);
@@ -22,18 +23,12 @@ class _DropDownFieldState extends State<DropDownField> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: AppColors.lightGreyColor,
+      color: AppColors.backgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: DropdownButtonHideUnderline(
           child: ButtonTheme(
             alignedDropdown: true,
             child: DropdownButtonFormField<String>(
-              //dropdownColor: widget.isColor?Colors.lightBlueAccent:Colors.white,
-              // validator: (value) {
-              //   if (value == null || value.length == 0) {
-              //     return 'Please select one options';
-              //   }
-              // },
               decoration: const InputDecoration(
                 enabledBorder: InputBorder.none,
                 enabled: false,
@@ -47,7 +42,7 @@ class _DropDownFieldState extends State<DropDownField> {
               icon: (null),
               style:const TextStyle(
                 color: Colors.black54,
-                fontSize: 16,
+                fontSize: AppConstants.defaultFontSize,
               ),
               onChanged: (String? newValue) =>
                   widget.onValueChange(newValue!),

@@ -8,9 +8,10 @@ import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'constants.dart';
 
 class EmailField extends StatefulWidget {
-  EmailField(this._textEditingController,{Key? key}) : super(key: key);
+  EmailField(this._textEditingController,this.hintText,{Key? key}) : super(key: key);
 
   TextEditingController _textEditingController;
+  String hintText;
 
   @override
   _EmailFieldState createState() => _EmailFieldState();
@@ -25,14 +26,23 @@ class _EmailFieldState extends State<EmailField> {
         controller: widget._textEditingController,
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            focusColor:  Colors.grey[800],
+            focusColor:  AppColors.primaryColor,
             border: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: AppColors.primaryColor
+              ),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                  color: AppColors.primaryColor
+              ),
               borderRadius: BorderRadius.circular(10.0),
             ),
             filled: true,
-            prefixIcon: const Icon(Icons.email),
+            prefixIcon: const Icon(Icons.email,color: AppColors.primaryColor,),
             hintStyle: TextStyle(color: Colors.grey[800]),
-            hintText: "Type your email",
+            hintText: widget.hintText,
             fillColor: AppColors.hoverColor),
         validator: (email)=> EmailValidator.validate(email!.trim()) ? null :"Please enter a valid email"
     );

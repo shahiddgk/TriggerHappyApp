@@ -1,6 +1,4 @@
-// ignore_for_file: override_on_non_overriding_member
-
-import 'dart:io';
+// ignore_for_file: override_on_non_overriding_member, avoid_print, must_be_immutable, duplicate_ignore, depend_on_referenced_packages, unused_element, unused_field
 
 import 'package:flutter/material.dart';
 // import 'package:flutter_quill/flutter_quill.dart' hide Text;
@@ -9,16 +7,24 @@ import 'package:flutter_quiz_app/Screens/Column/Widgets/text_field_widet.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
+import 'package:flutter_quiz_app/model/reponse_model/column_read_data_model.dart';
 import 'package:flutter_quiz_app/model/request_model/session_entry_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/logo_widget_for_all_screens.dart';
-import '../PireScreens/widgets/PopMenuButton.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
+import '../../model/request_model/logout_user_request.dart';
+import '../PireScreens/widgets/AppBar.dart';
+import '../Widgets/show_notification_pop_up.dart';
 import '../utill/userConstants.dart';
+import 'package:intl/intl.dart';
 
 class CreateColumnScreen extends StatefulWidget {
-  const CreateColumnScreen({Key? key}) : super(key: key);
+  CreateColumnScreen(this.isEdit,this.columnReadDataModel, {Key? key}) : super(key: key);
+
+  bool isEdit;
+  ColumnReadDataModel columnReadDataModel;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,6 +43,9 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
   bool _isLoading = false;
   // ignore: prefer_final_fields
   late bool isPhone;
+
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   int selectedRadio = 1;
 
@@ -89,6 +98,35 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
     //_controller.formatSelection(Attribute.ul);
    // _controller.formatSelection(Attribute.clone(Attribute.ul, Attribute.ul));
     _getUserData();
+
+    if(widget.isEdit) {
+      setState(() {
+
+        if(widget.columnReadDataModel.entryType == "entry") {
+          setState(() {
+            selectedRadio = 1;
+          });
+        }else if (widget.columnReadDataModel.entryType == "session") {
+          setState(() {
+            selectedRadio = 2;
+          });
+        } else if (widget.columnReadDataModel.entryType == "meeting") {
+          setState(() {
+            selectedRadio = 3;
+          });
+        } else {
+          setState(() {
+            selectedRadio = 4;
+          });
+        }
+
+        titleController.text = widget.columnReadDataModel.entryTitle!;
+        dateController.text = widget.columnReadDataModel.entryDate!;
+        descriptionController.text = widget.columnReadDataModel.entryDecs!;
+        takeAwaysController.text = widget.columnReadDataModel.entryTakeaway!;
+      });
+    }
+
     super.initState();
   }
 
@@ -100,15 +138,54 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
     email = sharedPreferences.getString(UserConstants().userEmail)!;
     timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
     userType = sharedPreferences.getString(UserConstants().userType)!;
 
+    _getSkippedReminderList();
 
     setState(() {
       _isUserDataLoading = false;
+    });
+  }
+
+  String? formattedDate;
+  String? formattedTime;
+  late SkippedReminderNotification skippedReminderNotification;
+
+  _getSkippedReminderList() {
+    setState(() {
+      // sharedPreferences.setString("Score", "");
+      // _isLoading = true;
+    });
+    HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        skippedReminderNotification = value;
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
+      print("SKIPPED REMINDER LIST");
+      print(value);
+
+      for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+        String title = "Hi $name. Did you....";
+        DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+        formattedDate = DateFormat('MM-dd-yy').format(DateTime.parse(skippedReminderNotification.result![i].createdAt.toString()));
+        formattedTime = DateFormat("hh:mm a").format(date);
+        showPopupDialogueForReminderGeneral(context,skippedReminderNotification.result![i].entityId.toString(),skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate!,formattedTime!);
+      }
+
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
     });
   }
 
@@ -137,33 +214,22 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
   Widget build(BuildContext context) {
     getScreenDetails();
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-          onPressed: () {
-            // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-            //   _setTrellisData();
-            // }
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
             Navigator.of(context).pop();
-          },
-        ),
-        title: Text(_isUserDataLoading ? "" : name),
-        actions:  [
-          IconButton(onPressed: (){
-
-          }, icon:const Icon(Icons.search,)),
-          PopMenuButton(false,false,id)
-        ],
-      ),
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       floatingActionButton: Container(
         width: 60.0,
         height: 60.0,
         margin:const EdgeInsets.only(right: 10,bottom: 10),
         child: FloatingActionButton(
           onPressed: (){
-            _saveColumnData();
+            if(widget.isEdit) {
+              _updateColumnData();
+            } else {
+              _saveColumnData();
+            }
           },
           child: const Icon(Icons.save,color: AppColors.backgroundColor,size: 30,),
         ),
@@ -266,6 +332,26 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
                                 ),
                               ),
                             ),
+                            Expanded(
+                              child: SizedBox(
+                                height: 30,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    listTileTheme:const ListTileThemeData(
+                                      horizontalTitleGap: 1,//here adjust based on your need
+                                    ),
+                                  ),
+                                  child: RadioListTile(
+                                    value: 4,
+                                    groupValue: selectedRadio,
+                                    title:const Text('Task',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                    onChanged: (int? val) {
+                                      setSelectedRadio(val!);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],) : Column(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -317,25 +403,53 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
                                 ),
                               ),
                             ],),
-                            SizedBox(
-                              height: 30,
-                              width: MediaQuery.of(context).size.width/2,
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  listTileTheme:const ListTileThemeData(
-                                    horizontalTitleGap: 1,//here adjust based on your need
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 30,
+                                    width: MediaQuery.of(context).size.width/2,
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        listTileTheme:const ListTileThemeData(
+                                          horizontalTitleGap: 1,//here adjust based on your need
+                                        ),
+                                      ),
+                                      child: RadioListTile(
+                                        value: 3,
+                                        groupValue: selectedRadio,
+                                        title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                        onChanged: (int? val) {
+                                          setSelectedRadio(val!);
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                child: RadioListTile(
-                                  value: 3,
-                                  groupValue: selectedRadio,
-                                  title:const Text('Meeting',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-                                  onChanged: (int? val) {
-                                    setSelectedRadio(val!);
-                                  },
-                                ),
-                              ),
-                            ),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 30,
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        listTileTheme:const ListTileThemeData(
+                                          horizontalTitleGap: 1,//here adjust based on your need
+                                        ),
+                                      ),
+                                      child: RadioListTile(
+                                        value: 4,
+                                        groupValue: selectedRadio,
+                                        title:const Text('Task',style: TextStyle(fontSize: AppConstants.defaultFontSize),),
+                                        onChanged: (int? val) {
+                                          setSelectedRadio(val!);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
                             // Add more RadioListTile widgets for additional options
                           ],
                         ),
@@ -379,9 +493,13 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
     setState(() {
       radioOption = "session";
     });
-  } else {
+  } else if (selectedRadio == 3) {
     setState(() {
       radioOption = "Meeting";
+    });
+  } else {
+    setState(() {
+      radioOption = "Task";
     });
   }
 // Convert the Delta object to plain text
@@ -392,8 +510,14 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
 //     //testingTakeAwayPoints.trimRight();
 //     List<String> items = test2.split(',');
 //     print(items);
+    print("Column Data Check");
+    print(radioOption);
+    print(titleController.text);
+    print(descriptionController.text);
+    print(dateController.text);
+    print(takeAwaysController.text);
+    print(id);
 
-    //print(radioOption);
     if(_formKey.currentState!.validate()) {
      setState(() {
        _isLoading = true;
@@ -417,5 +541,59 @@ class _CreateColumnScreenState extends State<CreateColumnScreen> {
       showToastMessage(context, "Please add some data", false);
     }
    }
+
+  _updateColumnData() {
+    String? radioOption;
+    //  _focusNode.unfocus();
+    if(selectedRadio == 1) {
+      setState(() {
+        radioOption = "entry";
+      });
+    }else if (selectedRadio == 2) {
+      setState(() {
+        radioOption = "session";
+      });
+    } else if (selectedRadio == 3) {
+      setState(() {
+        radioOption = "Meeting";
+      });
+    } else {
+      setState(() {
+        radioOption = "Task";
+      });
+    }
+// Convert the Delta object to plain text
+//     String takeAwayPoints = _controller.document.toPlainText();
+//     takeAwayPoints = "\n" + takeAwayPoints;
+//     String testingTakeAwayPoints = takeAwayPoints.substring(0,takeAwayPoints.length-1)+"";
+//     String test2 = testingTakeAwayPoints.replaceAll('\n', '\n• ');
+//     //testingTakeAwayPoints.trimRight();
+//     List<String> items = test2.split(',');
+//     print(items);
+
+    //print(radioOption);
+    if(_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      HTTPManager().sessionEntryUpdate(ColumnUpdateRequestModel(entryType:radioOption,title: titleController.text,description: descriptionController.text,date: dateController.text,id: widget.columnReadDataModel.id,takeAways: takeAwaysController.text)).then((value) {
+        //  print(value);
+        showToastMessage(context, "Data updated Successfully add", true);
+        Navigator.of(context).pop();
+        // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>ColumnScreen()));
+        setState(() {
+          _isLoading = false;
+        });
+      }).catchError((e) {
+        // print(e);
+        setState(() {
+          _isLoading = false;
+        });
+        showToastMessage(context, e.toString(), false);
+      });
+    } else {
+      showToastMessage(context, "Please add some data", false);
+    }
+  }
 }
 

@@ -11,6 +11,7 @@ import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 import 'login_screen.dart';
@@ -30,12 +31,13 @@ class _ChangePasswordState extends State<ChangePassword> {
   final TextEditingController _newPasswordController = TextEditingController();
   final GoogleSignIn googleSignIn = GoogleSignIn();
   late LoginResponseModel loginResponseModel;
-  bool _isUserDataLoading = false;
   bool isLoading = false;
   String name = "";
   String id = "";
   String authId = "";
 
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   @override
   void initState() {
@@ -48,25 +50,24 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   _getAuthId() async {
     setState(() {
-      _isUserDataLoading = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       authId = sharedPreferences.getString("authId")!;
-      _isUserDataLoading = false;
     });
 
   }
   _getUserData() async {
     setState(() {
-      _isUserDataLoading = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
     setState(() {
       name = sharedPreferences.getString(UserConstants().userName)!;
       id = sharedPreferences.getString(UserConstants().userId)!;
+      badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+      badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
-      _isUserDataLoading = false;
     });
 
   }
@@ -74,11 +75,11 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-       // automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(!_isUserDataLoading? name : ""),
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       body: Container(
         color: AppColors.backgroundColor,
         height: MediaQuery.of(context).size.height,

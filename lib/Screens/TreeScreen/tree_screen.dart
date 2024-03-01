@@ -736,7 +736,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
          String formattedTime = DateFormat("hh:mm a").format(date);
 
         String title = "Hi $name. Did you....";
-        showPopupDialogueForReminder(skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate,formattedTime);
+        showPopupDialogueForReminder(skippedReminderNotification.result![i].entityId.toString(),skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate,formattedTime);
       }
 
     }).catchError((e) {
@@ -748,7 +748,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
     });
   }
 
-  showPopupDialogueForReminder(String notificationId,String title,String description,String date,String time) {
+  showPopupDialogueForReminder(String entityIDD,String notificationId,String title,String description,String date,String time) {
     bool isDataLoading = false;
     bool isYesDataLoading = false;
     bool isNoDataLoading = false;
@@ -915,7 +915,7 @@ class _TreeScreenState extends State<TreeScreen> with TickerProviderStateMixin{
                                     isDataLoading = true;
                                   });
                                   // _notificationSnoozeReminderStatusData(notificationId,"yes");
-                                  HTTPManager().postReminderSnoozeData(ReminderNotificationForSnoozeRequestModel(notificationId: notificationId,snooze: "yes")).then((value) {
+                                  HTTPManager().postReminderSnoozeData(ReminderNotificationForSnoozeRequestModel(notificationId: entityIDD,updateId: notificationId)).then((value) {
                                     setState(() {
                                       isDataLoading = false;
                                     });

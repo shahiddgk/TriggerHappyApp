@@ -40,6 +40,7 @@ class _Screen10State extends State<Screen10> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   late Timer _timer;
   int _start = 30;
+  int badgeCountShared = 0;
 
   void startTimer() {
     const oneSec = Duration(seconds: 1);
@@ -70,6 +71,7 @@ class _Screen10State extends State<Screen10> {
   String email = "";
   String timeZone = "";
   String userType = "";
+  int badgeCount1= 0;
 
   _getUserData() async {
     setState(() {
@@ -78,6 +80,9 @@ class _Screen10State extends State<Screen10> {
     // ignore: avoid_print
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -93,7 +98,15 @@ class _Screen10State extends State<Screen10> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+            //         (Route<dynamic> route) => false
+            // );
+          }, true, true, true, id, false,true,badgeCount1,false,badgeCountShared),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //

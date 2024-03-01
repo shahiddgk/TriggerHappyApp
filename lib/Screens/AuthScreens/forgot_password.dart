@@ -33,37 +33,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 100),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  LogoScreen(""),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LogoScreen(""),
+                    const  SizedBox(
+                      height: 30,
+                    ),
+                    Container(
+                        margin:const EdgeInsets.only(top: 10),
+                        child: EmailField(_emailController,"Type your email")),
                   const  SizedBox(
-                    height: 30,
-                  ),
-                  Container(
-                      margin:const EdgeInsets.only(top: 10),
-                      child: EmailField(_emailController)),
-                const  SizedBox(
-                    height: 10,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      _forgotPassword(_emailController.text);
-                    },
-                    child: OptionMcqAnswer(
-                      Container(
-                          width: MediaQuery.of(context).size.width,
-                          alignment: Alignment.center,
-                          margin:const EdgeInsets.only(top: 5,bottom: 5),
-                          child:
-                          const Text("Submit",style: TextStyle(fontSize: AppConstants.defaultFontSize),)
+                      height: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        _forgotPassword(_emailController.text);
+                      },
+                      child: OptionMcqAnswer(
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            alignment: Alignment.center,
+                            margin:const EdgeInsets.only(top: 5,bottom: 5),
+                            child:
+                            const Text("Submit",style: TextStyle(fontSize: AppConstants.defaultFontSize),)
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

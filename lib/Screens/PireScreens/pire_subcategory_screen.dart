@@ -1,10 +1,9 @@
-// ignore_for_file: unnecessary_import, avoid_print, prefer_final_fields
-
-import 'dart:io';
+// ignore_for_file: unnecessary_import, avoid_print, prefer_final_fields, depend_on_referenced_packages, unused_field
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/video_screen.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -13,11 +12,15 @@ import '../../Widgets/constants.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/sub_categoy_border.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
-import '../PireScreens/widgets/PopMenuButton.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
+import '../../model/request_model/logout_user_request.dart';
+import '../../network/http_manager.dart';
 import '../Widgets/footer_widget.dart';
+import '../Widgets/show_notification_pop_up.dart';
 import '../Widgets/toast_message.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
+import 'package:intl/intl.dart';
 
 class PireCategoryScreen extends StatefulWidget {
   const PireCategoryScreen({Key? key}) : super(key: key);
@@ -52,6 +55,10 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
   String favPlaceOnEarth = "https://youtu.be/26ArgGvNTAE";
 
   late bool isPhone;
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
+  bool otherUserLoggedIn = false;
 
   @override
   void initState() {
@@ -82,21 +89,77 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
-    allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
-    userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
-    userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
-    userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
-    userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
-    // _getNAQResonseList(id);
+
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
+
+
+    if(otherUserLoggedIn) {
+
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+      allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
+      userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+      userPremiumType =
+      sharedPreferences.getString(UserConstants().userPremiumType)!;
+      userCustomerId =
+      sharedPreferences.getString(UserConstants().userCustomerId)!;
+      userSubscriptionId =
+      sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+
+      // _getNAQResonseList(id);
+      _getSkippedReminderList();
+    }
     //
     setState(() {
       _isUserDataLoading = false;
+    });
+  }
+
+  String? formattedDate;
+  String? formattedTime;
+  late SkippedReminderNotification skippedReminderNotification;
+
+  _getSkippedReminderList() {
+    setState(() {
+      // sharedPreferences.setString("Score", "");
+      // _isLoading = true;
+    });
+    HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        skippedReminderNotification = value;
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
+      print("SKIPPED REMINDER LIST");
+      print(value);
+
+      for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+        String title = "Hi $name. Did you....";
+        DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+        formattedDate = DateFormat('MM-dd-yy').format(DateTime.parse(skippedReminderNotification.result![i].createdAt.toString()));
+        formattedTime = DateFormat("hh:mm a").format(date);
+        showPopupDialogueForReminderGeneral(context,skippedReminderNotification.result![i].entityId.toString(),skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate!,formattedTime!);
+      }
+
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
     });
   }
 
@@ -123,11 +186,16 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
   // }
 
   Future<bool> _onWillPop() async {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
-            (Route<dynamic> route) => false
-    );
+
+    if(otherUserLoggedIn) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+              (Route<dynamic> route) => false
+      );
+    }
     // int count = 0;
     // Navigator.of(context).popUntil((_) => count++ >= 11);
     return true;
@@ -145,31 +213,26 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-            onPressed: () {
-              // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-              //   _setTrellisData();
-              // }
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-            },
-          ),
-          title: Text(_isUserDataLoading ? "" : name),
-          actions:  [
-            PopMenuButton(false,false,id)
-          ],
-        ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              LogoScreen("PIRE"),
-              Container(
+        appBar: AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+            context,
+                () {
+                  if(otherUserLoggedIn) {
+                    Navigator.of(context).pop();
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+                            (Route<dynamic> route) => false
+                    );
+                  }
+            }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            LogoScreen("PIRE"),
+            Expanded(
+              child: Container(
                 margin: const EdgeInsets.only(top: 10),
                 height:!isPhone ? MediaQuery.of(context).size.height/1.27  : MediaQuery.of(context).size.height/1.43,
                 width: MediaQuery.of(context).size.width,
@@ -195,7 +258,7 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Center(
-                                child: Text("P.I.R.E. Challenge",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                child: Text("P.I.R.E. Negative",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
                               ),
                             ),
                           )
@@ -276,9 +339,9 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                   ],
                 ),
               ),
-              const FooterWidget(),
-            ],
-          ),
+            ),
+            const FooterWidget(),
+          ],
         ),
       ),
     );

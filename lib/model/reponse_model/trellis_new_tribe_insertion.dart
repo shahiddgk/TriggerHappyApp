@@ -19,3 +19,25 @@ class TrellisNewDataAddRequestModel {
     return data;
   }
 }
+
+class TrellisUpdateDataAddRequestModel {
+  String? id;
+  String? text;
+  String? type;
+
+  TrellisUpdateDataAddRequestModel({this.id, this.text,this.type});
+
+  TrellisUpdateDataAddRequestModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    text = json['text'];
+    type = json['type'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['text'] = text;
+    data['type'] = type;
+    return data;
+  }
+}

@@ -1,4 +1,6 @@
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
 import 'package:flutter_quiz_app/Screens/Posts/post_reminders.dart';
@@ -15,7 +17,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
+import '../../model/request_model/admin_access_request_model.dart';
 import '../Garden/garden_screen.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../utill/userConstants.dart';
 import 'change_password.dart';
 import 'edit_profile.dart';
@@ -37,7 +41,6 @@ class _SettingsState extends State<Settings> {
   bool isStatusLoading = false;
   bool status = false;
   late LoginResponseModel loginResponseModel;
-  bool _isUserDataLoading = false;
   String name = "";
   String id = "";
   String allowEmail = "";
@@ -49,6 +52,12 @@ class _SettingsState extends State<Settings> {
   String userPremiumType = "";
   String userCustomerId = "";
   String userSubscriptionId = "";
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+  String userAccess = "";
+  bool userAccessStatus = false;
+
+  bool isPhone = true;
 
   @override
   void initState() {
@@ -61,21 +70,21 @@ class _SettingsState extends State<Settings> {
 
   _getAuthId() async {
     setState(() {
-      _isUserDataLoading = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       authId = sharedPreferences.getString("authId")!;
-      _isUserDataLoading = false;
     });
 
   }
   _getUserData() async {
     setState(() {
-      _isUserDataLoading = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
+
+      badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+      badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
       name = sharedPreferences.getString(UserConstants().userName)!;
       id = sharedPreferences.getString(UserConstants().userId)!;
       email = sharedPreferences.getString(UserConstants().userEmail)!;
@@ -85,26 +94,48 @@ class _SettingsState extends State<Settings> {
       userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
       userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
       userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+      userAccess = sharedPreferences.getString(UserConstants().userAccess)!;
+
       setState(() {
         if(allowEmail == "yes") {
           status = true;
         } else {
           status = false;
         }
+
+        if(userAccess == "yes") {
+          userAccessStatus = true;
+        } else {
+          userAccessStatus = false;
+        }
       });
-      _isUserDataLoading = false;
     });
 
   }
 
+  getScreenDetails() {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getScreenDetails();
     return Scaffold(
-      appBar: AppBar(
-        // automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(!_isUserDataLoading? name : ""),
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       // bottomNavigationBar: GestureDetector(
       //   onTap: () {
       //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
@@ -122,6 +153,7 @@ class _SettingsState extends State<Settings> {
         color: AppColors.backgroundColor,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
+        margin: !isPhone ?  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/4,vertical: 10) : const EdgeInsets.symmetric(horizontal: 5,vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 60),
         child: Form(
           key: _formKey,
@@ -219,6 +251,48 @@ class _SettingsState extends State<Settings> {
                                             setState(() {
                                               setEmailResponse(id,val);
                                               status = val;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                          OptionMcqAnswer(
+                            Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                width: MediaQuery.of(context).size.width,
+                                alignment: Alignment.center,
+                                margin:const EdgeInsets.symmetric(vertical: 5,horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Expanded(
+                                        flex: 2,
+                                        child: Text("Allow admin to make changes to your column?",style: TextStyle(fontSize: AppConstants.defaultFontSize),)),
+                                    Expanded(
+                                      flex: 1,
+                                      child: MediaQuery(
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                        child: FlutterSwitch(
+                                          activeColor: AppColors.primaryColor,
+                                          value: userAccessStatus,
+                                          borderRadius: 30.0,
+                                          padding: 8.0,
+                                          showOnOff: true,
+                                          onToggle: (val) {
+                                            String userAccessText = "";
+                                            if(userAccessStatus) {
+                                              userAccessText = "no";
+                                            } else {
+                                              userAccessText = "yes";
+                                            }
+                                            setState(() {
+                                              setAdminAccess(userAccessText);
+                                              userAccessStatus = val;
                                             });
                                           },
                                         ),
@@ -328,6 +402,24 @@ class _SettingsState extends State<Settings> {
       // ignore: avoid_print
       print(e.toString());
       showToastMessage(context, e.toString(),false);
+    });
+  }
+
+  setAdminAccess(String userAccessNew) async {
+    setState(() {
+      isStatusLoading = true;
+    });
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    HTTPManager().adminAccess(AdminAccessRequestModel(userId: id,adminAccess: userAccessNew)).then((value){
+      setState(() {
+        isStatusLoading = false;
+      });
+      sharedPreferences.setString(UserConstants().userAccess, value['data']['admin_access'].toString());
+      showToastMessage(context, "Status updated successfully", true);
+    }).catchError((e) {
+      setState(() {
+        isStatusLoading = false;
+      });
     });
   }
 

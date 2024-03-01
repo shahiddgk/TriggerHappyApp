@@ -1,4 +1,9 @@
 
+// ignore_for_file: avoid_print
+
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/AuthScreens/settings_screen.dart';
@@ -9,13 +14,16 @@ import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/option_mcq_widget.dart';
 import 'package:flutter_quiz_app/model/reponse_model/login_response_model.dart';
 import 'package:flutter_quiz_app/model/request_model/change_request_model.dart';
+import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 import '../../Widgets/constants.dart';
 import '../../Widgets/username_field_widget.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/UserState.dart';
 import '../utill/userConstants.dart';
@@ -39,6 +47,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   late LoginResponseModel loginResponseModel;
   bool _isUserDataLoading = false;
   bool isLoading = false;
+  bool isLoading1 = true;
   late String firebaseDeviceToken;
   String name = "";
   String id = "";
@@ -50,6 +59,16 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String userPremiumType = "";
   String userCustomerId = "";
   String userSubscriptionId = "";
+
+  String profileImageUrl = "";
+
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
+  bool isPhone = true;
+
+  File? imageFile;
+  bool isFilePicked = false;
 
   late String _timezoneValue;
   late SingleValueDropDownController _valueDropDownController;
@@ -63,7 +82,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
     super.initState();
     _valueDropDownController = SingleValueDropDownController();
     _getUserData();
-    _getAuthId();
+    // _getAuthId();
     _initData();
 
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
@@ -159,23 +178,27 @@ class _ChangeProfileState extends State<ChangeProfile> {
   }
 
 
-  _getAuthId() async {
-    setState(() {
-      _isUserDataLoading = true;
-    });
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      authId = sharedPreferences.getString("authId")!;
-      _isUserDataLoading = false;
-    });
-
-  }
+  // _getAuthId() async {
+  //   setState(() {
+  //     _isUserDataLoading = true;
+  //   });
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     authId = sharedPreferences.getString("authId")!;
+  //     _isUserDataLoading = false;
+  //   });
+  //
+  // }
   _getUserData() async {
     setState(() {
       _isUserDataLoading = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
+
+      badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+      badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
       name = sharedPreferences.getString(UserConstants().userName)!;
       id = sharedPreferences.getString(UserConstants().userId)!;
       email = sharedPreferences.getString(UserConstants().userEmail)!;
@@ -187,12 +210,39 @@ class _ChangeProfileState extends State<ChangeProfile> {
       userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
       userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
 
-      userNameController.text = name;
-      emailController.text = email;
-      _valueDropDownController.dropDownValue = DropDownValueModel(name: _timezoneValue, value: _timezoneValue);
+      getUserProfileDetails();
+
       _isUserDataLoading = false;
     });
 
+  }
+
+  getUserProfileDetails() {
+    setState(() {
+      isLoading1 = true;
+    });
+    HTTPManager().getUserProfileDetails(LogoutRequestModel(userId: id)).then((value) {
+
+      setState(() {
+        profileImageUrl = value['data']['image_url'];
+        name = value['data']['name'];
+        email = value['data']['email'];
+
+        userNameController.text = name;
+        emailController.text = email;
+        _valueDropDownController.dropDownValue = DropDownValueModel(name: _timezoneValue, value: _timezoneValue);
+
+        print("Profile Image");
+        print(profileImageUrl);
+        isLoading1 = false;
+      });
+
+    }).catchError((e) {
+      setState(() {
+        isLoading1 = false;
+      });
+      print(e.toString());
+    });
   }
 
   showPopUponBackButton(BuildContext context) {
@@ -234,7 +284,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   }
 
   Future<bool> _onWillPop() async {
-    if(userNameController.text != "" && userNameController.text!=name) {
+    if(userNameController.text!=name || emailController.text != email) {
       showPopUponBackButton(context);
       return false;
     } else {
@@ -249,29 +299,51 @@ class _ChangeProfileState extends State<ChangeProfile> {
     _valueDropDownController.dispose();
   }
 
+  getScreenDetails() {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getScreenDetails();
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(onPressed: (){
-            if(userNameController.text != "" && userNameController.text!=name) {
-              showPopUponBackButton(context);
-            } else {
-              Navigator.of(context).pop();
-            }
-          }, icon:const Icon(Icons.arrow_back)),
-          // automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Text(!_isUserDataLoading? name : ""),
-        ),
+        appBar: AppBarWidget().appBarGeneralButtons(
+            context,
+                () {
+                  if(userNameController.text != "" && userNameController.text!=name) {
+                    showPopUponBackButton(context);
+                  } else {
+                    Navigator.of(context).pop();
+                  }
+            }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
+
+        // AppBar(
+        //   leading: IconButton(onPressed: (){
+        //
+        //   }, icon:const Icon(Icons.arrow_back)),
+        //   // automaticallyImplyLeading: false,
+        //   centerTitle: true,
+        //   title: Text(!_isUserDataLoading? name : ""),
+        // ),
         body: Container(
           color: AppColors.backgroundColor,
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 60),
-          child: Stack(
+          margin: !isPhone ?  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/4,vertical: 10) : const EdgeInsets.symmetric(horizontal: 5,vertical: 10),
+          padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+          child: isLoading1 ? const Center(child: CircularProgressIndicator(),) : Stack(
            children: [
              Form(
                key: _formKey,
@@ -284,7 +356,6 @@ class _ChangeProfileState extends State<ChangeProfile> {
                       LogoScreen(""),
 
                      Container(
-                       margin:const EdgeInsets.only(top: 10),
                        padding:const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                        decoration: BoxDecoration(
                            color: AppColors.hoverColor,
@@ -293,13 +364,77 @@ class _ChangeProfileState extends State<ChangeProfile> {
                        child: _isUserDataLoading ? Container() : Column(
                          children: [
 
+                           InkWell(
+                             onTap: () async {
+                               final ImagePicker picker=ImagePicker();
+                               final XFile? image1 = await picker.pickImage(source: ImageSource.gallery);
+                               if(image1!=null){
+                                 print("image path: ${image1.path}");
+                                 setState(() {
+                                   imageFile = File(image1.path);
+                                   isFilePicked = true;
+                                 });
+                               } else {
+                                 setState(() {
+                                   isFilePicked = false;
+                                 });
+                               }
+                             },
+                             child: Stack(
+                               alignment: Alignment.center,
+                               children: [
+                                 Container(
+                                   height: 150,
+                                   width: 150,
+                                     decoration: BoxDecoration(
+                                       borderRadius: BorderRadius.circular(150),
+                                       border: Border.all(color: AppColors.primaryColor),
+                                     ),
+                                   margin: const EdgeInsets.symmetric(horizontal: 10),
+                                   child: ClipOval(
+                                     child: imageFile == null ? CachedNetworkImage(
+                                       imageUrl: profileImageUrl,
+                                       fit: BoxFit.cover,
+                                       progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                           Container(
+                                             margin: const EdgeInsets.only(
+                                                 top: 100,
+                                                 bottom: 100
+                                             ),
+                                             child: CircularProgressIndicator(
+                                                 value: downloadProgress.progress,
+                                                 color: AppColors.primaryColor
+                                             ),
+                                           ),
+                                       errorWidget: (context, url, error) =>  const Center(child: Icon(Icons.error,color: AppColors.redColor,)),
+                                     ) : Image.file(
+                                       imageFile!,
+                                       fit: BoxFit.cover,
+                                     ),
+                                   )
+                                 ),
+                                  Positioned(
+                                   bottom: 10,
+                                   right: 10,
+                                   child: Container(
+                                     padding: const EdgeInsets.all(5),
+                                       decoration: BoxDecoration(
+                                         color: AppColors.hoverColor,
+                                         borderRadius: BorderRadius.circular(150)
+                                       ),
+                                       child: const Icon(Icons.image,color: AppColors.primaryColor,size: 30,)),
+                                 )
+                               ],
+                             ),
+                           ),
+
                            Container(
                                margin:const EdgeInsets.only(top: 10,bottom: 10),
                                child: userName(userNameController)),
 
                            Container(
                                margin:const EdgeInsets.only(top: 10,bottom: 10),
-                               child: EmailField(emailController)),
+                               child: EmailField(emailController,"Type your email")),
 
                            if(!isTimeZoneLoading && !_isUserDataLoading)
                              Container(
@@ -428,48 +563,93 @@ class _ChangeProfileState extends State<ChangeProfile> {
       setState(() {
         isLoading = true;
       });
-      HTTPManager().changeProfile(
-          ChangeProfileRequestModel(name:name1,email: email, userId: id,timeZone: timeZone,deviceToken: deviceToken)).then((
-          value) async {
-        // print("ChangeProfileResponse");
-        // print(value);
-        UserStatePrefrence().setAnswerText(
-            true,
-            userType,
-            name1,
-            email,
-            id,
-            timeZone,
-            allowEmail,
-            userPremium,
-            userPremiumType,
-            userCustomerId,
-            userSubscriptionId);
+      if(isFilePicked) {
+        HTTPManager().changeProfileWithImage(
+            ChangeProfileRequestModel(name:name1,email: email, userId: id,timeZone: timeZone,deviceToken: deviceToken),imageFile!).then((
+            value) async {
+          // print("ChangeProfileResponse");
+          // print(value);
+          UserStatePrefrence().setAnswerText(
+              true,
+              userType,
+              name1,
+              email,
+              id,
+              timeZone,
+              allowEmail,
+              userPremium,
+              userPremiumType,
+              userCustomerId,
+              userSubscriptionId);
 
-        setState(() {
-          name = name1;
-          //  loginResponseModel = value;
-          isLoading = false;
-          userNameController.text == "";
-          emailController.text == "";
+          setState(() {
+            name = name1;
+            //  loginResponseModel = value;
+            isLoading = false;
+            userNameController.text == "";
+            emailController.text == "";
+
+          });
+          // ignore: use_build_context_synchronously
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+                  (Route<dynamic> route) => false
+          );
+          // ignore: use_build_context_synchronously
+          showToastMessage(context, "Profile updated successfully",true);
+
+        }).catchError((e) {
+          setState(() {
+            isLoading = false;
+          });
+          showToastMessage(context, e.toString(),false);
 
         });
-        // ignore: use_build_context_synchronously
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
-                (Route<dynamic> route) => false
-        );
-        // ignore: use_build_context_synchronously
-        showToastMessage(context, "Profile updated successfully",true);
+      } else {
+        HTTPManager().changeProfile(
+            ChangeProfileRequestModel(name:name1,email: email, userId: id,timeZone: timeZone,deviceToken: deviceToken)).then((
+            value) async {
+          // print("ChangeProfileResponse");
+          // print(value);
+          UserStatePrefrence().setAnswerText(
+              true,
+              userType,
+              name1,
+              email,
+              id,
+              timeZone,
+              allowEmail,
+              userPremium,
+              userPremiumType,
+              userCustomerId,
+              userSubscriptionId);
 
-      }).catchError((e) {
-        setState(() {
-          isLoading = false;
+          setState(() {
+            name = name1;
+            //  loginResponseModel = value;
+            isLoading = false;
+            userNameController.text == "";
+            emailController.text == "";
+
+          });
+          // ignore: use_build_context_synchronously
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => const Dashboard()),
+                  (Route<dynamic> route) => false
+          );
+          // ignore: use_build_context_synchronously
+          showToastMessage(context, "Profile updated successfully",true);
+
+        }).catchError((e) {
+          setState(() {
+            isLoading = false;
+          });
+          showToastMessage(context, e.toString(),false);
+
         });
-        showToastMessage(context, e.toString(),false);
-
-      });
+      }
     }
     // if result not null we simply call the MaterialpageRoute,
     // for go to the HomePage screen

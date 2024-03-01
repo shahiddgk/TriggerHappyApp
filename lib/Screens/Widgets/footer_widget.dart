@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,7 +15,7 @@ class FooterWidget extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       color: AppColors.footerBackgroundColor,
       alignment: Alignment.topCenter,
-      height: 85,
+      height: Platform.isAndroid ? 55 : 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

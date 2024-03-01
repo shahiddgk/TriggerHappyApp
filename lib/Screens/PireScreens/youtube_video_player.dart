@@ -1,9 +1,9 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_field
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,6 +36,8 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   String userCustomerId = "";
   String userSubscriptionId = "";
   String allowEmail = "";
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   String bodyScanVideoUrl = "https://youtu.be/whc21PAm4tQ";
   String favPlaceOnEarth = "https://youtu.be/26ArgGvNTAE";
@@ -48,6 +50,9 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
     });
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -88,23 +93,17 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-          onPressed: () {
-            // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-            //   _setTrellisData();
-            // }
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+
             Navigator.of(context).pop();
-          },
-        ),
-        title: Text(_isUserDataLoading ? "" : name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+            //         (Route<dynamic> route) => false
+            // );
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,

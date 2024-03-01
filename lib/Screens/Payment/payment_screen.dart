@@ -1,5 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_field
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:credit_card_form/credit_card_form.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_quiz_app/Screens/utill/userConstants.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/model/request_model/stripe_request_payment_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +60,11 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   bool isDayButton = false;
   bool isAnnualButton = false;
   bool isMonthlyButton = false;
+
+  late bool isPhone;
+
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   // final CardFormEditController cardFormEditController = CardFormEditController();
   final CreditCardController creditCardController = CreditCardController();
@@ -175,6 +178,9 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
     //  print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
     email = sharedPreferences.getString(UserConstants().userEmail)!;
@@ -188,17 +194,33 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
     });
   }
 
+  getScreenDetails() {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getScreenDetails();
     return Scaffold(
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
-        centerTitle: true,
-        title: Text(name),
-        leading: IconButton(onPressed: (){Navigator.of(context).pop();}, icon:Platform.isAndroid ? const Icon(Icons.arrow_back) : const Icon(Icons.arrow_back_ios)),
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, false, true, id, true,true,badgeCount1,false,badgeCountShared),
       body: Stack(
         children: [
-          SizedBox(
+          Container(
+            margin: const EdgeInsets.only(top: 1),
             height: MediaQuery.of(context).size.height/6,
             width: MediaQuery.of(context).size.width/0.2,
             child: Image.asset("assets/primium_page_header.png",fit: BoxFit.fill,width: MediaQuery.of(context).size.width,),
@@ -221,7 +243,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/18),
+            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/20,right: !isPhone ? MediaQuery.of(context).size.width/4 : 4,left: !isPhone ? MediaQuery.of(context).size.width/4 : 5),
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
@@ -235,7 +257,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 3.0),
+                  const SizedBox(height: 2.0),
                   Text(
                     userPremiumType == "year" ? "Premium Annual" : userPremiumType == "month" ? "Premium monthly" : "Free Plan",
                     style:const TextStyle(
@@ -244,7 +266,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 2.0),
                   if(isFreeButton)
                   const Text(
                     'Free',
@@ -372,6 +394,24 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                     ),
                   ),
                   const SizedBox(height: 10,),
+                  isMonthlyButton || isAnnualButton ? const Text(
+                    '✔ Post Unlimited',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ) :  const Text(
+                    '✔ Post',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: AppColors.textWhiteColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
                   isAnnualButton || isMonthlyButton ? const Text(
                     '✔ Garden Unlimited',
                     textAlign: TextAlign.start,
@@ -407,24 +447,6 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                  const SizedBox(height: 10,),
-                  isMonthlyButton || isAnnualButton ? const Text(
-                    '✔ Post Unlimited',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: AppColors.textWhiteColor,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ) :  const Text(
-                    '',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: AppColors.textWhiteColor,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
                   if(isFreeButton)
                     const SizedBox(height: 2,),
                   Container(
@@ -578,18 +600,18 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                       if(userPremium == "no") {
                         if (isFreeButton) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (
-                              context) => CardFormScreen("Free",false)));
+                              context) => CardFormScreen("Free",false,false,"","","")));
                         } else if (isDayButton) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (
-                              context) => CardFormScreen("Day",false)));
+                              context) => CardFormScreen("Day",false,false,"","","")));
                         } else if (isAnnualButton) {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      CardFormScreen("Annual",false)));
+                                      CardFormScreen("Annual",false,false,"","","")));
                           } else {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
-                                    CardFormScreen("Monthly",false
+                                    CardFormScreen("Monthly",false,false,"","",""
                                     )));
                         }
                       } else {
@@ -628,11 +650,11 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   _cancelSubscription(String subscriptionType) {
     if (subscriptionType == "Annual") {
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => CardFormScreen("Annual",true)));
+          builder: (context) => CardFormScreen("Annual",true,false,"","","")));
     } else if (subscriptionType == "Monthly") {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) =>
-              CardFormScreen("Monthly",true
+              CardFormScreen("Monthly",true,false,"","",""
               )));
     } else {
       //showToastMessage(context, "Subscription cancelled", true);
@@ -671,12 +693,11 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
         });
         if (subscriptionType == "Annual") {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => CardFormScreen("Annual",true)));
+              builder: (context) => CardFormScreen("Annual",true,false,"","","")));
         } else if (subscriptionType == "Monthly") {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>
-                  CardFormScreen("Monthly",true
-                  )));
+                  CardFormScreen("Monthly",true,false,"","","")));
         } else {
           showToastMessage(context, "Subscription cancelled", true);
         }

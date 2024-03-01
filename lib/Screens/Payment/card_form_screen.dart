@@ -1,16 +1,17 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:credit_card_form/credit_card_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/dashboard_tiles.dart';
 import 'package:flutter_quiz_app/model/reponse_model/stripe_keys_details.dart';
+import 'package:flutter_quiz_app/model/request_model/Sage%20Request/sage_coaches_payment_request.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
+import '../../Widgets/constants.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../../model/request_model/logout_user_request.dart';
 import '../../model/request_model/stripe_request_payment_model.dart';
@@ -22,9 +23,14 @@ import '../utill/userConstants.dart';
 
 // ignore: must_be_immutable
 class CardFormScreen extends StatefulWidget {
-   CardFormScreen(this.packageDetails,this.isUpgrade,{Key? key}) : super(key: key);
+   CardFormScreen(this.packageDetails,this.isUpgrade,this.isSageCoachPayment,this.recieverId,this.entityId,this.shareType,{Key? key}) : super(key: key);
    String packageDetails;
    bool isUpgrade;
+
+   bool isSageCoachPayment;
+   String recieverId;
+   String entityId;
+   String shareType;
 
   @override
   State<CardFormScreen> createState() => _CardFormScreenState();
@@ -34,7 +40,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
   String name = "";
   String id = "";
-  bool _isUserDataLoading = true;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   String email = "";
   String timeZone = "";
@@ -55,6 +60,8 @@ class _CardFormScreenState extends State<CardFormScreen> {
   Map<String, dynamic>? paymentIntent;
   bool isLoading = false;
 
+  late bool isPhone;
+
   bool isError = false;
   String errorMessage = "";
   String publishableKey = "";
@@ -65,6 +72,9 @@ class _CardFormScreenState extends State<CardFormScreen> {
   String cardCVC = "";
   late StripeKeysDetailsModelClass stripeKeysDetailsModelClass;
 
+
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
   // final CardFormEditController cardFormEditController = CardFormEditController();
   final CreditCardController creditCardController = CreditCardController();
 
@@ -123,13 +133,26 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
   }
 
+  getScreenDetails() {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    if(MediaQuery.of(context).size.width<= 500) {
+      isPhone = true;
+    } else {
+      isPhone = false;
+    }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
   _getUserData() async {
-    //showUpdatePopup(context);
-    setState(() {
-      _isUserDataLoading = true;
-    });
-    //  print("Data getting called");
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    // badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    // badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -140,28 +163,28 @@ class _CardFormScreenState extends State<CardFormScreen> {
     allowEmail = sharedPreferences.getString(UserConstants().allowEmail)!;
     userLoggedIn = sharedPreferences.getBool(UserConstants().userLoggedIn)!;
     _getStripeKeys();
-    setState(() {
-      _isUserDataLoading = false;
-    });
+
   }
 
   @override
   Widget build(BuildContext context) {
+    getScreenDetails();
     return Scaffold(
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
-        centerTitle: true,
-        title: Text(name),
-        leading: IconButton(onPressed: (){Navigator.of(context).pop();}, icon:Platform.isAndroid ? const Icon(Icons.arrow_back) : const Icon(Icons.arrow_back_ios)),
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       body: Stack(
         children: [
-          SizedBox(
+          Container(
+            margin: const EdgeInsets.only(top: 1),
             height: MediaQuery.of(context).size.height/6,
             width: MediaQuery.of(context).size.width/0.2,
             child: Image.asset("assets/primium_page_header.png",fit: BoxFit.fill,width: MediaQuery.of(context).size.width,),
           ),
           Container(
-            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/12),
+            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/14,right: !isPhone ? MediaQuery.of(context).size.width/4 : 4,left: !isPhone ? MediaQuery.of(context).size.width/4 : 5 ),
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
@@ -176,7 +199,8 @@ class _CardFormScreenState extends State<CardFormScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(width: 3,),
+                  const SizedBox(height: 6.0),
                   isError ? Center(
                     // ignore: avoid_unnecessary_containers
                     child: Container(
@@ -199,6 +223,155 @@ class _CardFormScreenState extends State<CardFormScreen> {
                             )
                           ],
                         )
+                    ),
+                  ) : widget.isSageCoachPayment ? Container(
+                    alignment: Alignment.topCenter,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.shareType == "pire"? "P.I.R.E" :
+                        widget.shareType == "naq"? "NAQ" : widget.shareType == "ladder"? "Ladder" :
+                        widget.shareType == "column"? "Column" : "Trellis",
+                          style:const TextStyle(
+                            fontSize: 20.0,
+                            color: AppColors.backgroundColor,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height/25),
+                        Visibility(
+                            visible: widget.isSageCoachPayment,
+                            child:widget.recieverId == "96" ? Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(150),
+                                    border: Border.all(color: AppColors.primaryColor),
+                                  ),
+                                  width: 80,
+                                  height: 80,
+                                  margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                  child: const CircleAvatar(
+                                      backgroundImage: NetworkImage("https://trueincrease.com/wp-content/uploads/2023/02/Aaron-Brown-Bio-Headshot-2023-300x300.jpg")),
+                                ),
+                                const Text(
+                                  "Aaron Brown",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: AppConstants.userActivityFontSize,
+                                  ),
+                                ),
+                                const Text(
+                                  "Coach",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: AppConstants.fontSizeForReminderSectionTimePicker,
+                                  ),
+                                ),
+                              ],
+                            ) : Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(150),
+                                    border: Border.all(color: AppColors.primaryColor),
+                                  ),
+                                  width: 80,
+                                  height: 80,
+                                  margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                  child: const CircleAvatar(
+                                      backgroundImage: NetworkImage("https://trueincrease.com/wp-content/uploads/2023/02/Chris-Williams-Bio-Headshot-2023-300x300.jpg")),
+                                ),
+                                const Text(
+                                  "Chris Williams",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: AppConstants.userActivityFontSize,
+                                  ),
+                                ),
+                                const Text(
+                                  "Coach",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: AppConstants.fontSizeForReminderSectionTimePicker,
+                                  ),
+                                ),
+                              ],
+                            )),
+                        const SizedBox(height: 10,),
+                        const Text(
+                         "\$25",
+                         style: TextStyle(
+                           fontSize: AppConstants.logoFontSizeForMobile,
+                           color: AppColors.primaryColor,
+                           fontWeight: FontWeight.bold,
+                         ),
+                       ),
+                       const SizedBox(height: 10,),
+                       const Text("Seeking your coach's opinion is like unlocking a treasure chest of wisdom; it's the pathway to improvement and success.",
+                         textAlign: TextAlign.center,
+                         style: TextStyle(
+                           fontSize: 15.0,
+                           color: AppColors.textWhiteColor,
+                           fontWeight: FontWeight.normal,
+                         ),
+                       ),
+                        const SizedBox(height: 10,),
+                        Form(
+                          key: _formKey,
+                          child: SingleChildScrollView(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                child: CreditCardForm(
+                                  hideCardHolder: true,
+                                  controller: creditCardController,
+
+                                  theme: CustomCardTheme(),
+                                  // ignore: avoid_types_as_parameter_names
+                                  onChanged: (CreditCardResult ) {
+                                    setState(() {
+                                      cardNumber = CreditCardResult.cardNumber;
+                                      cardExpiryMonth = CreditCardResult.expirationMonth;
+                                      cardExpiryYear = CreditCardResult.expirationYear;
+                                      cardCVC = CreditCardResult.cvc;
+                                    });
+                                    print(CreditCardResult.cardNumber);
+                                    print(CreditCardResult.expirationMonth);
+                                    print(CreditCardResult.expirationYear);
+                                    print(CreditCardResult.cardType);
+                                    print(CreditCardResult.cvc);
+                                  },
+                                ),
+                              )
+                          ),
+                        ),
+                        const SizedBox(height: 15,),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 100),
+                            backgroundColor: AppColors.primaryColor,
+                          ),
+                          onPressed: () {
+                            if(cardNumber != "" && cardCVC != ""&& cardExpiryYear != ""&& cardExpiryMonth != "") {
+                              _createCardToken(
+                                    cardNumber,
+                                    int.parse(cardExpiryMonth.toString()),
+                                    int.parse(cardExpiryYear.toString()),
+                                    cardCVC,
+                                    publishableKey);
+
+                            } else {
+                              showToastMessage(context, "Field cannot be empty", false);
+                            }
+                          },
+                          child:const Text('Pay Now',style: TextStyle(color: AppColors.backgroundColor),),
+                        ),
+                      ],
                     ),
                   ) : Column(
                      children: [
@@ -345,6 +518,55 @@ class _CardFormScreenState extends State<CardFormScreen> {
       });
   }
 
+  _createCardToken(String cardNumber1,int expMonth1,int expYear1,String cvc1,String publishableKey1) {
+
+    if(_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+      HTTPManager().stripeTokenApi(cardNumber1, expMonth1, expYear1, cvc1, publishableKey).then((value) {
+
+        print("Payment Token");
+        print(value);
+
+        _sendPaymentForCoaches(id,value.toString(),widget.shareType,widget.recieverId,widget.entityId);
+
+      }).catchError((e) {
+        final jsonData = jsonDecode(e.toString());
+
+        final error = jsonData['error'];
+        final errorMessage = error['message'];
+
+        // Print the values
+        print('Error Message: $errorMessage');
+
+        showToastMessage(context, errorMessage.toString(), false);
+        setState(() {
+          isLoading = false;
+        });
+      });
+    }
+  }
+
+  _sendPaymentForCoaches(String userId1,String token1,String type1,String recieverId1,String entityId1) {
+
+    HTTPManager().sendSagePaymentForCoach(SageCoachesPayment(userId: userId1, token: token1, type: type1,recieverId: recieverId1, entityId: entityId1)).then((value) {
+
+      setState(() {
+        isLoading = false;
+      });
+      showToastMessage(context, "Payment Successful", true);
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+
+    }).catchError((e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Error Message1234123");
+      print(e);
+      showToastMessage(context, e.toString(), false);
+    });
+  }
 
   _createCardToke(String cardNumber1,int expMonth1,int expYear1,String cvc1,String publishableKey1,String interval,String amount) {
 

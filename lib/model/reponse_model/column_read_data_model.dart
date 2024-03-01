@@ -6,6 +6,8 @@ class ColumnReadDataModel {
   String? entryDate;
   String? entryTakeaway;
   String? entryType;
+  String? definedBy;
+  String? completed;
   String? createdAt;
 
   ColumnReadDataModel(
@@ -16,6 +18,8 @@ class ColumnReadDataModel {
         this.entryDate,
         this.entryType,
         this.entryTakeaway,
+        this.definedBy,
+        this.completed,
         this.createdAt});
 
   ColumnReadDataModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class ColumnReadDataModel {
     entryDate = json['entry_date'];
     entryType = json['entry_type'];
     entryTakeaway = json['entry_takeaway'];
+    definedBy = json['defined_by'];
+    completed = json['completed'];
     createdAt = json['created_at'];
   }
 
@@ -38,6 +44,8 @@ class ColumnReadDataModel {
     data['entry_date'] = entryDate;
     data['entry_type'] = entryType;
     data['entry_takeaway'] = entryTakeaway;
+    data['defined_by'] = definedBy;
+    data['completed'] = completed;
     data['created_at'] = createdAt;
     return data;
   }

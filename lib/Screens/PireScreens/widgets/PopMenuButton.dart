@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/utill/UserState.dart';
+import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -57,6 +58,8 @@ class _PopMenuButtonState extends State<PopMenuButton> {
     return PopupMenuButton(
       // add icon, by default "3 dot" icon
       // icon: Icon(Icons.book)
+      padding: const EdgeInsets.only(right: 5),
+      child: const Icon(Icons.more_vert,size: 23,color: AppColors.hoverColor,),
         itemBuilder: (context){
           return [
             if(widget.isSummaryVisible)

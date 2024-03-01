@@ -2,6 +2,9 @@
 
 // ignore_for_file: avoid_print, duplicate_ignore
 
+import 'dart:io';
+
+import 'package:flutter_quiz_app/model/reponse_model/Tribe/module_tribe_list_detail.dart';
 import 'package:flutter_quiz_app/model/reponse_model/garden_response_model.dart';
 import 'package:flutter_quiz_app/model/reponse_model/naq_response_model.dart';
 import 'package:flutter_quiz_app/model/reponse_model/question_answer_response_model.dart';
@@ -18,6 +21,17 @@ import 'package:flutter_quiz_app/model/request_model/social_login_request_model.
 import 'package:flutter_quiz_app/model/request_model/trellis_data_saving_request.dart';
 import 'package:flutter_quiz_app/network/response_handler.dart';
 
+import '../model/reponse_model/Sage/accepted_connections_list_response.dart';
+import '../model/reponse_model/Sage/chat_list_response.dart';
+import '../model/reponse_model/Sage/invite_connection_notification_list.dart';
+import '../model/reponse_model/Sage/sage_feedback_list_model.dart';
+import '../model/reponse_model/Sage/sage_list_response_model.dart';
+import '../model/reponse_model/Sage/shared_item_list_details.dart';
+import '../model/reponse_model/Sage/shared_list_response.dart';
+import '../model/reponse_model/Sage/user_search_list_response.dart';
+import '../model/reponse_model/Tribe/trellis_share_response_model_all.dart';
+import '../model/reponse_model/Tribe/tribe_shared_items_lists_response_model.dart';
+import '../model/reponse_model/Tribe/tribe_single_item_shared_list.dart';
 import '../model/reponse_model/column_read_data_model.dart';
 import '../model/reponse_model/garden_level_response.dart';
 import '../model/reponse_model/garden_seed_response_model.dart';
@@ -26,10 +40,26 @@ import '../model/reponse_model/history_response_model.dart';
 import '../model/reponse_model/level_response_model.dart';
 import '../model/reponse_model/naq__response_model.dart';
 import '../model/reponse_model/new_history_garden_details_response.dart';
+import '../model/reponse_model/pire_naq_list_response_model.dart';
 import '../model/reponse_model/post_reminder_list_response_model.dart';
+import '../model/reponse_model/pro_user_response_model.dart';
 import '../model/reponse_model/skipped_list_response_model.dart';
 import '../model/reponse_model/trellis_data_history_response.dart';
 import '../model/reponse_model/trellis_new_tribe_insertion.dart';
+import '../model/request_model/Sage Request/add_shared_item_to_shared_list.dart';
+import '../model/request_model/Sage Request/chat_list_request.dart';
+import '../model/request_model/Sage Request/invite_connection_request.dart';
+import '../model/request_model/Sage Request/sage_coaches_payment_request.dart';
+import '../model/request_model/Sage Request/sage_feedback_add_request.dart';
+import '../model/request_model/Sage Request/sage_feedback_list_request.dart';
+import '../model/request_model/Sage Request/search_request_model.dart';
+import '../model/request_model/Sage Request/shared_item_details_request.dart';
+import '../model/request_model/Tribe/all_single_item_shared_request.dart';
+import '../model/request_model/Tribe/pending_permission_request_model.dart';
+import '../model/request_model/Tribe/pending_permission_sent_request.dart';
+import '../model/request_model/Tribe/tribe_shared_item_request.dart';
+import '../model/request_model/Tribe/tribe_shared_module_list_item_request.dart';
+import '../model/request_model/admin_access_request_model.dart';
 import '../model/request_model/answer_reques_model.dart';
 import '../model/request_model/chnage_tree_growth_type_request.dart';
 import '../model/request_model/column_delete_request.dart';
@@ -38,6 +68,7 @@ import '../model/request_model/garden_history_details_request.dart';
 import '../model/request_model/garden_seed_request_model.dart';
 import '../model/request_model/ladder_add_favourite_response.dart';
 import '../model/request_model/logout_user_request.dart';
+import '../model/request_model/pire_naq_request_model.dart';
 import '../model/request_model/post_request_model.dart';
 import '../model/request_model/read_trellis_model.dart';
 import '../model/request_model/session_entry_request.dart';
@@ -46,6 +77,7 @@ import '../model/request_model/trellis_delete_request_model.dart';
 import '../model/request_model/trellis_identity_request_model.dart';
 import '../model/request_model/trellis_ladder_request_model.dart';
 import '../model/request_model/trellis_principles_request_model.dart';
+import '../model/request_model/trellis_share_request.dart';
 import '../model/request_model/tribe_data_saving_request.dart';
 import '../model/request_model/user_email_response_request.dart';
 import 'api_urls.dart';
@@ -67,6 +99,17 @@ class HTTPManager {
     return stripeKeysDetailsModelClass;
   }
 
+  Future<ProUserResponse> proUsersList() async {
+    const url = ApplicationURLs.API_PRO_USERS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.postWithOutParams(Uri.parse(url));
+    ProUserResponse proUserResponse = ProUserResponse.fromJson(response);
+    return proUserResponse;
+  }
+
   Future<dynamic> registerUser(RegisterRequestModel registerRequestModel) async {
     const url = ApplicationURLs.API_REGISTER_USER;
     // ignore: avoid_print
@@ -74,6 +117,16 @@ class HTTPManager {
 
     final response =
         await _handler.post(Uri.parse(url),registerRequestModel.toJson());
+    return response;
+  }
+
+  Future<dynamic> adminAccess(AdminAccessRequestModel adminAccessRequestModel) async {
+    const url = ApplicationURLs.API_ADMIN_ACCESS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),adminAccessRequestModel.toJson());
     return response;
   }
 
@@ -150,10 +203,32 @@ class HTTPManager {
     const url = ApplicationURLs.API_CHANGE_PROFILE;
     // ignore: avoid_print
     print(url);
+      final response =
+      await _handler.post(Uri.parse(url),changeProfileRequestModel.toJson());
+      return response;
 
+
+
+  }
+
+  Future<dynamic> getUserProfileDetails(LogoutRequestModel logoutRequestModel) async {
+    const url = ApplicationURLs.API_USER_DETAILS;
+    // ignore: avoid_print
+    print(url);
     final response =
-    await _handler.post(Uri.parse(url),changeProfileRequestModel.toJson());
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
     return response;
+
+  }
+
+  Future<dynamic> changeProfileWithImage(ChangeProfileRequestModel changeProfileRequestModel,File profileImage) async {
+    const url = ApplicationURLs.API_CHANGE_PROFILE;
+    // ignore: avoid_print
+    print(url);
+      final response =
+      await _handler.postImage(Uri.parse(url),changeProfileRequestModel.toJson(),profileImage);
+      return response;
+
   }
 
   Future<QuestionListModel> getQuestions(String questionListType) async {
@@ -283,6 +358,49 @@ class HTTPManager {
     HistoryResponseListModel responseListModel = HistoryResponseListModel.fromJson(response["response_history"]);
     return responseListModel;
   }
+
+  //PIRE NAQ LIST API CALL
+  Future<PireNaqListResponseModel> pireNaqListResponse(PireNaqListRequestModel pireNaqListRequestModel) async {
+
+    String url = ApplicationURLs.API_PIRE_NAQ_LIST;
+    //// ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),pireNaqListRequestModel.toJson());
+    PireNaqListResponseModel pireNaqListResponseModel = PireNaqListResponseModel.fromJson(response);
+
+    return pireNaqListResponseModel;
+  }
+
+  //PIRE sinel Item API CALL
+  Future<PireNaqSingleItemResponseModel> pireSingleItemResponse(PireNaqSingleItemRequestModel pireNaqSingleItemRequestModel) async {
+
+    String url = ApplicationURLs.API_PIRE_SINGLE_ITEM_DETAILS;
+    //// ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),pireNaqSingleItemRequestModel.toJson());
+    PireNaqSingleItemResponseModel pireNaqSingleItemResponseModel = PireNaqSingleItemResponseModel.fromJson(response);
+
+    return pireNaqSingleItemResponseModel;
+  }
+
+  //Naq sinel Item API CALL
+  Future<PireNaqSingleItemResponseModel> naqSingleItemResponse(PireNaqSingleItemRequestModel pireNaqSingleItemRequestModel) async {
+
+    String url = ApplicationURLs.API_NAQ_SINGLE_ITEM_DETAILS;
+    //// ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),pireNaqSingleItemRequestModel.toJson());
+    PireNaqSingleItemResponseModel pireNaqSingleItemResponseModel = PireNaqSingleItemResponseModel.fromJson(response);
+
+    return pireNaqSingleItemResponseModel;
+  }
+
   //NAQ API CALL
   Future<NaqResponseListModel> naqResponseList(LogoutRequestModel logoutRequestModel) async {
 
@@ -326,6 +444,75 @@ class HTTPManager {
   }
 
 //Trellis Api's Manager
+
+  Future<dynamic> trellisShareScreen(TrellisShareRequest trellisShareRequest) async {
+
+    String url = ApplicationURLs.API_TRELLIS_SHARE;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisShareRequest.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // print(response.toString());
+    return response;
+  }
+
+
+  Future<SingleShredItemsForTribeResponse> tribeAllSingleItemsSharedRead(TribeAllSingleSharedRequestModel tribeAllSingleSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_ALL_SINGLE_SHARED_ITEM;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeAllSingleSharedRequestModel.toJson());
+    SingleShredItemsForTribeResponse singleShredItemsForTribeResponse = SingleShredItemsForTribeResponse.fromJson(response);
+    // print(response.toString());
+    return singleShredItemsForTribeResponse;
+  }
+
+  Future<dynamic> tribeSingleItemsSharedDelete(TribeSingleSharedDeleteRequestModel tribeSingleSharedDeleteRequestModel) async {
+
+    String url = ApplicationURLs.API_SINGLE_SHARED_ITEM_DELETE;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSingleSharedDeleteRequestModel.toJson());
+    // SingleShredItemsForTribeResponse singleShredItemsForTribeResponse = SingleShredItemsForTribeResponse.fromJson(response);
+    // print(response.toString());
+    return response;
+  }
+
+  //All App Share
+
+  Future<dynamic> allAppShareScreen(TrellisShareRequest trellisShareRequest) async {
+
+    String url = ApplicationURLs.API_ALL_APP_SHARE;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisShareRequest.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // print(response.toString());
+    return response;
+  }
+
+  Future<TrellisShareResponseModel> trellisShareScreenRead(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SHARE_READ;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    TrellisShareResponseModel trellisShareResponseModel = TrellisShareResponseModel.fromJson(response);
+    // print(response.toString());
+    return trellisShareResponseModel;
+  }
+
   Future<dynamic> trellisScreen(TrellisDataRequestModel trellisDataRequestModel) async {
 
     String url = ApplicationURLs.API_TRELLIS;
@@ -463,6 +650,20 @@ class HTTPManager {
     return response;
   }
 
+  Future<dynamic> trellisUpdateIdentity(TrellisUpdateIdentityRequestModel trellisUpdateIdentityRequestModel) async {
+
+    String url = ApplicationURLs.API_TRELLIS_UPDATE_IDENTITY;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisUpdateIdentityRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
   Future<dynamic> trellisPrinciples(TrellisPrinciplesRequestModel trellisPrinciplesRequestModel) async {
 
     String url = ApplicationURLs.API_TRELLIS_PRINCIPLES;
@@ -472,6 +673,21 @@ class HTTPManager {
 
     final response =
     await _handler.post(Uri.parse(url),trellisPrinciplesRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
+  Future<dynamic> trellisUpdatePrinciples(TrellisPrinciplesUpdateRequestModel trellisPrinciplesUpdateRequestModel) async {
+
+    String url = ApplicationURLs.API_TRELLIS_UPDATE_PRINCIPLES;
+    // print
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisPrinciplesUpdateRequestModel.toJson());
     // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
     // ignore: avoid_print
     print(response.toString());
@@ -537,6 +753,21 @@ class HTTPManager {
     return response;
   }
 
+  Future<dynamic> trellisUpdateTribeDataAdd(TrellisUpdateDataAddRequestModel trellisUpdateDataAddRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_EDIT_RESPONSE;
+    // print
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),trellisUpdateDataAddRequestModel.toJson());
+    // QuestionListModel questionAnswerResponseModel = QuestionListModel.fromJson(response["questions"]);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
   Future<dynamic> trellisDelete(TrellisDeleteRequestModel trellisDeleteRequestModel) async {
 
     String url = ApplicationURLs.API_TRELLIS_DELETE;
@@ -579,6 +810,17 @@ class HTTPManager {
     return response;
   }
 
+  Future<dynamic> sessionEntryUpdate(ColumnUpdateRequestModel columnUpdateRequestModel) async {
+    const url = ApplicationURLs.API_COLUMN_UPDATE;
+    // print
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),columnUpdateRequestModel.toJson());
+    return response;
+  }
+
   Future<dynamic> sessionRead(ColumnReadRequestModel columnReadRequestModel) async {
     const url = ApplicationURLs.API_COLUMN_READ;
     // print
@@ -599,6 +841,19 @@ class HTTPManager {
     final response =
     await _handler.post(Uri.parse(url),columnDeleteRequestModel.toJson());
     return response;
+  }
+
+  Future<ColumnReadDataModel> sessionTaskComplete(ColumnTaskCompleteRequestModel columnTaskCompleteRequestModel) async {
+    const url = ApplicationURLs.API_COLUMN_COMPLETE_TASK;
+    // print
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),columnTaskCompleteRequestModel.toJson());
+    ColumnReadDataModel columnReadDataModel = ColumnReadDataModel.fromJson(response['data']);
+
+    return columnReadDataModel;
   }
 
   Future<dynamic> getAppVersion() async {
@@ -890,6 +1145,538 @@ class HTTPManager {
     // ignore: avoid_print
     print(response.toString());
     return userActivityResponse;
+  }
+
+
+  //Sage API Call
+
+  //Sage Feedback List
+  Future<SageFeedbackListResponse> getSageFeedbackList(SageFeedbackRequestModel sageFeedbackRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_FEEDBACK_LIST_READ;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sageFeedbackRequestModel.toJson());
+    SageFeedbackListResponse sageFeedbackListResponse = SageFeedbackListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sageFeedbackListResponse;
+  }
+
+  //Sage Feedback Insert
+  Future<SageFeedback> addSageFeedback(SageFeedbackAddRequest sageFeedbackAddRequest) async {
+
+    String url = ApplicationURLs.API_SAGE_FEEDBACK;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sageFeedbackAddRequest.toJson());
+    SageFeedback sageFeedback = SageFeedback.fromJson(response['data']);
+    // ignore: avoid_print
+    print(response.toString());
+    return sageFeedback;
+  }
+
+  //Sage Connection List
+  Future<ConnectionListResponse> getConnectionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_CONNECTION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    ConnectionListResponse connectionListResponse = ConnectionListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return connectionListResponse;
+  }
+
+  //Sage Payment For Share with coach
+  Future<dynamic> sendSagePaymentForCoach(SageCoachesPayment sageCoachesPayment) async {
+
+    String url = ApplicationURLs.API_SAGE_PAYMENT_FOR_COACH;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sageCoachesPayment.toJson());
+
+    return response;
+  }
+
+  //Sage Accepted Connections List
+  Future<AcceptedConnectionsListResponse> getAcceptedConnectionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_ACCEPTED_CONNECTION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    AcceptedConnectionsListResponse acceptedConnectionsListResponse = AcceptedConnectionsListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return acceptedConnectionsListResponse;
+  }
+
+  //Sage Accepted Connections List
+  Future<AcceptedConnectionsListResponse> getPendingConnectionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_PENDING_CONNECTION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    AcceptedConnectionsListResponse acceptedConnectionsListResponse = AcceptedConnectionsListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return acceptedConnectionsListResponse;
+  }
+
+  //Tribe Pending permission List
+  Future<PendingPermissionSentRequestList> getPendingPermssionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_Tribe_PENDING_PERMISSION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    PendingPermissionSentRequestList pendingPermissionSentRequestList = PendingPermissionSentRequestList.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return pendingPermissionSentRequestList;
+  }
+
+  //Tribe Pending permission List
+  Future<PendingPermissionSentRequestList> getPendingPermssionRequestList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_Tribe_PENDING_PERMISSION_REQUEST_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    PendingPermissionSentRequestList pendingPermissionList = PendingPermissionSentRequestList.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return pendingPermissionList;
+  }
+
+  //Sage Sent Connections List
+  Future<AcceptedConnectionsListResponse> getSentConnectionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SENT_CONNECTION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    AcceptedConnectionsListResponse acceptedConnectionsListResponse = AcceptedConnectionsListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return acceptedConnectionsListResponse;
+  }
+
+
+  //Sage Pending Connections count
+  Future<dynamic> getPendingConnectionCount(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_PENDING_CONNECTION_COUNT;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    // AcceptedConnectionsListResponse acceptedConnectionsListResponse = AcceptedConnectionsListResponse.fromJson(response);
+    // // ignore: avoid_print
+    // print(response.toString());
+    return response;
+  }
+
+  //Sage Pending Connections count
+  Future<dynamic> addShareItemToConnectionList(SharedListItemAddRequest sharedListItemAddRequest) async {
+
+    String url = ApplicationURLs.API_SAGE_CHAT_ROOM_INSERT;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sharedListItemAddRequest.toJson());
+    return response;
+  }
+
+  //Sage Shared Item List Item Details
+  Future<SharedItemDetailsResponse> getShareItemDetail(SharedItemDetailsRequest sharedItemDetailsRequest) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_ITEM_DETAILS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sharedItemDetailsRequest.toJson());
+    SharedItemDetailsResponse sharedItemDetailsResponse = SharedItemDetailsResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharedItemDetailsResponse;
+  }
+
+  //Tribe Shared Item List
+  Future<SharePireResponseModel> getTribeShareItemDetailForPireNaq(TribeSharedRequestModel tribeSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_FULL_MODULE_DETAIL;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSharedRequestModel.toJson());
+    SharePireResponseModel sharePireResponseModel = SharePireResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharePireResponseModel;
+  }
+
+  //Tribe Shared Item List
+  Future<ShareColumnResponseModel> getTribeShareItemDetailForColumn(TribeSharedRequestModel tribeSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_FULL_MODULE_DETAIL;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSharedRequestModel.toJson());
+    ShareColumnResponseModel shareColumnResponseModel = ShareColumnResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return shareColumnResponseModel;
+  }
+
+  //Tribe Shared Item List
+  Future<dynamic> getTribeShareItemDetailForTrellis(TribeSharedRequestModel tribeSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_FULL_MODULE_DETAIL;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSharedRequestModel.toJson());
+    // ShareColumnResponseModel shareColumnResponseModel = ShareColumnResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
+  //Tribe Shared Item List
+  Future<ShareLadderResponseModel> getTribeShareItemDetailForLadder(TribeSharedRequestModel tribeSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_FULL_MODULE_DETAIL;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSharedRequestModel.toJson());
+    ShareLadderResponseModel shareLadderResponseModel = ShareLadderResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return shareLadderResponseModel;
+  }
+
+  Future<ColumnSharedItemDetail> getShareItemDetailForColumn(SharedItemDetailsRequest sharedItemDetailsRequest) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_ITEM_DETAILS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sharedItemDetailsRequest.toJson());
+    ColumnSharedItemDetail columnSharedItemDetail = ColumnSharedItemDetail.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return columnSharedItemDetail;
+  }
+
+  Future<LadderSingleItemDetailsResponseModel> getShareItemDetailForLadder(SharedItemDetailsRequest sharedItemDetailsRequest) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_ITEM_DETAILS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),sharedItemDetailsRequest.toJson());
+    LadderSingleItemDetailsResponseModel ladderSingleItemDetailsResponseModel = LadderSingleItemDetailsResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return ladderSingleItemDetailsResponseModel;
+  }
+
+  //Tribe Shared Single Item List
+  Future<SharePireResponseModel> getTribeShareSingleItemDetailForPireNaq(TribeSingleSharedRequestModel tribeSingleSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_SINGLE_TYPE_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSingleSharedRequestModel.toJson());
+    SharePireResponseModel sharePireResponseModel = SharePireResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharePireResponseModel;
+  }
+
+  //Tribe Shared Single Item List
+  Future<ShareColumnResponseModel> getTribeShareSingleItemDetailForColumn(TribeSingleSharedRequestModel tribeSingleSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_SINGLE_TYPE_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSingleSharedRequestModel.toJson());
+    ShareColumnResponseModel shareColumnResponseModel = ShareColumnResponseModel.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return shareColumnResponseModel;
+  }
+
+  //Tribe Shared Single Item List
+  Future<dynamic> getTribeShareSingleItemDetailForTrellis(TribeSingleSharedRequestModel tribeSingleSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_SINGLE_TYPE_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSingleSharedRequestModel.toJson());
+    // ShareColumnResponseModel shareColumnResponseModel = ShareColumnResponseModel.fromJson(response);
+    // ignore: avoid_print
+    // print(response.toString());
+    return response;
+  }
+
+  //Tribe Shared Single Item List
+  Future<ShareLadderResponseModel> getTribeShareSingleItemDetailForLadder(TribeSingleSharedRequestModel tribeSingleSharedRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_SINGLE_TYPE_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSingleSharedRequestModel.toJson());
+    ShareLadderResponseModel shareLadderResponseModel = ShareLadderResponseModel.fromJson(response);
+    // ignore: avoid_print
+    // print(response.toString());
+    return shareLadderResponseModel;
+  }
+
+  // Tribe Edit Connection
+  Future<dynamic> editConnectionRequest(EditConnectionRequestModel editConnectionRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_EDIT_MODULE_TYPE;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),editConnectionRequestModel.toJson());
+    // AcceptedConnectionItem acceptedConnectionItem = AcceptedConnectionItem.fromJson(response['data']);
+    return response;
+  }
+
+  // Tribe Edit Accept No Connection
+  Future<dynamic> editConnectionAcceptNoRequest(EditConnectionAcceptNoRequestModel editConnectionAcceptNoRequestModel) async {
+
+    String url = ApplicationURLs.API_TRIBE_EDIT_MODULE_ACCEPT_NO_TYPE;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),editConnectionAcceptNoRequestModel.toJson());
+    // AcceptedConnectionItem acceptedConnectionItem = AcceptedConnectionItem.fromJson(response['data']);
+    return response;
+  }
+
+  //Sage Shared Item List With me
+  Future<TribeModuleTypeListDetails> getShareModuleTypeList(TribeSharedModuleRequestModel tribeSharedModuleRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_ITEM_DETAILS;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),tribeSharedModuleRequestModel.toJson());
+    TribeModuleTypeListDetails tribeModuleTypeListDetails = TribeModuleTypeListDetails.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return tribeModuleTypeListDetails;
+  }
+
+  //Sage Shared Item List With me
+  Future<SharedListResponseForOther> getShareItemListWithMe(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_WITH_ME;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    SharedListResponseForOther sharedListResponse = SharedListResponseForOther.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharedListResponse;
+  }
+
+  //Sage Shared Item List With Other
+  Future<SharedListResponse> getShareItemListWithOther(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_WITH_OTHER;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    SharedListResponse sharedListResponse = SharedListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharedListResponse;
+  }
+
+  //Sage Shared Item List With Other
+  Future<SharedListResponse> getShareItemListWithCoach(SenderRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SHARED_WITH_COACH;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    SharedListResponse sharedListResponse = SharedListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return sharedListResponse;
+  }
+
+
+  //Sage Search User For Connection
+  Future<ConnectionUserListResponse1> getSearchConnectionUserList(SearchConnectionUserRequestModel searchConnectionUserRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_CONNECTION_SEARCH_USER;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),searchConnectionUserRequestModel.toJson());
+    ConnectionUserListResponse1 connectionUserListResponse1 = ConnectionUserListResponse1.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return connectionUserListResponse1;
+  }
+
+  //Sage Invite User For Connection
+  Future<AcceptedConnectionItem> getInviteConnectionRequest(InviteConnectionRequestModel inviteConnectionRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SEND_CONNECTION;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),inviteConnectionRequestModel.toJson());
+    AcceptedConnectionItem acceptedConnectionItem = AcceptedConnectionItem.fromJson(response['data']);
+    // ignore: avoid_print
+    print(response.toString());
+    return acceptedConnectionItem;
+  }
+
+  //Sage Invite User For Connection
+  Future<dynamic> getInviteConnectionRequestForEmail(InviteConnectionRequestModel inviteConnectionRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_SEND_CONNECTION;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),inviteConnectionRequestModel.toJson());
+    // AcceptedConnectionItem acceptedConnectionItem = AcceptedConnectionItem.fromJson(response['data']);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
+  //Sage Invite Notification List For User For Connection
+  Future<InvitedNotificationConnectionListResponse> getInviteNotificationConnectionList(LogoutRequestModel logoutRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_INVITED_CONNECTION_LIST;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),logoutRequestModel.toJson());
+    InvitedNotificationConnectionListResponse invitedNotificationConnectionListResponse = InvitedNotificationConnectionListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return invitedNotificationConnectionListResponse;
+  }
+
+  //Accept User For Connection
+  Future<dynamic> acceptRejectPendingPermission(PendingPermissionRequestModel pendingPermissionRequestModel) async {
+
+    String url = ApplicationURLs.API_ACCEPT_PENDING_PERMISSION;
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),pendingPermissionRequestModel.toJson());
+    print(response.toString());
+    return response;
+  }
+
+
+  //Accept User For Connection
+  Future<dynamic> acceptNotificationInvite(String senderId,String recieverId, String role) async {
+
+    String url = "${ApplicationURLs.API_SAGE_ACCEPT_CONNECTION}?approver_role=$role&requester_id=$senderId&approver_id=$recieverId";
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.get(Uri.parse(url),false);
+    // SearchConnectionListResponse searchConnectionListResponse = SearchConnectionListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
+  // Reject User For Connection
+  Future<dynamic> rejectNotificationInvite(String senderId,String recieverId, String role) async {
+
+    String url = "${ApplicationURLs.API_SAGE_REJECT_CONNECTION}?approver_role=$role&requester_id=$senderId&approver_id=$recieverId";
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.get(Uri.parse(url),false);
+    // SearchConnectionListResponse searchConnectionListResponse = SearchConnectionListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return response;
+  }
+
+  // Chat Messages List
+  Future<ChatMessageListResponse> chatMessagesList(ChatRequestModel chatRequestModel) async {
+
+    String url = ApplicationURLs.API_SAGE_CHAT_ROOM_READ;
+    // ignore: avoid_print
+    print(url);
+
+    final response =
+    await _handler.post(Uri.parse(url),chatRequestModel.toJson());
+    ChatMessageListResponse chatMessageListResponse = ChatMessageListResponse.fromJson(response);
+    // ignore: avoid_print
+    print(response.toString());
+    return chatMessageListResponse;
   }
 
 }

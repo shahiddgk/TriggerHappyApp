@@ -1,4 +1,6 @@
 
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_8.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
@@ -34,7 +36,6 @@ class Screen7 extends StatefulWidget {
 class _Screen7State extends State<Screen7> {
 
   List <String> selectedAnswer = [];
-  // ignore: unused_field
   final String _groupValue ="";
 
   String name = "";
@@ -51,6 +52,8 @@ class _Screen7State extends State<Screen7> {
   String timeZone = "";
   String userType = "";
   late bool isPhone;
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   _getUserData() async {
     setState(() {
@@ -58,6 +61,9 @@ class _Screen7State extends State<Screen7> {
     });
     //print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -130,7 +136,15 @@ class _Screen7State extends State<Screen7> {
     final double itemWidth = size.width / 2;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,false,"","",false) : AppBarWidget().appBar(context,false,false,name,id,false),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+            //         (Route<dynamic> route) => false
+            // );
+          }, true, true, true, id, false,true,badgeCount1,false,badgeCountShared),
       bottomNavigationBar: GestureDetector(
         // onTap: () {
         //   setAnswerText();
@@ -181,8 +195,8 @@ class _Screen7State extends State<Screen7> {
                             padding: const EdgeInsets.only(top: 1),
                             width: MediaQuery.of(context).size.width,
                             child: QuestionTextWidget(widget.questionListResponse[4].title,widget.questionListResponse[4].videoUrl,(){
-                              String urlQ7 = "https://www.youtube.com/watch?v=s59egGceFMA";
-                              String? videoId = YoutubePlayer.convertUrlToId(urlQ7);
+                              String urlQ1 = "https://www.youtube.com/watch?v=_kX9Cjez51Q&t=16s";
+                              String? videoId = YoutubePlayer.convertUrlToId(urlQ1);
                               YoutubePlayerController youtubePlayerController = YoutubePlayerController(
                                   initialVideoId: videoId!,
                                   flags: const YoutubePlayerFlags(
@@ -191,7 +205,7 @@ class _Screen7State extends State<Screen7> {
                                   )
 
                               );
-                              videoPopupDialog(context, "Introduction to question#7", youtubePlayerController);
+                              videoPopupDialog(context, "Introduction to question#1", youtubePlayerController);
                             },true)),
                       ),
                       // Align(

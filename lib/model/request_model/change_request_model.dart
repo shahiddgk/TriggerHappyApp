@@ -32,7 +32,7 @@ class ChangeProfileRequestModel {
 
   ChangeProfileRequestModel({this.name,this.email,this.userId,this.timeZone,this.deviceToken});
 
-  ChangeProfileRequestModel.fromJson(Map<String, dynamic> json) {
+  ChangeProfileRequestModel.fromJson(Map<String, String> json) {
     name = json['name'];
     email = json['email'];
     userId = json['user_id'];
@@ -40,13 +40,13 @@ class ChangeProfileRequestModel {
     deviceToken = json['device_token'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['name'] = name;
-    data['email'] = email;
-    data['user_id'] = userId;
-    data['time_zone'] = timeZone;
-    data['device_token'] = deviceToken;
+  Map<String, String> toJson() {
+    final Map<String, String> data = <String, String>{};
+    data['name'] = name!;
+    data['email'] = email!;
+    data['user_id'] = userId!;
+    data['time_zone'] = timeZone!;
+    data['device_token'] = deviceToken!;
     return data;
   }
 }

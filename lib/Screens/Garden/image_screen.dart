@@ -1,5 +1,5 @@
 
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_field
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
 import '../PireScreens/widgets/AppBar.dart';
-import '../PireScreens/widgets/PopMenuButton.dart';
 import '../utill/userConstants.dart';
 
 // ignore: must_be_immutable
@@ -36,6 +35,10 @@ class _ImageScreenState extends State<ImageScreen> {
   late String countNumber;
   String errorMessage = "";
   String url = "";
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
+  bool otherUserLoggedIn = false;
 
   @override
   void initState() {
@@ -51,12 +54,26 @@ class _ImageScreenState extends State<ImageScreen> {
    // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
-    // _getTreeGrowth();
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
+    if(otherUserLoggedIn) {
+
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+      // _getTreeGrowth();
+    }
     setState(() {
       _isUserDataLoading = false;
     });
@@ -154,13 +171,11 @@ class _ImageScreenState extends State<ImageScreen> {
   Widget build(BuildContext context) {
     getScreenDetails();
     return Scaffold(
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
-        centerTitle: true,
-        title: Text(name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
+      appBar: AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+          context,
+              () {
+                Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
       body: Container(
         child: _isLoading ? Container(
           color: Colors.white,

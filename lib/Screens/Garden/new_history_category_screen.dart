@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, must_be_immutable, unrelated_type_equality_checks
+// ignore_for_file: library_private_types_in_public_api, must_be_immutable, unrelated_type_equality_checks, avoid_print, depend_on_referenced_packages, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Garden/new_history_response_record_list_screen.dart';
@@ -10,10 +10,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/colors.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
+import '../../model/request_model/logout_user_request.dart';
+import '../../network/http_manager.dart';
 import '../PireScreens/widgets/AppBar.dart';
-import '../PireScreens/widgets/PopMenuButton.dart';
+import '../Widgets/show_notification_pop_up.dart';
 import '../utill/userConstants.dart';
 import 'image_screen.dart';
+import 'package:intl/intl.dart';
 
 class NewHistoryCategoryScreen extends StatefulWidget {
    NewHistoryCategoryScreen(this.responseData,this.dateHistory,{Key? key}) : super(key: key);
@@ -36,6 +40,10 @@ class _NewHistoryCategoryScreenState extends State<NewHistoryCategoryScreen> {
   String userType = "";
   late bool isPhone;
   late String score;
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
+  bool otherUserLoggedIn = false;
 
   @override
   void initState() {
@@ -51,14 +59,65 @@ class _NewHistoryCategoryScreenState extends State<NewHistoryCategoryScreen> {
     // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
-    score = sharedPreferences.getString("Score")!;
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
+    if(otherUserLoggedIn) {
+
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+      score = sharedPreferences.getString("Score")!;
+
+      _getSkippedReminderList();
+    }
     setState(() {
       _isUserDataLoading = false;
+    });
+  }
+
+  String? formattedDate;
+  String? formattedTime;
+  late SkippedReminderNotification skippedReminderNotification;
+
+  _getSkippedReminderList() {
+    setState(() {
+      // sharedPreferences.setString("Score", "");
+      // _isLoading = true;
+    });
+    HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        skippedReminderNotification = value;
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
+      print("SKIPPED REMINDER LIST");
+      print(value);
+
+      for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+        String title = "Hi $name. Did you....";
+        DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+        formattedDate = DateFormat('MM-dd-yy').format(DateTime.parse(skippedReminderNotification.result![i].createdAt.toString()));
+        formattedTime = DateFormat("hh:mm a").format(date);
+        showPopupDialogueForReminderGeneral(context,skippedReminderNotification.result![i].entityId.toString(),skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate!,formattedTime!);
+      }
+
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        // sharedPreferences.setString("Score", "");
+        // _isLoading = false;
+      });
     });
   }
 
@@ -80,13 +139,17 @@ class _NewHistoryCategoryScreenState extends State<NewHistoryCategoryScreen> {
     /*24 is for notification bar on Android*/
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: _isUserDataLoading ? AppBarWidget().appBar(context,false,true,"","",false) : AppBar(
-        centerTitle: true,
-        title: Text(name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
+      appBar: AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+          context,
+              () {
+                Navigator.of(context).pop();
+
+                // Navigator.pushAndRemoveUntil(
+                //     context,
+                //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+                //         (Route<dynamic> route) => false
+                // );
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
       body: Container(
         alignment: Alignment.topCenter,
         color: AppColors.backgroundColor,

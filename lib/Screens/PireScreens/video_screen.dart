@@ -1,11 +1,15 @@
+// ignore_for_file: unused_field
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/pire_listing_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/pire_subcategory_screen.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_3.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
+import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -14,7 +18,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/logo_widget_for_all_screens.dart';
-import '../../Widgets/option_mcq_widget.dart';
+import '../../model/reponse_model/pire_naq_list_response_model.dart';
+import '../../model/request_model/pire_naq_request_model.dart';
+import '../../network/http_manager.dart';
 import '../utill/userConstants.dart';
 import '../video_player.dart';
 
@@ -40,6 +46,17 @@ class _VideoScreenState extends State<VideoScreen> {
   String urlFirst = "https://youtu.be/dk5vgNpIWMM";
   String urlSecond = "https://youtu.be/jkyP7pjF70k";
   String urlThird = "https://youtu.be/GvlUXJoq90c";
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
+  bool otherUserLoggedIn = false;
+
+  bool _isLoading = true;
+
+  bool isError = false;
+  String errorText = "";
+
+  List<PireNaqListItem> pireNaqListItem = <PireNaqListItem>[];
 
 
   _getUserData() async {
@@ -49,13 +66,49 @@ class _VideoScreenState extends State<VideoScreen> {
     // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
+    if(otherUserLoggedIn) {
+
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+    }
+
+    _getPireList();
     setState(() {
       _isUserDataLoading = false;
+    });
+  }
+
+  _getPireList() {
+    setState(() {
+      _isLoading = true;
+    });
+    HTTPManager().pireNaqListResponse(PireNaqListRequestModel(userId: id,type: "pire")).then((value) {
+      setState(() {
+        pireNaqListItem = value.responses!;
+        _isLoading = false;
+        isError = false;
+      });
+    }).catchError((e) {
+      setState(() {
+        _isLoading = false;
+        isError = true;
+        errorText = e.toString();
+      });
     });
   }
 
@@ -82,11 +135,15 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<bool> _onWillPop() async {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) => const PireCategoryScreen()),
-            (Route<dynamic> route) => false
-    );
+    if(otherUserLoggedIn) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) =>const PireCategoryScreen()),
+              (Route<dynamic> route) => false
+      );
+    }
     // int count = 0;
     // Navigator.of(context).popUntil((_) => count++ >= 11);
     return true;
@@ -98,24 +155,35 @@ class _VideoScreenState extends State<VideoScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (BuildContext context) =>const PireCategoryScreen()),
-                      (Route<dynamic> route) => false
-              );
-            },
-          ),
-          title: Text(_isUserDataLoading ? "" : name),
-          actions:  [
-            PopMenuButton(false,false,id)
-          ],
-        ),
+        appBar: AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+            context,
+                () {
+                  if(otherUserLoggedIn) {
+                    Navigator.of(context).pop();
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) =>const PireCategoryScreen()),
+                            (Route<dynamic> route) => false
+                    );
+                  }
+            }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
+
+
+        // AppBar(
+        //   automaticallyImplyLeading: true,
+        //   centerTitle: true,
+        //   leading: IconButton(
+        //     icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
+        //     onPressed: () {
+        //
+        //     },
+        //   ),
+        //   title: Text(_isUserDataLoading ? "" : name),
+        //   actions:  [
+        //     PopMenuButton(false,false,id)
+        //   ],
+        // ),
         body: Container(
           color: AppColors.backgroundColor,
           width: MediaQuery.of(context).size.width,
@@ -125,7 +193,7 @@ class _VideoScreenState extends State<VideoScreen> {
               children: [
                 LogoScreen("PIRE"),
                   _isDataLoading ? const CircularProgressIndicator()
-                      : !isPhone ? Column(
+                      : _isLoading ? const Center(child: CircularProgressIndicator(),) : !isPhone ? Column(
                     children: [
                       Row(
                         children: [
@@ -517,20 +585,51 @@ class _VideoScreenState extends State<VideoScreen> {
                       const Divider(color: AppColors.textWhiteColor,),
                     ],
                   ),
-
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
-                  },
-                  child: Container(
-                    margin:const EdgeInsets.symmetric(horizontal: 3),
-                    child: OptionMcqAnswer(
-                        TextButton(onPressed: () {
+                if(!_isLoading)
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 15),
+                  height: 40,
+                  width: MediaQuery.of(context).size.width/2,
+                  child: ElevatedButton(
+                    onPressed: (){
+                      if(otherUserLoggedIn) {
+                        if(pireNaqListItem.isEmpty) {
+                          showToastMessage(context, "P.I.R.E Collection not created yet", false);
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const PireListScreen(isSageShare: false,)));
+                        }
+                      } else {
+                        if(pireNaqListItem.isEmpty) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
-                          }, child: const Text("Proceed",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const PireListScreen(isSageShare: false,)));
+                        }
+                      }
+                    },
+                    style:ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      backgroundColor: AppColors.primaryColor,
                     ),
+                    child: const Text("Proceed",style: TextStyle(color: AppColors.backgroundColor),),
                   ),
                 )
+
+                // GestureDetector(
+                //   onTap: () {
+                //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const PireListScreen()));
+                //   },
+                //   child: Container(
+                //     margin:const EdgeInsets.symmetric(horizontal: 3),
+                //     child: OptionMcqAnswer(
+                //         TextButton(onPressed: () {
+                //           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Screen3()));
+                //           }, child: const Text("Proceed",style: TextStyle(color: AppColors.textWhiteColor,fontSize: AppConstants.defaultFontSize)),)
+                //     ),
+                //   ),
+                // )
               ],
             ),
           ),

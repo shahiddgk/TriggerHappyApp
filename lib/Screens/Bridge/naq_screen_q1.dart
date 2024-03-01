@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print, unused_element
+// ignore_for_file: avoid_print, unused_element, unused_field
 
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:confetti/confetti.dart';
@@ -15,12 +14,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Widgets/colors.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../model/reponse_model/naq__response_model.dart';
-import '../PireScreens/widgets/PopMenuButton.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../Widgets/toast_message.dart';
 import '../utill/userConstants.dart';
 import 'bridge_category_screen.dart';
 import 'naq_prev_next_button.dart';
 import 'package:circular_progress_stack/circular_progress_stack.dart';
+
+import 'naq_scree_share_screen.dart';
+
 
 class NaqScreen1 extends StatefulWidget {
   const NaqScreen1({Key? key}) : super(key: key);
@@ -72,11 +75,13 @@ class _NaqScreen1State extends State<NaqScreen1> {
   List simpleSelectedItems = [];
   Map<String, dynamic> myAnswerMap= {};
   late bool isPhone;
+  int badgeCount1 = 0;
 
   String answer1 = "";
   String answer2 = "";
 
   String naqListLength = "";
+  int badgeCountShared = 0;
 
   late NaqModelClassResponse naqModelClassResponse;
   // List<naq_reponse_model> naqListResponse = <naq_reponse_model>[];
@@ -95,6 +100,16 @@ class _NaqScreen1State extends State<NaqScreen1> {
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
 
     return true;
+  }
+
+  Future<bool> _onWillPopForPop() async {
+    // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty || mentorDescriptionController.text.isNotEmpty || peerNameController.text.isNotEmpty || peerDescriptionController.text.isNotEmpty || menteeNameController.text.isNotEmpty || menteeDescriptionController.text.isNotEmpty) {
+    //   _setTrellisData();
+    // }
+
+    // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+
+    return false;
   }
 
   @override
@@ -208,6 +223,8 @@ class _NaqScreen1State extends State<NaqScreen1> {
     });
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    // badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    // badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -219,13 +236,48 @@ class _NaqScreen1State extends State<NaqScreen1> {
     userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
     userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
     userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
-
+    // _getSkippedReminderList();
     //_getTrellisReadData();
    // _getNAQResonseList(id);
     setState(() {
       _isUserDataLoading = false;
     });
   }
+
+  String? formattedDate;
+  String? formattedTime;
+  late SkippedReminderNotification skippedReminderNotification;
+
+  // _getSkippedReminderList() {
+  //   setState(() {
+  //     // sharedPreferences.setString("Score", "");
+  //     _isLoading = true;
+  //   });
+  //   HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+  //     setState(() {
+  //       skippedReminderNotification = value;
+  //       // sharedPreferences.setString("Score", "");
+  //       _isLoading = false;
+  //     });
+  //     print("SKIPPED REMINDER LIST");
+  //     print(value);
+  //
+  //     for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+  //       String title = "Hi $name. Did you....";
+  //       DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+  //       formattedDate = DateFormat('MM-dd-yy').format(date);
+  //       formattedTime = DateFormat("hh:mm a").format(date);
+  //       showPopupDialogueForReminderGeneral(context,skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate!,formattedTime!);
+  //     }
+  //
+  //   }).catchError((e) {
+  //     print(e);
+  //     setState(() {
+  //       // sharedPreferences.setString("Score", "");
+  //       _isLoading = false;
+  //     });
+  //   });
+  // }
 
   // _getNAQResonseList(String id) {
   //   setState(() {
@@ -269,23 +321,11 @@ class _NaqScreen1State extends State<NaqScreen1> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-            onPressed: () {
-              // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-              //   _setTrellisData();
-              // }
+        appBar: AppBarWidget().appBarGeneralButtons(
+            context,
+                () {
               Navigator.of(context).pop();
-            },
-          ),
-          title: Text(_isUserDataLoading ? "" : name),
-          actions:  [
-            PopMenuButton(false,true,id)
-          ],
-        ),
+            }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -466,7 +506,7 @@ class _NaqScreen1State extends State<NaqScreen1> {
                                             // print(answer2);
                                             },
                                           maxLines: 2,
-                                          maxLength: 100,
+                                          // maxLength: 100,
                                         ),
                                       )
                                   ),
@@ -800,7 +840,7 @@ class _NaqScreen1State extends State<NaqScreen1> {
         sharedPreferences.remove("answer1forQ1");
         sharedPreferences.remove("answer2forQ2");
         sharedPreferences.remove("answerIdList");
-        showScorePopUp(int.parse(value['total_score'].toString()));
+        showScorePopUp(int.parse(value['total_score'].toString()),value['response_id'].toString());
 
         if(allowEmail == "yes") {
           showToastMessage(context, value['message'].toString(), true);
@@ -918,14 +958,14 @@ class _NaqScreen1State extends State<NaqScreen1> {
       setMapForApi(answerTextList,questionIdList);
     }
   }
-  showScorePopUp(int score) {
+  showScorePopUp(int score,String naqId) {
 
     showDialog(
         barrierDismissible: false,
         context: context,
         builder: (context) {
           return WillPopScope(
-            onWillPop: _onWillPop,
+            onWillPop: _onWillPopForPop,
             child: SafeArea(
               child: AlertDialog(
                 shape: CircularAlertDialogShape(),
@@ -996,7 +1036,7 @@ class _NaqScreen1State extends State<NaqScreen1> {
                       ),
                       ElevatedButton(
                         onPressed: (){
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const BridgeCategoryScreen()));
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> NaqShareScreen(naqId)));
                       },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -1005,7 +1045,7 @@ class _NaqScreen1State extends State<NaqScreen1> {
                           minimumSize: Size(MediaQuery.of(context).size.width/2, 40), // Set the minimum width and height
                           padding: EdgeInsets.zero, // Remove any default padding
                         ),
-                        child:const Text("Back to Home Screen",style: TextStyle(color: AppColors.backgroundColor),),)
+                        child:const Text("Go to Share Screen",style: TextStyle(color: AppColors.backgroundColor),),)
                     ],
                   )
                 ),

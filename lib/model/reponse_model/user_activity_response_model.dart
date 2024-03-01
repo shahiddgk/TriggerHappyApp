@@ -38,22 +38,22 @@ class UserActivityResponse {
 
   UserActivityResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    message = json['message'] ?? " ";
-    userId = json['user_id'] ?? " ";
-    name = json['name'] ?? " ";
-    date = json['date'] ?? " ";
-    minNaqResponse = json['min_naq_response'] ?? " ";
-    maxNaqResponse = json['max_naq_response'] ?? " ";
-    level = json['level'] ?? " ";
-    delta = json['delta'] ?? " ";
-    countPire = json['count_pire'] ?? " ";
-    countTrellis = json['count_trellis'] ?? " ";
-    countColumn = json['count_column'] ?? " ";
-    countLadder = json['count_ladder'] ?? " ";
-    totalCount = json['total_count'] ?? " ";
-    sumActiveReminders = json['sum_active_reminders'] ?? " ";
-    sumYesReminders = json['sum_yes_reminders'] ?? " ";
-    sumReminders = json['sum_reminders'] ?? " ";
+    message = json['message'].toString();
+    userId = json['user_id'].toString();
+    name = json['name'].toString();
+    date = json['date'].toString();
+    minNaqResponse = json['min_naq_response'].toString();
+    maxNaqResponse = json['max_naq_response'].toString();
+    level = json['level'].toString();
+    delta = json['delta'].toString();
+    countPire = json['count_pire'].toString();
+    countTrellis = json['count_trellis'].toString();
+    countColumn = json['count_column'].toString();
+    countLadder = json['count_ladder'].toString();
+    totalCount = json['total_count'].toString();
+    sumActiveReminders = json['sum_active_reminders'].toString();
+    sumYesReminders = json['sum_yes_reminders'].toString();
+    sumReminders = json['sum_reminders'].toString();
   }
 
   Map<String, dynamic> toJson() {

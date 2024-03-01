@@ -45,7 +45,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 Container(
                     margin:const EdgeInsets.only(top: 10),
-                    child: EmailField(_emailController)),
+                    child: EmailField(_emailController,"Type your email")),
 
                 Container(
                     margin:const EdgeInsets.only(top: 10),

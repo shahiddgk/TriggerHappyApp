@@ -48,14 +48,14 @@ class StripeCancelRequestModel {
   }
 }
 
-class User {
+class User1 {
   int? userid;
   String? useremail;
   String? username;
 
-  User({this.userid, this.useremail, this.username});
+  User1({this.userid, this.useremail, this.username});
 
-  User.fromJson(Map<String, dynamic> json) {
+  User1.fromJson(Map<String, dynamic> json) {
     userid = json['userid'];
     useremail = json['useremail'];
     username = json['username'];

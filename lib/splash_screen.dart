@@ -1,8 +1,9 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print
+// ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/utill/UserState.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
@@ -17,7 +18,7 @@ import 'Screens/AuthScreens/login_screen.dart';
 import 'Screens/TreeScreen/tree_screen111.dart';
 import 'Screens/utill/userConstants.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatefulWidget  {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
@@ -27,9 +28,10 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
 
   late bool isUserLoggedIn = false;
+  bool _isLoading = false;
+  late String id;
   String introUrl = "https://youtu.be/O4fsrMcxRqc";
   late YoutubePlayerController youtubePlayerController;
-  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -102,8 +104,6 @@ class _SplashScreenState extends State<SplashScreen> {
                     setState(() {
                       UserStatePrefrence().clearAnswerText();
                     });
-                    // ignore: use_build_context_synchronously
-                    // Invoke the update now callback
                     onUpdateNowPressed(deviceType);
                     Navigator.pushAndRemoveUntil(
                         context,
@@ -144,7 +144,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String currentVersion = packageInfo.version;
-    // ignore: use_build_context_synchronously
     String? appStoreVersion = await getAppStoreVersion(context);
     // print("UPDATE FUNCTION CALLED");
     // print(appStoreVersion);
@@ -194,10 +193,33 @@ class _SplashScreenState extends State<SplashScreen> {
     setState(() {
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setBool(UserConstants().otherUserLoggedIn, false);
     setState(() {
       isUserLoggedIn = sharedPreferences.getBool(UserConstants().userLoggedIn)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
     });
 
+  }
+
+  Future<void> createDocumentIfNotExists(String collectionPath, String documentId) async {
+    // Get the document reference.
+    final documentReference = FirebaseFirestore.instance.collection(collectionPath).doc(documentId);
+
+    // Check if the document exists.
+    final documentSnapshot = await documentReference.get();
+    if (!documentSnapshot.exists) {
+      // Create a new document.
+      await documentReference.set({
+        'shared_response':0,
+        'con_request':0,
+        'module_requested':0,
+        'user_id':id
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TreeScreen1(true)));
   }
 
   @override
@@ -214,51 +236,67 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  LogoScreen(""),
-                 _isLoading ?const Center(child: CircularProgressIndicator(),)  : Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: YoutubePlayer(
-                        controller: youtubePlayerController,
-                        showVideoProgressIndicator: true,
-                        bottomActions: [
-                          CurrentPosition(),
-                          ProgressBar(
-                            isExpanded: true,
-                            colors: const ProgressBarColors(
-                                playedColor: AppColors.primaryColor,
-                                handleColor: AppColors.primaryColor
-                            ),
-                          )
-                        ],
+                  Column(
+                    children: [
+                      LogoScreen(""),
+                     _isLoading ?const Center(child: CircularProgressIndicator(),)  : Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: YoutubePlayer(
+                            controller: youtubePlayerController,
+                            showVideoProgressIndicator: true,
+                            bottomActions: [
+                              CurrentPosition(),
+                              ProgressBar(
+                                isExpanded: true,
+                                colors: const ProgressBarColors(
+                                    playedColor: AppColors.primaryColor,
+                                    handleColor: AppColors.primaryColor
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                      // _isLoading ? Container() : SizedBox(height: MediaQuery.of(context).size.height/2.5,),
+
+                    ],
                   ),
-                  _isLoading ? Container() : SizedBox(height: MediaQuery.of(context).size.height/2.5,),
-                  _isLoading ? Container() : ElevatedButton(onPressed: (){
+                  _isLoading ? Container() : Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: ElevatedButton(
+                      onPressed: (){
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        if(isUserLoggedIn) {
+                          createDocumentIfNotExists("connections",id);
+                        } else {
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder:
+                                  (context) =>
+                              const LoginPage()
+                              )
+                          );
+                        }
 
-                    isUserLoggedIn ? Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TreeScreen1(true)))
-                        : Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                        const LoginPage()
-                        )
-                    );
-
-                  },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        minimumSize: Size(MediaQuery.of(context).size.width/2, 40), // Set the minimum width and height
+                        padding: EdgeInsets.zero, // Remove any default padding
                       ),
-                      minimumSize: Size(MediaQuery.of(context).size.width/2, 40), // Set the minimum width and height
-                      padding: EdgeInsets.zero, // Remove any default padding
-                    ),
-                    child:const Text("Tap to Proceed"),)
+                      child:const Text("Tap to Proceed",style: TextStyle(color: AppColors.textWhiteColor),),),
+                  )
                 ],
               ),
             ),

@@ -2,12 +2,14 @@ class NewGardenHistoryResponseDetailsModel {
   int? status;
   String? message;
   List<Data>? data;
+  String? score;
 
-  NewGardenHistoryResponseDetailsModel({this.status, this.message, this.data});
+  NewGardenHistoryResponseDetailsModel({this.status, this.message, this.data,this.score});
 
   NewGardenHistoryResponseDetailsModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
+    score = json['score'];
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
@@ -20,6 +22,7 @@ class NewGardenHistoryResponseDetailsModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
     data['message'] = message;
+    data['score'] = score;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }

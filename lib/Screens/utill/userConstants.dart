@@ -16,6 +16,13 @@ class UserConstants {
   late String userGardenLevel = "userGardenLevel" ;
   late String userGardenName = "userGardenName" ;
 
+  late String userAccess = "userAccess" ;
+
+  late String otherUserLoggedIn = "otherUserLoggedIn";
+  late String otherUserName = "otherUserName" ;
+  late String otherUserEmail = "otherUserEmail" ;
+  late String otherUserId = "otherUserId" ;
+
 }
 
 class TrellisScreenStatus {

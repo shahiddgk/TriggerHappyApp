@@ -1,12 +1,11 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_field
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/question_state_prefrence.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/utills/constants.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_4.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
@@ -62,6 +61,9 @@ class _Screen3State extends State<Screen3> {
   String a2 = "";
   String a3 = "";
 
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
   late Map answerList;
 
   @override
@@ -93,6 +95,9 @@ class _Screen3State extends State<Screen3> {
     });
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -147,20 +152,11 @@ class _Screen3State extends State<Screen3> {
       onWillPop: _onWillPop,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-          appBar: AppBar(
-            automaticallyImplyLeading: true,
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-              onPressed: () {
+          appBar: AppBarWidget().appBarGeneralButtons(
+              context,
+                  () {
                 Navigator.of(context).pop();
-              },
-            ),
-            title: Text(_isUserDataLoading ? "" : name),
-            actions:  [
-              PopMenuButton(true,false,id)
-            ],
-          ),
+              }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
            // AppBarWidget().appBar(true,true,"","",true) : AppBarWidget().appBar(true,true,name,id,true),
           bottomNavigationBar: Visibility(
             visible: questionListResponseLength != 0,

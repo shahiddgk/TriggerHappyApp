@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "201811649952",
+    "project_id": "triggerhappy-a7406",
+    "storage_bucket": "triggerhappy-a7406.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201811649952:android:a13625ae4343aefa8c70c5",
+        "android_client_info": {
+          "package_name": "com.ratedsolution.flutter_quiz_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201811649952-sbv7ud1tm5qc7ef5f621u4kjib5gj026.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6G7opwaTePnaAbkzV34a_VyW8jjX_nOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "201811649952-sbv7ud1tm5qc7ef5f621u4kjib5gj026.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "201811649952-165mqjbus0uoeu4c52j2ustob579b4ta.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.TrueIncrease.TriggerHappy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,6 +6,7 @@ class TrellisLadderGoalsRequestModel {
   String? date;
   String? title;
   String? description;
+  String? insertFrom;
 
   TrellisLadderGoalsRequestModel({
     this.userId,
@@ -14,7 +15,8 @@ class TrellisLadderGoalsRequestModel {
     this.option2,
     this.date,
     this.title,
-    this.description
+    this.description,
+    this.insertFrom
   });
 
   TrellisLadderGoalsRequestModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class TrellisLadderGoalsRequestModel {
     date = json['date'];
     title = json['text'];
     description = json['description'];
+    insertFrom = json['insert_from'];
   }
 
   Map<String, dynamic> toJson() {
@@ -36,6 +39,7 @@ class TrellisLadderGoalsRequestModel {
     data['date'] = date;
     data['text'] = title;
     data['description'] = description;
+    data['insert_from'] = insertFrom;
     return data;
   }
 }
@@ -89,6 +93,7 @@ class TrellisLadderAchievementRequestModel {
   String? date;
   String? title;
   String? description;
+  String? insertFrom;
 
   TrellisLadderAchievementRequestModel({
     this.userId,
@@ -96,7 +101,8 @@ class TrellisLadderAchievementRequestModel {
     this.option1,
     this.date,
     this.title,
-    this.description
+    this.description,
+    this.insertFrom
   });
 
   TrellisLadderAchievementRequestModel.fromJson(Map<String, dynamic> json) {
@@ -106,6 +112,7 @@ class TrellisLadderAchievementRequestModel {
     date = json['date'];
     title = json['text'];
     description = json['description'];
+    insertFrom = json['insert_from'];
   }
 
   Map<String, dynamic> toJson() {
@@ -116,6 +123,7 @@ class TrellisLadderAchievementRequestModel {
     data['date'] = date;
     data['text'] = title;
     data['description'] = description;
+    data['insert_from'] = insertFrom;
     return data;
   }
 }

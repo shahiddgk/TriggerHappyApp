@@ -122,19 +122,19 @@ class UpdateReminderStatusRequestModel {
 class ReminderNotificationForSnoozeRequestModel {
 
   String? notificationId;
-  String? snooze;
+  String? updateId;
 
-  ReminderNotificationForSnoozeRequestModel({ this.notificationId,this.snooze});
+  ReminderNotificationForSnoozeRequestModel({ this.notificationId,this.updateId});
 
   ReminderNotificationForSnoozeRequestModel.fromJson(Map<String, dynamic> json) {
     notificationId = json['entity_id'];
-    snooze = json['snooze'];
+    updateId = json['update_id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['entity_id'] = notificationId;
-    data['snooze'] = snooze;
+    data['update_id'] = updateId;
     return data;
   }
 }

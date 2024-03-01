@@ -1,9 +1,7 @@
-// ignore_for_file: avoid_print, duplicate_ignore, unused_element
+// ignore_for_file: avoid_print, duplicate_ignore, unused_element, use_build_context_synchronously, unused_field
 
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Screens/Trellis/widgets/add_widgets_button.dart';
 import 'package:flutter_quiz_app/Screens/Trellis/widgets/bottom_sheet.dart';
 import 'package:flutter_quiz_app/Screens/Trellis/widgets/expansion_tile_widget.dart';
@@ -12,6 +10,7 @@ import 'package:flutter_quiz_app/Screens/Trellis/widgets/save_button_widgets.dar
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
+import 'package:flutter_quiz_app/Widgets/share_custom_alert_dialogue.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/model/request_model/read_trellis_model.dart';
 import 'package:flutter_quiz_app/model/request_model/trellis_data_saving_request.dart';
@@ -27,12 +26,15 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/colors.dart';
 import '../../Widgets/video_player_in_pop_up.dart';
+import '../../model/reponse_model/Sage/accepted_connections_list_response.dart';
 import '../../model/reponse_model/trellis_ladder_data_response.dart';
 import '../../model/reponse_model/trellis_new_tribe_insertion.dart';
 import '../../model/reponse_model/trellis_principle_data_response.dart';
 import '../../model/reponse_model/tribe_new_read_data_response.dart';
+import '../../model/request_model/trellis_ladder_request_model.dart';
 import '../../model/request_model/trellis_principles_request_model.dart';
 import '../Payment/payment_screen.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../dashboard_tiles.dart';
 import '../utill/userConstants.dart';
 
@@ -54,6 +56,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
   String timeZone = "";
   String userType = "";
 
+  bool otherUserLoggedIn = false;
+
   String selectedValueFromBottomSheet = "Mentor";
 
   String userPremium = "";
@@ -69,6 +73,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
   List <TrellisLadderDataModel> trellisLadderDataForGoals = [];
   List <TrellisLadderDataModel> trellisLadderDataForGoalsChallenges = [];
   List <TrellisLadderDataModel> trellisLadderDataForAchievements = [];
+
+  List <TrellisLadderDataModel> trellisLadderDataForGoalsFavourites = [];
+  List <TrellisLadderDataModel> trellisLadderDataForAchievementsFavourites = [];
+
   late List <dynamic> trellisIdentityNeedsData;
   List <dynamic> trellisNeedsData = [];
   List <dynamic> trellisIdentityData = [];
@@ -161,11 +169,15 @@ class _TrellisScreenState extends State<TrellisScreen> {
   // String urlFourth = "https://www.youtube.com/watch?v=4_9pRALrO1k";
   // String urlFifth = "https://www.youtube.com/watch?v=2PqaSGRZgI0";
 
+
   bool empoweredTruthOR = true;
   bool powerLessBelievedOR = true;
 
   bool empoweredTruthRhythms = true;
   bool powerLessBelievedRhythms = true;
+
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 //  late final YoutubePlayerController _playerController;
 
   // bool isNameExpanded = false;
@@ -187,17 +199,29 @@ class _TrellisScreenState extends State<TrellisScreen> {
     print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
-    userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
-    userPremiumType = sharedPreferences.getString(UserConstants().userPremiumType)!;
-    userCustomerId = sharedPreferences.getString(UserConstants().userCustomerId)!;
-    userSubscriptionId = sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
 
+    if(otherUserLoggedIn) {
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+      userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+      userPremiumType =
+      sharedPreferences.getString(UserConstants().userPremiumType)!;
+      userCustomerId =
+      sharedPreferences.getString(UserConstants().userCustomerId)!;
+      userSubscriptionId =
+      sharedPreferences.getString(UserConstants().userSubscriptionId)!;
+    }
     setState(() {
       _isUserDataLoading = false;
     });
@@ -309,6 +333,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
   @override
   void initState() {
+
     _getTrellisDetails();
     _getUserData();
     _getScreenStatus();
@@ -369,6 +394,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
         if(trellisLadderDataForGoalsAchievements[i].favourite == "yes") {
           if (trellisLadderDataForGoalsAchievements[i].type.toString() ==
               "goal") {
+            if(trellisLadderDataForGoalsAchievements[i].favourite!="no" ) {
+              trellisLadderDataForGoalsFavourites.add(
+                  trellisLadderDataForGoalsAchievements[i]);
+            }
             if (trellisLadderDataForGoalsAchievements[i].option2 ==
                 "Challenges") {
               trellisLadderDataForGoalsChallenges.add(
@@ -378,6 +407,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                   trellisLadderDataForGoalsAchievements[i]);
             }
           } else {
+            if(trellisLadderDataForGoalsAchievements[i].favourite!="no" ) {
+              trellisLadderDataForAchievementsFavourites.add(
+                  trellisLadderDataForGoalsAchievements[i]);
+            }
             trellisLadderDataForAchievements.add(
                 trellisLadderDataForGoalsAchievements[i]);
           }
@@ -607,7 +640,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
     //   _setTrellisData();
     // }
 
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
+    Navigator.of(context).pop();
 
     return true;
   }
@@ -617,27 +650,21 @@ class _TrellisScreenState extends State<TrellisScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-            onPressed: () {
-              // if(nameController.text.isNotEmpty || descriptionController.text.isNotEmpty || purposeController.text.isNotEmpty || mentorNameController.text.isNotEmpty  || peerNameController.text.isNotEmpty || menteeNameController.text.isNotEmpty ) {
-              //   _setTrellisData();
-              // }
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-            },
-          ),
-          title: Text(_isUserDataLoading ? "" : name),
-          actions:  [
-            PopMenuButton(false,false,id)
-          ],
-        ),
+        appBar: AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+            context,
+                () {
+                  Navigator.of(context).pop();
+
+              // Navigator.pushAndRemoveUntil(
+              //     context,
+              //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+              //         (Route<dynamic> route) => false
+              // );
+            }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
         body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: _isLoading ? const Center(child: CircularProgressIndicator(),)  : Stack(
-            alignment: Alignment.center,
+            alignment: Alignment.topCenter,
             children: [
               SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -652,6 +679,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
                         children: [
                           LogoScreen("Trellis"),
                             const SizedBox(width: 20,),
+                          // if(!otherUserLoggedIn)
+                          // IconButton(onPressed: () {
+                          //   showDialog(
+                          //   barrierDismissible: false,
+                          //   context: context,
+                          //   builder: (context) {
+                          //     return const ShareCustomAlertDialogue(responseId: "", isModule: true, responseType: "trellis");
+                          //   }
+                          //   );
+                          //   // showThumbsUpDialogueForTrellis(context, _animationController, id,'trellis',selectedUserAcceptedConnectionsListResponse, searchAcceptedConnectionsListResponse, acceptedConnectionsListResponse);
+                          // }, icon: const Icon(Icons.share,color: AppColors.primaryColor,)),
+                          const SizedBox(width: 5,),
                           IconButton(onPressed: (){
                             String? videoId = YoutubePlayer.convertUrlToId(titleTrellis);
                             YoutubePlayerController playerController = YoutubePlayerController(
@@ -667,6 +706,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           }, icon: const Icon(Icons.ondemand_video,size:30,color: AppColors.infoIconColor,))
                         ],
                     ),
+
+
 
                     const SizedBox(height: 5,),
 
@@ -708,7 +749,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       //     _setTrellisData ();
                                       //   }
                                       //   },
-                                        child: NameField(nameController,"Name",1,70,false))),
+                                        child: NameField(nameController,"Name",1,70,false,otherUserLoggedIn))),
                                 Container(
                                     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
                                     child: Focus(
@@ -718,8 +759,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       //     _setTrellisData ();
                                       //   }
                                       // },
-                                        child: NameField(descriptionController,"Description",1,70,false))),
+                                        child: NameField(descriptionController,"Description",1,70,false,otherUserLoggedIn))),
+                                if(!otherUserLoggedIn)
                                 SaveButtonWidgets( (){
+                                  FocusManager.instance.primaryFocus?.unfocus();
                                   _setTrellisData();
                                 }),
                               ],
@@ -766,8 +809,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       //     _setTrellisData ();
                                       //   }
                                       // },
-                                        child: NameField(purposeController,"Purpose",4,100,false))),
+                                        child: NameField(purposeController,"Purpose",4,0,false,otherUserLoggedIn))),
+                                if(!otherUserLoggedIn)
                                 SaveButtonWidgets( (){
+                                  FocusManager.instance.primaryFocus?.unfocus();
                                   _setTrellisData();
                                 }),
                               ],
@@ -808,12 +853,97 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
+                                if(!otherUserLoggedIn)
+                                Align(alignment: Alignment.topRight,
+                                  child: AddButton(userPremium == "no" ? trellisLadderDataForAchievements.length>=isLadderAchievements : false,
+                                          () async {
+                                            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                            sharedPreferences.setBool("IsGoals", true);
+                                            print(userPremium);
+
+                                            setState(() {
+                                              initialValueForType = "physical";
+                                              initialValueForMType = "Memories";
+                                              initialValueForGoals = "Goals";
+                                              initialValueForMGoals = "Goals";
+                                              titleForGController.clear();
+                                              descriptionForGController.clear();
+                                              dateForGController.clear();
+                                              dateForGController.text = "";
+                                              descriptionForGController.text = "";
+                                              titleForGController.text = "";
+                                            });
+                                            ladderBottomSheet(false,context,true,"Ladder","Goals/Challenges",
+                                                initialValueForType,itemsForType,
+                                                initialValueForGoals,itemsForGoals,
+                                                    () async {
+                                                  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                                  bool isGoalsValue = sharedPreferences.getBool("IsGoals")!;
+
+                                                  if(isGoalsValue) {
+                                                    if(userPremium == "no" && trellisLadderDataForGoals.length>=isLadderGoals) {
+                                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+                                                    } else {
+                                                      print("Goals Saving");
+                                                      if(initialValueForType == "Memories" || initialValueForType == "Achievements")
+                                                      {
+                                                        setState(() {
+                                                          initialValueForType = "physical";
+                                                        });
+                                                      }
+                                                      if(initialValueForGoals == "Challenges") {
+
+                                                        _setLadderGoalsData();
+                                                      } else {
+                                                        if(dateForGController.text.isNotEmpty) {
+                                                          _setLadderGoalsData();
+                                                        } else {
+                                                          showToastMessage(context, "Please select a date", false);
+                                                        }
+                                                      }
+
+                                                    }
+                                                  } else {
+                                                    if(userPremium == "no" && trellisLadderDataForAchievements.length>=isLadderAchievements) {
+                                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+                                                    } else {
+                                                      print("Memories saving");
+                                                      if(initialValueForType == "physical" || initialValueForType == "Emotional" || initialValueForType =="Relational" || initialValueForType =="Work" || initialValueForType =="Financial" || initialValueForType =="Spiritual")
+                                                      {
+                                                        setState(() {
+                                                          initialValueForType = "Memories";
+                                                        });
+                                                      }
+                                                      _setLadderMemoriesData();
+                                                    }
+                                                  }
+                                                },
+                                                    (value) {
+                                                  print(value);
+                                                  setState(() {
+                                                    initialValueForGoals = value;
+                                                  });
+                                                },
+                                                    (value) {
+                                                  print(value);
+                                                  setState(() {
+                                                    initialValueForType = value;
+                                                  });
+                                                },
+                                                dateForGController,
+                                                titleForGController,
+                                                descriptionForGController
+                                            );
+                                      }
+                                  ),
+                                ),
                                 Container(
                                   margin:const EdgeInsets.symmetric(horizontal: 10),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
+
                                       Row(
                                         children: [
                                           const Text("Goals/Challenges",style: TextStyle(
@@ -895,17 +1025,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   ),
                                 ),
 
-                                trellisLadderDataForGoals.isEmpty ? const Text("") : Container(
+                                trellisLadderDataForGoalsFavourites.isEmpty ? const Text("") : Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 10),
                                   child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: trellisLadderDataForGoals.length,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: trellisLadderDataForGoalsFavourites.length >= 3 ? 3 : trellisLadderDataForGoalsFavourites.length ,
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
                                           onTap: () {
                                             showDialog(
                                               context: context,
-                                              builder: (BuildContext context) => _buildPopupDialog(context,"Goals/Challenges",trellisLadderDataForGoals[index],false),
+                                              builder: (BuildContext context) => _buildPopupDialog(context,"Goals/Challenges",trellisLadderDataForGoalsFavourites[index],false),
                                             );
                                           },
                                           child: Container(
@@ -920,13 +1051,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text("${trellisLadderDataForGoals[index].option1} | ${trellisLadderDataForGoals[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
-
+                                                      Text("${trellisLadderDataForGoalsFavourites[index].option1} | ${trellisLadderDataForGoalsFavourites[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                                                      if(!otherUserLoggedIn)
                                                       Row(
                                                         children: [
-                                                      trellisLadderDataForGoals[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                          trellisLadderDataForGoalsFavourites[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                      showDeletePopup( "goal",trellisLadderDataForGoals[index].id.toString(),index,trellisLadderDataForGoals[index].option2.toString());
+                                                      showDeletePopup( "goal",trellisLadderDataForGoalsFavourites[index].id.toString(),index,trellisLadderDataForGoalsFavourites[index].option2.toString());
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
                                                         ],
                                                       )
@@ -940,7 +1071,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   //   ),),
                                                   Align(
                                                       alignment: Alignment.topLeft,
-                                                      child:  Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForGoals[index].date.toString()))} | ${trellisLadderDataForGoals[index].text} | ${trellisLadderDataForGoals[index].description}"))
+                                                      child:  Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForGoalsFavourites[index].date.toString()))} | ${trellisLadderDataForGoalsFavourites[index].text} | ${trellisLadderDataForGoalsFavourites[index].description}"))
                                                 ],
                                               )),
                                         );
@@ -948,59 +1079,61 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   ),
                                 ),
                               //  const Divider(),
-                                trellisLadderDataForGoalsChallenges.isEmpty ? const Text("") : Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: trellisLadderDataForGoalsChallenges.length >= 3 ? 3 : trellisLadderDataForGoalsChallenges.length ,
-                                      itemBuilder:(context,index) {
-                                        return GestureDetector(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) => _buildPopupDialog(context,"Goals/Challenges",trellisLadderDataForGoalsChallenges[index],false),
-                                            );
-                                          },
-                                          child: Container(
-                                              margin:const EdgeInsets.symmetric(vertical: 5),
-                                              decoration: BoxDecoration(
-                                                  color: AppColors.backgroundColor,
-                                                  borderRadius: BorderRadius.circular(10)
-                                              ),
-                                              padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text("${trellisLadderDataForGoalsChallenges[index].option1} | ${trellisLadderDataForGoalsChallenges[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
-
-                                                      Row(
-                                                        children: [
-                                                          trellisLadderDataForGoalsChallenges[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
-                                                          IconButton(onPressed: () {
-                                                            _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index].id.toString(),index,trellisLadderDataForGoalsChallenges[index].option2.toString());
-                                                          }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
-                                                        ],
-                                                      )
-
-
-                                                    ],
-                                                  ),
-                                                  // Align(alignment: Alignment.topRight,
-                                                  //   child: IconButton(
-                                                  //     onPressed: () {},
-                                                  //     icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                  //   ),),
-                                                  Align(
-                                                      alignment: Alignment.topLeft,
-                                                      child:  Text(" ${trellisLadderDataForGoalsChallenges[index].text} "))
-                                                ],
-                                              )),
-                                        );
-                                      }
-                                  ),
-                                ),
+                              //   trellisLadderDataForGoalsFavourites.isEmpty ? const Text("") : Container(
+                              //     margin: const EdgeInsets.symmetric(horizontal: 10),
+                              //     child: ListView.builder(
+                              //         shrinkWrap: true,
+                              //         physics: const NeverScrollableScrollPhysics(),
+                              //         itemCount: trellisLadderDataForGoalsFavourites.length >= 3 ? 3 : trellisLadderDataForGoalsFavourites.length ,
+                              //         itemBuilder:(context,index) {
+                              //           return GestureDetector(
+                              //             onTap: () {
+                              //               showDialog(
+                              //                 context: context,
+                              //                 builder: (BuildContext context) => _buildPopupDialog(context,"Goals/Challenges",trellisLadderDataForGoalsChallenges[index],false),
+                              //               );
+                              //             },
+                              //             child: Container(
+                              //                 margin:const EdgeInsets.symmetric(vertical: 5),
+                              //                 decoration: BoxDecoration(
+                              //                     color: AppColors.backgroundColor,
+                              //                     borderRadius: BorderRadius.circular(10)
+                              //                 ),
+                              //                 padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
+                              //                 child: Column(
+                              //                   children: [
+                              //                     Row(
+                              //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //                       children: [
+                              //                         Text("${trellisLadderDataForGoalsChallenges[index].option1} | ${trellisLadderDataForGoalsChallenges[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                              //
+                              //                         Row(
+                              //                           children: [
+                              //                             trellisLadderDataForGoalsChallenges[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                              //                             IconButton(onPressed: () {
+                              //                               // _deleteRecord("goal", trellisLadderDataForGoalsChallenges[index].id.toString(),index,trellisLadderDataForGoalsChallenges[index].option2.toString());
+                              //                               showDeletePopup("goal", trellisLadderDataForGoalsChallenges[index].id.toString(),index,trellisLadderDataForGoalsChallenges[index].option2.toString());
+                              //                             }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+                              //                           ],
+                              //                         )
+                              //
+                              //
+                              //                       ],
+                              //                     ),
+                              //                     // Align(alignment: Alignment.topRight,
+                              //                     //   child: IconButton(
+                              //                     //     onPressed: () {},
+                              //                     //     icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                              //                     //   ),),
+                              //                     Align(
+                              //                         alignment: Alignment.topLeft,
+                              //                         child:  Text(" ${trellisLadderDataForGoalsChallenges[index].text} "))
+                              //                   ],
+                              //                 )),
+                              //           );
+                              //         }
+                              //     ),
+                              //   ),
 
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 10,),
@@ -1025,83 +1158,22 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                         ],
                                       ),
 
-                                      // AddButton(userPremium == "no" ? trellisLadderDataForAchievements.length>=isLadderAchievements : false,
-                                      //     () {
-                                      //       ladderBottomSheet(context,false,"Ladder","Memories/Achievements",
-                                      //           initialValueForMType,itemsForMType,
-                                      //           initialValueForMGoals,itemsForGoals,
-                                      //               (){_setLadderMemoriesData();},
-                                      //               (value) {
-                                      //             setState(() {
-                                      //               initialValueForMGoals = value;
-                                      //             });
-                                      //           },
-                                      //               (value) {
-                                      //             setState(() {
-                                      //               initialValueForMType = value;
-                                      //             });
-                                      //           },
-                                      //           dateForMController,
-                                      //           titleForMController,
-                                      //           descriptionForMController
-                                      //       //     <Widget>[
-                                      //       //
-                                      //       //   DropDownField(initialValueForMType, itemsForMType.map((item) {
-                                      //       //     return  DropdownMenuItem(
-                                      //       //       value: item.toString(),
-                                      //       //       child: Text(item.toString()),
-                                      //       //     );
-                                      //       //   }).toList(), (value) {
-                                      //       //     setState(() {
-                                      //       //       initialValueForMType = value;
-                                      //       //     });
-                                      //       //   }),
-                                      //       //
-                                      //       //   DropDownField(initialValueForMGoals, itemsForGoals.map((item) {
-                                      //       //     return  DropdownMenuItem(
-                                      //       //       value: item.toString(),
-                                      //       //       child: Text(item.toString()),
-                                      //       //     );
-                                      //       //   }).toList(), (value) {
-                                      //       //     setState(() {
-                                      //       //       initialValueForMGoals = value;
-                                      //       //     });
-                                      //       //   }),
-                                      //       //
-                                      //       //   Visibility(
-                                      //       //       visible: initialValueForMGoals != "Challenges",
-                                      //       //       child: DatePickerField(dateForMController,"Select date",false)),
-                                      //       //
-                                      //       //   Container(
-                                      //       //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                      //       //       child: NameField(titleForMController,"title",1,70,true)),
-                                      //       //   Container(
-                                      //       //       margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                      //       //       child: NameField(descriptionForMController,"description",4,70,true)),
-                                      //       //   SaveButtonWidgets( (){
-                                      //       //     _setLadderMemoriesData();
-                                      //       //   }),
-                                      //       //
-                                      //       // ]
-                                      //       );
-                                      //     }
-                                      // ),
-
                                     ],
                                   ),
                                 ),
 
-                                trellisLadderDataForAchievements.isEmpty ?const Text("") : Container(
+                                trellisLadderDataForAchievementsFavourites.isEmpty ?const Text("") : Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
                                   child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: trellisLadderDataForAchievements.length >=3 ? 3 : trellisLadderDataForAchievements.length,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: trellisLadderDataForAchievementsFavourites.length >= 3 ? 3 : trellisLadderDataForAchievementsFavourites.length,
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
                                           onTap: () {
                                             showDialog(
                                               context: context,
-                                              builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements",trellisLadderDataForAchievements[index],true),
+                                              builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements",trellisLadderDataForAchievementsFavourites[index],true),
                                             );
                                           },
                                           child: Container(
@@ -1116,13 +1188,14 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text("${trellisLadderDataForAchievements[index].option1} | ${trellisLadderDataForAchievements[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+                                                      Text("${trellisLadderDataForAchievementsFavourites[index].option1}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
 
+                                                      if(!otherUserLoggedIn)
                                                       Row(
                                                         children: [
-                                                      trellisLadderDataForAchievements[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                                          trellisLadderDataForAchievementsFavourites[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
                                                       IconButton(onPressed: () {
-                                                        showDeletePopup( "achievements",trellisLadderDataForAchievements[index].id.toString(),index,"");
+                                                        showDeletePopup( "achievements",trellisLadderDataForAchievementsFavourites[index].id.toString(),index,"");
                                                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
                                                         ],
                                                       )
@@ -1130,7 +1203,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                   ),
                                                   Align(
                                                       alignment: Alignment.topLeft,
-                                                      child: Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForAchievements[index].date.toString()))} | ${trellisLadderDataForAchievements[index].text}"))
+                                                      child: Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForAchievementsFavourites[index].date.toString()))} | ${trellisLadderDataForAchievementsFavourites[index].text}"))
                                                 ],
                                               )),
                                         );
@@ -1166,6 +1239,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                      // bottomSheet(context,"Organizing Principles","Two organizing principles shape us: Powerless Beliefs and Empowered Truths. Powerless Beliefs are negative, unconsciously formed around fear or shame in our formative years, such as I don't have what it takes. Empowered Truths are core, empowering principles to organize our lives around, such as There is goodness in me, for me, and through me. Shade out powerless beliefs.","");
                     },
                         <Widget>[
+                          if(!otherUserLoggedIn)
                           AddButton(userPremium == "no" ? trellisPrinciplesData.length>=isOPLength : false,() {
                             needsBottomSheet(context, "Organizing Principles", <Widget>[
                               Column(
@@ -1218,7 +1292,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //    }
                                             //   },
-                                              child: NameField(empoweredTruthOPController,"empowered truth",1,70,true)))),
+                                              child: NameField(empoweredTruthOPController,"empowered truth",1,70,true,otherUserLoggedIn)))),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -1267,8 +1341,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(powerlessOpController,"powerless Belief",1,70,true)))),
+                                              child: NameField(powerlessOpController,"powerless Belief",1,70,true,otherUserLoggedIn)))),
+                                  if(!otherUserLoggedIn)
                                   SaveButtonWidgets( (){
+                                    FocusManager.instance.primaryFocus?.unfocus();
                                     _setTrellisOPData();
                                   }),
                                 ],
@@ -1282,6 +1358,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                 alignment: Alignment.topLeft,
                                 child: Text("")) : ListView.builder(
                                 shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: trellisPrinciplesData.length,
                                 itemBuilder:(context,index) {
                                   return GestureDetector(
@@ -1321,11 +1398,134 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                         )),
                                                   ],
                                                 ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    _deleteRecord("principles", trellisPrinciplesData[index].id.toString(),index,"");
-                                                  },
-                                                  icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                if(!otherUserLoggedIn)
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    IconButton(
+                                                        onPressed: () {
+                                                      setState(() {
+                                                        powerlessOpController.text = trellisPrinciplesData[index].powerlessBelieves! ;
+                                                        empoweredTruthOPController.text = trellisPrinciplesData[index].empTruths!;
+                                                      });
+                                                      needsBottomSheet(context, "Organizing Principles", <Widget>[
+                                                        Column(
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Container(
+                                                                    margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Image.asset("assets/arm.png"),
+                                                                        const SizedBox(
+                                                                          width: 5,
+                                                                        ),
+                                                                        const  Text("Empowered truths",style: TextStyle(color: AppColors.primaryColor),)
+                                                                      ],
+                                                                    )),
+                                                                // GestureDetector(
+                                                                //   onTap: () {
+                                                                //     setState(() {
+                                                                //       empoweredTruthOR = !empoweredTruthOR;
+                                                                //     });
+                                                                //   },
+                                                                //   child: Container(
+                                                                //       margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                //       child: Row(
+                                                                //         children: [
+                                                                //           Image.asset(empoweredTruthOR ? "assets/close_eye.png" : "assets/open_eye.png"),
+                                                                //           const SizedBox(
+                                                                //             width: 5,
+                                                                //           ),
+                                                                //         //  Text(empoweredTruthOR ? "Hide" : "Show",style: const TextStyle(color: AppColors.primaryColor),)
+                                                                //         ],
+                                                                //       )
+                                                                //   ),
+                                                                // )
+
+                                                              ],
+                                                            ),
+
+                                                            Container(
+                                                                margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
+                                                                child: Visibility(
+                                                                    visible: empoweredTruthOR,
+                                                                    child: Focus(
+                                                                      // onFocusChange: (hasFocus) {
+                                                                      //   print('empowered truths OP:  $hasFocus');
+                                                                      //   if(!hasFocus && empoweredTruthOPController.text.isNotEmpty) {
+                                                                      //     _setTrellisData ();
+                                                                      //    }
+                                                                      //   },
+                                                                        child: NameField(empoweredTruthOPController,"empowered truth",1,70,true,otherUserLoggedIn)))),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+
+                                                                Container(
+                                                                    margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                    child: Row(
+
+                                                                      children: [
+                                                                        Image.asset("assets/emoji.png"),
+                                                                        const SizedBox(
+                                                                          width: 5,
+                                                                        ),
+                                                                        const  Text("Powerless Belief",style: TextStyle(color: AppColors.primaryColor),)
+                                                                      ],
+                                                                    )),
+                                                                // GestureDetector(
+                                                                //   onTap: () {
+                                                                //     setState(() {
+                                                                //       powerLessBelievedOR = !powerLessBelievedOR;
+                                                                //     });
+                                                                //   },
+                                                                //   child: Container(
+                                                                //       margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                //       child: Row(
+                                                                //         children: [
+                                                                //           Image.asset(powerLessBelievedOR ? "assets/close_eye.png" : "assets/open_eye.png"),
+                                                                //           const SizedBox(
+                                                                //             width: 5,
+                                                                //           ),
+                                                                //           Text(powerLessBelievedOR ? "Hide" : "Show",style: const TextStyle(color: AppColors.primaryColor),)
+                                                                //         ],
+                                                                //       )
+                                                                //   ),
+                                                                // ),
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                                margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
+                                                                child: Visibility(
+                                                                    visible: powerLessBelievedOR,
+                                                                    child: Focus(
+                                                                      // onFocusChange: (hasFocus) {
+                                                                      //   print('PowerLess believes OP Field:  $hasFocus');
+                                                                      //   if(!hasFocus && powerlessOpController.text.isNotEmpty) {
+                                                                      //     _setTrellisData ();
+                                                                      //   }
+                                                                      // },
+                                                                        child: NameField(powerlessOpController,"powerless Belief",1,70,true,otherUserLoggedIn)))),
+                                                            SaveButtonWidgets( (){
+                                                              FocusManager.instance.primaryFocus?.unfocus();
+                                                              _updateTrellisOPData(index,trellisPrinciplesData[index].id!);
+                                                            }),
+                                                          ],
+                                                        ),
+                                                      ]);
+                                                    }, icon: const Icon(Icons.edit,color: AppColors.primaryColor,)),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        // _deleteRecord("principles", trellisPrinciplesData[index].id.toString(),index,"");
+                                                        showDeletePopup("principles", trellisPrinciplesData[index].id.toString(),index,"");
+                                                      },
+                                                      icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                    )
+                                                  ],
                                                 )
                                               ],
                                             ),
@@ -1571,7 +1771,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                     //  bottomSheet(context,"Rhythms","Rhythms are either principles or habitual behaviors that either increase or decrease our well-being. Empowered Rhythms bring life-giving results while Powerless Rhythms decrease overall flourishing. Example: Empowering Rhythm is waking up early to avoid rushing, while a Powerless Rhythm is talking over people.","");
                     },
                         <Widget>[
-
+                          if(!otherUserLoggedIn)
                           AddButton(userPremium == "no" ? trellisRhythmsData.length>= isRhythmsLength: false ,() {
                             needsBottomSheet(context, "Rhythms", <Widget>[
                               Column(
@@ -1624,7 +1824,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(empoweredTruthRhController,"empowered rhythms",1,70,true)))),
+                                              child: NameField(empoweredTruthRhController,"empowered rhythms",1,70,true,otherUserLoggedIn)))),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -1673,9 +1873,10 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             //     _setTrellisData ();
                                             //   }
                                             // },
-                                              child: NameField(powerlessRhController,"powerless habits",1,70,true)))),
-
+                                              child: NameField(powerlessRhController,"powerless habits",1,70,true,otherUserLoggedIn)))),
+                                  if(!otherUserLoggedIn)
                                   SaveButtonWidgets( (){
+                                    FocusManager.instance.primaryFocus?.unfocus();
                                     _setTrellisRhythmsData();
                                   }),
 
@@ -1689,6 +1890,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                 alignment: Alignment.topLeft,
                                 child: Text("")) : ListView.builder(
                                 shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: trellisRhythmsData.length,
                                 itemBuilder:(context,index) {
                                   return GestureDetector(
@@ -1727,12 +1929,138 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                         )),
                                                   ],
                                                 ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    _deleteRecord("rhythms", trellisRhythmsData[index].id.toString(),index,"");
-                                                  },
-                                                  icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                ),
+                                                if(!otherUserLoggedIn)
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    IconButton(onPressed: () {
+                                                      setState(() {
+                                                        powerlessRhController.text = trellisRhythmsData[index].powerlessBelieves! ;
+                                                        empoweredTruthRhController.text = trellisRhythmsData[index].empTruths!;
+                                                      });
+
+                                                      needsBottomSheet(context, "Rhythms", <Widget>[
+                                                        Column(
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Container(
+                                                                    margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Image.asset("assets/arm.png"),
+                                                                        const SizedBox(
+                                                                          width: 5,
+                                                                        ),
+                                                                        const  Text("Empowered Rhythms",style: TextStyle(color: AppColors.primaryColor),)
+                                                                      ],
+                                                                    )),
+                                                                // GestureDetector(
+                                                                //   onTap: () {
+                                                                //     setState(() {
+                                                                //       empoweredTruthRhythms = !empoweredTruthRhythms;
+                                                                //     });
+                                                                //   },
+                                                                //   child: Container(
+                                                                //       margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                //       child: Row(
+                                                                //         children: [
+                                                                //           Image.asset(empoweredTruthRhythms ? "assets/close_eye.png" : "assets/open_eye.png"),
+                                                                //           const SizedBox(
+                                                                //             width: 5,
+                                                                //           ),
+                                                                //           Text(empoweredTruthRhythms ? "Hide" : "Show",style:const TextStyle(color: AppColors.primaryColor),)
+                                                                //         ],
+                                                                //       )
+                                                                //   ),
+                                                                // )
+
+                                                              ],
+                                                            ),
+
+                                                            Container(
+                                                                margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
+                                                                child: Visibility(
+                                                                    visible: empoweredTruthRhythms,
+                                                                    child: Focus(
+                                                                      // onFocusChange: (hasFocus) {
+                                                                      //   print('Empowered Truth Rh Field:  $hasFocus');
+                                                                      //   if(!hasFocus && empoweredTruthRhController.text.isNotEmpty) {
+                                                                      //     _setTrellisData ();
+                                                                      //   }
+                                                                      // },
+                                                                        child: NameField(empoweredTruthRhController,"empowered rhythms",1,70,true,otherUserLoggedIn)))),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+
+                                                                Container(
+                                                                    margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                    child: Row(
+
+                                                                      children: [
+                                                                        Image.asset("assets/emoji.png"),
+                                                                        const SizedBox(
+                                                                          width: 5,
+                                                                        ),
+                                                                        const  Text("Powerless habits",style: TextStyle(color: AppColors.primaryColor),)
+                                                                      ],
+                                                                    )),
+                                                                // GestureDetector(
+                                                                //   onTap: () {
+                                                                //     setState(() {
+                                                                //       powerLessBelievedRhythms = !powerLessBelievedRhythms;
+                                                                //     });
+                                                                //   },
+                                                                //   child: Container(
+                                                                //       margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                //       child: Row(
+                                                                //         children: [
+                                                                //           Image.asset(powerLessBelievedRhythms ? "assets/close_eye.png" : "assets/open_eye.png"),
+                                                                //           const SizedBox(
+                                                                //             width: 5,
+                                                                //           ),
+                                                                //           Text(powerLessBelievedRhythms ? "Hide" : "Show",style:const TextStyle(color: AppColors.primaryColor),)
+                                                                //         ],
+                                                                //       )
+                                                                //   ),
+                                                                // ),
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                                margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
+                                                                child: Visibility(
+                                                                    visible: powerLessBelievedRhythms,
+                                                                    child: Focus(
+                                                                      // onFocusChange: (hasFocus) {
+                                                                      //   print('PowerLess believe Rh Field:  $hasFocus');
+                                                                      //   if(!hasFocus && powerlessRhController.text.isNotEmpty) {
+                                                                      //     _setTrellisData ();
+                                                                      //   }
+                                                                      // },
+                                                                        child: NameField(powerlessRhController,"powerless habits",1,70,true,otherUserLoggedIn)))),
+                                                            if(!otherUserLoggedIn)
+                                                            SaveButtonWidgets( (){
+                                                              FocusManager.instance.primaryFocus?.unfocus();
+                                                              _updateTrellisRhythmsData(index,trellisRhythmsData[index].id!);
+                                                            }),
+
+                                                          ],
+                                                        ),
+                                                      ]);
+
+                                                    }, icon: const Icon(Icons.edit,color: AppColors.primaryColor,)),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        // _deleteRecord("rhythms", trellisRhythmsData[index].id.toString(),index,"");
+                                                        showDeletePopup("rhythms", trellisRhythmsData[index].id.toString(),index,"");
+                                                      },
+                                                      icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                    ),
+                                                  ],
+                                                )
                                               ],
                                             ),
                                             // Align(alignment: Alignment.topRight,
@@ -1990,11 +2318,13 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
-
+                                if(!otherUserLoggedIn)
                                 AddButton(userPremium == "no" ? trellisNeedsData.length>= isNeedsLength : false,() {
                                   needsBottomSheet(context, "Needs", <Widget>[
-                                    NameField(needsController,"needs",5,140,true),
+                                    NameField(needsController,"needs",5,0,true,otherUserLoggedIn),
+                                    if(!otherUserLoggedIn)
                                     SaveButtonWidgets( (){
+                                      FocusManager.instance.primaryFocus?.unfocus();
                                       _setTrellisNeedsData();
                                     }),
                                   ]);
@@ -2006,14 +2336,9 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       child: Text("")) : ListView.builder(
                                       shrinkWrap: true,
                                       itemCount: trellisNeedsData.length,
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
-                                          // onTap: () {
-                                          //   showDialog(
-                                          //     context: context,
-                                          //     builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements"),
-                                          //   );
-                                          // },
                                           child: Container(
                                               margin:const EdgeInsets.symmetric(vertical: 5),
                                               decoration: BoxDecoration(
@@ -2023,13 +2348,42 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                               padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
                                               child: Column(
                                                 children: [
-                                                  Align(alignment: Alignment.topRight,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        _deleteRecord("needs", trellisNeedsData[index]['id'],index,"");
-                                                      },
-                                                      icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                    ),),
+                                                  if(!otherUserLoggedIn)
+                                                  Align(
+                                                    alignment: Alignment.topRight,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      children: [
+                                                        Align(alignment: Alignment.topRight,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                needsController.text = trellisNeedsData[index]['text'].toString();
+                                                              });
+
+                                                                needsBottomSheet(context, "Needs", <Widget>[
+                                                                  NameField(needsController,"needs",5,140,true,otherUserLoggedIn),
+                                                                  if(!otherUserLoggedIn)
+                                                                  SaveButtonWidgets( (){
+                                                                    FocusManager.instance.primaryFocus?.unfocus();
+                                                                    _updateTrellisNeedsData(index, trellisNeedsData[index]['id'].toString());
+                                                                  }),
+                                                                ]);
+                                                            },
+                                                            icon:const Icon(Icons.edit,color: AppColors.primaryColor,),
+                                                          ),),
+                                                        Align(alignment: Alignment.topRight,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              // _deleteRecord("needs", trellisNeedsData[index]['id'],index,"");
+                                                              showDeletePopup("needs", trellisNeedsData[index]['id'],index,"");
+                                                            },
+                                                            icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                          ),),
+                                                      ],
+                                                    ),
+                                                  ),
                                                   Align(
                                                       alignment: Alignment.topLeft,
                                                       child: Text(trellisNeedsData[index]['text'].toString()))
@@ -2073,10 +2427,12 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
+                                if(!otherUserLoggedIn)
                                 AddButton(userPremium == "no" ? trellisIdentityData.length>= isIdentityLength : false,(){
                                   needsBottomSheet(context, "Identity", <Widget>[
-                                    NameField(identityController,"identity",5,200,true),
+                                    NameField(identityController,"identity",5,0,true,otherUserLoggedIn),
                                     SaveButtonWidgets( (){
+                                      FocusManager.instance.primaryFocus?.unfocus();
                                       _setTrellisIdentityData ();
                                     }),
                                   ]);
@@ -2088,14 +2444,9 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       child: Text("")) : ListView.builder(
                                       shrinkWrap: true,
                                       itemCount: trellisIdentityData.length,
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder:(context,index) {
                                         return GestureDetector(
-                                          // onTap: () {
-                                          //   showDialog(
-                                          //     context: context,
-                                          //     builder: (BuildContext context) => _buildPopupDialog(context,"Memories/Achievements"),
-                                          //   );
-                                          // },
                                           child: Container(
                                             margin:const EdgeInsets.symmetric(vertical: 5),
                                               decoration: BoxDecoration(
@@ -2105,13 +2456,41 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                               padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
                                               child: Column(
                                                 children: [
-                                                  Align(alignment: Alignment.topRight,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        _deleteRecord("identity", trellisIdentityData[index]['id'],index,"");
-                                                      },
-                                                      icon:const Icon(Icons.delete,color: AppColors.redColor,),
-                                                    ),),
+                                                  if(!otherUserLoggedIn)
+                                                  Align(
+                                                    alignment: Alignment.topRight,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      children: [
+                                                        Align(alignment: Alignment.topRight,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                identityController.text = trellisIdentityData[index]['text'].toString();
+                                                              });
+                                                                needsBottomSheet(context, "Identity", <Widget>[
+                                                                  NameField(identityController,"identity",5,200,true,otherUserLoggedIn),
+                                                                  SaveButtonWidgets( (){
+                                                                    FocusManager.instance.primaryFocus?.unfocus();
+                                                                    _updateTrellisIdentityData(index, trellisIdentityData[index]['id'].toString());
+                                                                  }),
+                                                                ]);
+
+                                                            },
+                                                            icon:const Icon(Icons.edit,color: AppColors.primaryColor,),
+                                                          ),),
+                                                        Align(alignment: Alignment.topRight,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                               // _deleteRecord("identity", trellisIdentityData[index]['id'],index,"");
+                                                              showDeletePopup("identity",trellisIdentityData[index]['id'],index,"");
+                                                            },
+                                                            icon:const Icon(Icons.delete,color: AppColors.redColor,),
+                                                          ),),
+                                                      ],
+                                                    ),
+                                                  ),
                                                   Align(
                                                       alignment: Alignment.topLeft,
                                                       child: Text(trellisIdentityData[index]['text'].toString()))
@@ -2156,6 +2535,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                             padding:const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
                               children: [
+                                if(!otherUserLoggedIn)
                                 AddButton(false,() {
                                   setState(() {
                                     selectedValueFromBottomSheet = "Mentor";
@@ -2163,7 +2543,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                     peerNameController.text = '';
                                     menteeNameController.text = '';
                                   });
-                                  tribeBottomSheet(context,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
+                                  tribeBottomSheet(context,"Mentor",false,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
                                     children: [
                                       Align(
                                           alignment: Alignment.topLeft,
@@ -2181,23 +2561,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       Container(
                                           margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
                                           child: Focus(
-                                            // onFocusChange: (hasFocus) {
-                                            //   print('Mentor Name Field:  $hasFocus');
-                                            //   if(!hasFocus && mentorNameController.text.isNotEmpty) {
-                                            //     _setTrellisData ();
-                                            //   }
-                                            // },
-                                              child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false))),
-                                      // Container(
-                                      //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
-                                      //     child: Focus(
-                                      //       // onFocusChange: (hasFocus) {
-                                      //       //   print('Mentor Desc Field:  $hasFocus');
-                                      //       //   if(!hasFocus && mentorDescriptionController.text.isNotEmpty) {
-                                      //       //     _setTrellisData ();
-                                      //       //   }
-                                      //       // },
-                                      //         child: NameField(mentorDescriptionController,"Description",1,70,false))),
+                                              child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false,otherUserLoggedIn))),
                                     ],
                                   ),Column(
                                     children: [
@@ -2217,23 +2581,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       Container(
                                           margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
                                           child: Focus(
-                                            // onFocusChange: (hasFocus) {
-                                            //   print('Peer Name Field:  $hasFocus');
-                                            //   if(!hasFocus && peerNameController.text.isNotEmpty) {
-                                            //     _setTrellisData ();
-                                            //   }
-                                            // },
-                                              child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false))),
-                                      // Container(
-                                      //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
-                                      //     child: Focus(
-                                      //       // onFocusChange: (hasFocus) {
-                                      //       //   print('Peer Desc Field:  $hasFocus');
-                                      //       //   if(!hasFocus && peerDescriptionController.text.isNotEmpty) {
-                                      //       //     _setTrellisData ();
-                                      //       //   }
-                                      //       // },
-                                      //         child: NameField(peerDescriptionController,"Description",1,70,false))),
+                                              child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false,otherUserLoggedIn))),
                                     ],
                                   ),Column(
                                     children: [
@@ -2253,23 +2601,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       Container(
                                           margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
                                           child: Focus(
-                                            // onFocusChange: (hasFocus) {
-                                            //   print('Mentee Name Field:  $hasFocus');
-                                            //   if(!hasFocus && menteeNameController.text.isNotEmpty) {
-                                            //     _setTrellisData ();
-                                            //   }
-                                            // },
-                                              child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false))),
-                                      // Container(
-                                      //     margin:const EdgeInsets.only(top: 5,left: 10,right: 10,bottom: 10),
-                                      //     child: Focus(
-                                      //       // onFocusChange: (hasFocus) {
-                                      //       //   print('Mentee Desc Field:  $hasFocus');
-                                      //       //   if(!hasFocus && menteeDescriptionController.text.isNotEmpty ) {
-                                      //       //     _setTrellisData ();
-                                      //       //   }
-                                      //       // },
-                                      //         child: NameField(menteeDescriptionController,"Description",1,70,false))),
+
+                                              child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false,otherUserLoggedIn))),
                                     ],
                                   ),(selectedValue) {
                                     print('Selected value From Bottom Sheet: $selectedValue');
@@ -2514,6 +2847,102 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                 children: [
                                                   Expanded(
                                                       child: Text("• ${trellisMentorTribeData[index].text} ")),
+                                                  if(!otherUserLoggedIn)
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        selectedValueFromBottomSheet = "Mentor";
+                                                        isMenteeVisible = false;
+                                                        isMentorVisible = true;
+                                                        isPeerVisible = false;
+                                                        mentorNameController.text = trellisMentorTribeData[index].text!;
+                                                        peerNameController.text = '';
+                                                        menteeNameController.text = '';
+                                                      });
+
+                                                      tribeBottomSheet(context,"Mentor",true,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:  const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+                                                                  child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+                                                                  child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+
+                                                                  child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),(selectedValue) {
+                                                        print('Selected value From Bottom Sheet: $selectedValue');
+                                                        mentorNameController.clear();
+                                                        peerNameController.clear();
+                                                        menteeNameController.clear();
+                                                        setState(() {
+                                                          selectedValueFromBottomSheet = selectedValue;
+                                                        });
+                                                        // Do something with the selected value
+                                                      },(){
+                                                          _updateTribeData(
+                                                              index,
+                                                              trellisMentorTribeData[index]
+                                                                  .id!,
+                                                              mentorNameController
+                                                                  .text,
+                                                              selectedValueFromBottomSheet);
+                                                      },);
+                                                    },
+                                                    icon:const Icon(Icons.edit,color: AppColors.primaryColor,),
+                                                  ),
+                                                  if(!otherUserLoggedIn)
                                                   IconButton(
                                                     onPressed: () {
                                                       showDeletePopupForTribe("Mentor",trellisMentorTribeData[index].id.toString(),index);
@@ -2553,6 +2982,103 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(child: Text("• ${trellisPeerTribeData[index].text}")),
+                                              if(!otherUserLoggedIn)
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    selectedValueFromBottomSheet = "Peer";
+                                                    isMenteeVisible = false;
+                                                    isMentorVisible = false;
+                                                    isPeerVisible = true;
+                                                    mentorNameController.text = '';
+                                                    peerNameController.text = trellisPeerTribeData[index].text!;
+                                                    menteeNameController.text = '';
+                                                  });
+
+                                                  tribeBottomSheet(context,"Peer",true,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
+                                                    children: [
+                                                      Align(
+                                                          alignment: Alignment.topLeft,
+                                                          child: Container(
+                                                              margin:const EdgeInsets.only(left: 10,right: 10),
+                                                              child:  const Row(
+                                                                children: [
+                                                                  Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                  SizedBox(
+                                                                    width: 5,
+                                                                  ),
+                                                                  Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
+                                                                ],
+                                                              ))),
+                                                      Container(
+                                                          margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                          child: Focus(
+                                                              child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                    ],
+                                                  ),Column(
+                                                    children: [
+                                                      Align(
+                                                          alignment: Alignment.topLeft,
+                                                          child: Container(
+                                                              margin:const EdgeInsets.only(left: 10,right: 10),
+                                                              child:const Row(
+                                                                children: [
+                                                                  Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                  SizedBox(
+                                                                    width: 5,
+                                                                  ),
+                                                                  Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
+                                                                ],
+                                                              ))),
+                                                      Container(
+                                                          margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                          child: Focus(
+                                                              child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                    ],
+                                                  ),Column(
+                                                    children: [
+                                                      Align(
+                                                          alignment: Alignment.topLeft,
+                                                          child: Container(
+                                                              margin:const EdgeInsets.only(left: 10,right: 10),
+                                                              child:const Row(
+                                                                children: [
+                                                                  Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                  SizedBox(
+                                                                    width: 5,
+                                                                  ),
+                                                                  Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
+                                                                ],
+                                                              ))),
+                                                      Container(
+                                                          margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                          child: Focus(
+
+                                                              child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                    ],
+                                                  ),(selectedValue) {
+                                                    print('Selected value From Bottom Sheet: $selectedValue');
+                                                    mentorNameController.clear();
+                                                    peerNameController.clear();
+                                                    menteeNameController.clear();
+                                                    setState(() {
+                                                      selectedValueFromBottomSheet = selectedValue;
+                                                    });
+                                                    // Do something with the selected value
+                                                  },(){
+                                                      _updateTribeData(index,
+                                                          trellisPeerTribeData[index]
+                                                              .id!,
+                                                          peerNameController
+                                                              .text,
+                                                          selectedValueFromBottomSheet);
+
+                                                    },);
+
+                                                },
+                                                icon:const Icon(Icons.edit,color: AppColors.primaryColor,),
+                                              ),
+                                              if(!otherUserLoggedIn)
                                               IconButton(
                                                 onPressed: () {
                                                   showDeletePopupForTribe("Peer",trellisPeerTribeData[index].id.toString(),index);
@@ -2593,6 +3119,109 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Expanded(child: Text("• ${trellisMenteeTribeData[index].text}")),
+                                                  if(!otherUserLoggedIn)
+                                                  IconButton(
+                                                    onPressed: () {
+
+                                                      setState(() {
+                                                        menteeNameController.text = trellisMenteeTribeData[index].text!;
+                                                        selectedValueFromBottomSheet = "Mentee";
+                                                        isMenteeVisible = true;
+                                                        isMentorVisible = false;
+                                                        isPeerVisible = false;
+                                                        mentorNameController.text = '';
+                                                        peerNameController.text = '';
+                                                      });
+
+                                                      print('EDIT MENTEE');
+                                                      print(trellisMenteeTribeData[index].text!);
+                                                      print(menteeNameController.text);
+
+
+                                                      tribeBottomSheet(context,"Mentee",true,"Tribe",isMentorVisible,isPeerVisible,isMenteeVisible,Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:  const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Mentor",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+                                                                  child: NameField(mentorNameController," name of mentor-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Peer",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+                                                                  child: NameField(peerNameController," name of peer-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),Column(
+                                                        children: [
+                                                          Align(
+                                                              alignment: Alignment.topLeft,
+                                                              child: Container(
+                                                                  margin:const EdgeInsets.only(left: 10,right: 10),
+                                                                  child:const Row(
+                                                                    children: [
+                                                                      Icon(Icons.person,color: AppColors.primaryColor,),
+                                                                      SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Text("Mentee",style: TextStyle(color: AppColors.primaryColor),)
+                                                                    ],
+                                                                  ))),
+                                                          Container(
+                                                              margin:const EdgeInsets.only(top: 5,left: 10,right: 10),
+                                                              child: Focus(
+
+                                                                  child: NameField(menteeNameController," name of mentee-Type what they provide you",1,70,false,otherUserLoggedIn))),
+                                                        ],
+                                                      ),(selectedValue) {
+                                                        print('Selected value From Bottom Sheet: $selectedValue');
+                                                        mentorNameController.clear();
+                                                        peerNameController.clear();
+                                                        menteeNameController.clear();
+                                                        setState(() {
+                                                          selectedValueFromBottomSheet = selectedValue;
+                                                        });
+                                                        // Do something with the selected value
+                                                      },(){
+                                                          _updateTribeData(
+                                                              index,
+                                                              trellisMenteeTribeData[index]
+                                                                  .id!,
+                                                              menteeNameController
+                                                                  .text,
+                                                              selectedValueFromBottomSheet);
+
+                                                        },);
+                                                    },
+                                                    icon:const Icon(Icons.edit,color: AppColors.primaryColor,),
+                                                  ),
+                                                  if(!otherUserLoggedIn)
                                                   IconButton(
                                                     onPressed: () {
                                                       showDeletePopupForTribe("Mentee",trellisMenteeTribeData[index].id.toString(),index);
@@ -2710,6 +3339,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
                           )
                         ]
                     ),
+                    if(!otherUserLoggedIn)
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
@@ -2905,6 +3535,58 @@ class _TrellisScreenState extends State<TrellisScreen> {
   }
 
 
+  _updateTribeData(int index,String responseId,String fieldValue,String type) {
+
+    print("Update This type date");
+    print(type);
+
+    if(fieldValue.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager().trellisUpdateTribeDataAdd(TrellisUpdateDataAddRequestModel(
+          id: responseId, text: fieldValue, type: type)).then((value) {
+
+        TribeDataResponse tribeDataResponse = TribeDataResponse(
+          id: responseId,
+          userId: id,
+          type: value['updated_data']['type'].toString(),
+          text: value['updated_data']['text'].toString(),
+          createdAt: "",);
+
+        if(type == "Peer") {
+          trellisPeerTribeData[index] = tribeDataResponse;
+        } else if(type == "Mentee") {
+          trellisMenteeTribeData[index] = tribeDataResponse;
+        } else {
+          trellisMentorTribeData[index] = tribeDataResponse;
+        }
+        setState(() {
+          mentorNameController.text = '';
+          peerNameController.text = '';
+          menteeNameController.text = '';
+
+          _isDataLoading = false;
+        });
+
+        Navigator.of(context).pop();
+        showToastMessage(context, "updated Successfully", true);
+      }).catchError((e) {
+        print(e.toString());
+        setState(() {
+          _isDataLoading = false;
+        });
+        showToastMessage(context, e.toString(), false);
+      });
+    } else {
+      setState(() {
+        _isDataLoading = false;
+      });
+      showToastMessage(context, "Please Enter data in the field", false);
+    }
+
+  }
+
   _saveTrellisTriggerResponse() {
     setState(() {
       _isDataLoading = true;
@@ -2965,17 +3647,17 @@ class _TrellisScreenState extends State<TrellisScreen> {
     HTTPManager().trellisDelete(TrellisDeleteRequestModel(userId: id,recordId: recordId,type:type,)).then((value) {
 
       if(type == "goal") {
-        if(goalsOrChallenges == "Challenges") {
+        // if(goalsOrChallenges == "Challenges") {
           setState(() {
-            trellisLadderDataForGoalsChallenges.removeAt(index);
+            trellisLadderDataForGoalsFavourites.removeAt(index);
           });
-        } else {
-          trellisLadderDataForGoals.removeAt(index);
-        }
+        // } else {
+        //   trellisLadderDataForGoals.removeAt(index);
+        // }
 
       } else if(type == "achievements") {
         setState(() {
-          trellisLadderDataForAchievements.removeAt(index);
+          trellisLadderDataForAchievementsFavourites.removeAt(index);
         });
       } else if(type == "needs") {
         setState(() {
@@ -3013,6 +3695,71 @@ class _TrellisScreenState extends State<TrellisScreen> {
     });
   }
 
+  _setLadderGoalsData() {
+    // ignore: avoid_print
+    // print("Selected Date:${dateForGController.text}");
+
+    if(initialValueForGoals != "" && titleForGController.text.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager().trellisLadderForGoals(TrellisLadderGoalsRequestModel(userId: id,type: "goal",option1: initialValueForType,option2: initialValueForGoals,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text,insertFrom: "trellis")).then((value) {
+
+        Navigator.of(context).pop();
+        setState(() {
+          initialValueForType = "physical";
+          initialValueForMType = "Memories";
+          initialValueForGoals = "Goals";
+          initialValueForMGoals = "Goals";
+          dateForGController.text = "";
+          titleForGController.text = "";
+          descriptionForGController.text = "";
+        });
+
+        TrellisLadderDataModel trellisLadderDataModel = TrellisLadderDataModel(
+          id: value['post_data']['id'].toString(),
+          userId: value['post_data']['user_id'].toString(),
+          type: value['post_data']['type'].toString(),
+          favourite: value['post_data']['favourite'].toString(),
+          option1: value['post_data']['option1'].toString(),
+          option2: value['post_data']['option2'].toString(),
+          date: value['post_data']['date'].toString(),
+          text: value['post_data']['text'].toString(),
+          description: value['post_data']['description'].toString(),
+        );
+        if(trellisLadderDataForGoalsFavourites.length < 3 ) {
+          showToastMessage(context, "Added successfully", true);
+          trellisLadderDataForAchievementsFavourites.add(trellisLadderDataModel);
+
+        if(trellisLadderDataModel.option2 == "Challenges") {
+          trellisLadderDataForGoalsChallenges.add(trellisLadderDataModel);
+        } else {
+          trellisLadderDataForGoals.add(trellisLadderDataModel);
+        } }  else {
+          showToastMessage(context, "Please remove some item from your favourites list in Goals/Challenges in ladder section", true);
+        }
+
+        trellisLadderDataForGoals.sort((a,b)=>b.date!.compareTo(a.date!));
+        trellisLadderDataForGoalsFavourites.sort((a,b) => b.date!.compareTo(a.date!));
+        trellisLadderDataForGoalsChallenges.sort((a,b)=>b.date!.compareTo(a.date!));
+
+        setState(() {
+          _isDataLoading = false;
+        });
+        // print(value);
+        // print("Ladder Data For Goals");
+      }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+
+    } else {
+      showToastMessage(context, "Add some text to title field please", false);
+    }
+  }
+
   // _setLadderGoalsData() {
   //   // ignore: avoid_print
   //   print("Seleted Date:${dateForGController.text}");
@@ -3021,7 +3768,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
   //     setState(() {
   //       _isDataLoading = true;
   //     });
-  //     HTTPManager().trellisLadderForGoals(TrellisLadderGoalsRequestModel(userId: id,type: "goal",option1: initialValueForType,option2: initialValueForGoals,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text)).then((value) {
+  //     HTTPManager().trellisLadderForGoals(TrellisLadderGoalsRequestModel(userId: id,type: "goal",option1: initialValueForType,option2: initialValueForGoals,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text,insertFrom: "trellis")).then((value) {
   //
   //       Navigator.of(context).pop();
   //       setState(() {
@@ -3057,7 +3804,7 @@ class _TrellisScreenState extends State<TrellisScreen> {
   //     setState(() {
   //       _isDataLoading = true;
   //     });
-  //     HTTPManager().trellisLadderForAchievements(TrellisLadderAchievementRequestModel(userId: id,type: "achievements",option1:initialValueForMType ,date: dateForMController.text,title: titleForMController.text,description: descriptionForMController.text)).then((value) {
+  //     HTTPManager().trellisLadderForAchievements(TrellisLadderAchievementRequestModel(userId: id,type: "achievements",option1:initialValueForMType ,date: dateForMController.text,title: titleForMController.text,description: descriptionForMController.text,insertFrom: "trellis")).then((value) {
   //
   //       Navigator.of(context).pop();
   //       setState(() {
@@ -3083,6 +3830,58 @@ class _TrellisScreenState extends State<TrellisScreen> {
   //     showToastMessage(context, "Add some data please", false);
   //   }
   // }
+
+  _setLadderMemoriesData() {
+    if(initialValueForGoals != "" && titleForGController.text.isNotEmpty && dateForGController.text.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager().trellisLadderForAchievements(TrellisLadderAchievementRequestModel(userId: id,type: "achievements",option1:initialValueForType ,date: dateForGController.text,title: titleForGController.text,description: descriptionForGController.text,insertFrom: "trellis")).then((value) {
+
+        Navigator.of(context).pop();
+        setState(() {
+          dateForGController.text = "";
+          titleForGController.text = "";
+          descriptionForGController.text = "";
+        });
+
+        TrellisLadderDataModel trellisLadderDataModel = TrellisLadderDataModel(
+          id: value['post_data']['id'].toString(),
+          userId: value['post_data']['user_id'].toString(),
+          type: value['post_data']['type'].toString(),
+          favourite: value['post_data']['favourite'].toString(),
+          option1: value['post_data']['option1'].toString(),
+          option2: value['post_data']['option2'].toString(),
+          date: value['post_data']['date'].toString(),
+          text: value['post_data']['text'].toString(),
+          description: value['post_data']['description'].toString(),
+        );
+        if(trellisLadderDataForAchievementsFavourites.length < 3) {
+          showToastMessage(context, "Added successfully", true);
+          trellisLadderDataForAchievementsFavourites.add(trellisLadderDataModel);
+          trellisLadderDataForAchievements.add(trellisLadderDataModel);
+        } else {
+          showToastMessage(context, "Please remove some item from your favourites list in memories/achievement in ladder section", true);
+        }
+        trellisLadderDataForAchievements.sort((a,b)=>b.date!.compareTo(a.date!));
+        trellisLadderDataForAchievementsFavourites.sort((a,b)=>b.date!.compareTo(a.date!));
+        setState(() {
+          _isDataLoading = false;
+        });
+        // print(value);
+        // print("Ladder Data For Achievements");
+
+      }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+
+    } else {
+      showToastMessage(context, "Add some data please", false);
+    }
+  }
 
   _setTrellisOPData () {
 
@@ -3112,6 +3911,49 @@ class _TrellisScreenState extends State<TrellisScreen> {
           _isDataLoading = false;
         });
        // Navigator.of(context).pop();
+      }).catchError((e) {
+        // ignore: avoid_print
+        print(e);
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+    } else {
+      showToastMessage(context, "Add some data please", false);
+    }
+  }
+
+  _updateTrellisOPData (int index,String responseId) {
+
+    if(empoweredTruthOPController.text.isNotEmpty || powerlessOpController.text.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager()
+          .trellisUpdatePrinciples(TrellisPrinciplesUpdateRequestModel(
+          id: responseId, type: "principles", empTruths: empoweredTruthOPController.text,powerlessBelieve: powerlessOpController.text))
+          .then((value) {
+        // print("Organizing Principle Success");
+        // print(value);
+        setState(() {
+          trellisPrinciplesData[index] = Trellis_principle_data_model_class(
+            id : responseId,
+            userId : id,
+            type : value['updated_data']['type'].toString(),
+            empTruths : value['updated_data']['emp_truths'].toString(),
+            powerlessBelieves : value['updated_data']['powerless_believes'].toString(),
+            visibility : false,
+          );
+        });
+        Navigator.of(context).pop();
+        showToastMessage(context, "Record updated successfully", true);
+        setState(() {
+          empoweredTruthOPController.text = "";
+          powerlessOpController.text = "";
+          _isDataLoading = false;
+        });
+        // Navigator.of(context).pop();
       }).catchError((e) {
         // ignore: avoid_print
         print(e);
@@ -3164,6 +4006,44 @@ class _TrellisScreenState extends State<TrellisScreen> {
     }
   }
 
+  _updateTrellisRhythmsData (int index,String responseId) {
+
+    if(empoweredTruthRhController.text.isNotEmpty || powerlessRhController.text.isNotEmpty ) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager()
+          .trellisUpdatePrinciples(TrellisPrinciplesUpdateRequestModel(
+          id: responseId, type: "rhythms", empTruths: empoweredTruthRhController.text,powerlessBelieve: powerlessRhController.text))
+          .then((value) {
+        setState(() {
+          _isDataLoading = false;
+        });
+        trellisRhythmsData[index] = Trellis_principle_data_model_class(
+          id : responseId,
+          userId : id,
+          type : value['updated_data']['type'].toString(),
+          empTruths : value['updated_data']['emp_truths'].toString(),
+          powerlessBelieves : value['updated_data']['powerless_believes'].toString(),
+          visibility : false,);
+        Navigator.of(context).pop();
+        showToastMessage(context, "Record updated successfully", true);
+        setState(() {
+          empoweredTruthRhController.text = "";
+          powerlessRhController.text = "";
+        });
+        //  Navigator.of(context).pop();
+      }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+    } else {
+      showToastMessage(context, "Add your data please", false);
+    }
+  }
+
   _setTrellisNeedsData () {
 
     if(needsController.text.isNotEmpty) {
@@ -3194,6 +4074,36 @@ class _TrellisScreenState extends State<TrellisScreen> {
     }
   }
 
+  _updateTrellisNeedsData (int index,String responseID) {
+
+    if(needsController.text.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager()
+          .trellisUpdateIdentity(TrellisUpdateIdentityRequestModel(
+          id: responseID, type: "needs", text: needsController.text))
+          .then((value) {
+        // print("Needs Success");
+        // print(value);
+        trellisNeedsData[index] = value['updated_data'];
+        showToastMessage(context, "Record updated successfully", true);
+        setState(() {
+          needsController.text = "";
+          _isDataLoading = false;
+        });
+        Navigator.of(context).pop();
+      }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+    } else {
+      showToastMessage(context, "Add your needs in the field", false);
+    }
+  }
+
   _setTrellisIdentityData () {
 
     if(identityController.text.isNotEmpty) {
@@ -3208,6 +4118,36 @@ class _TrellisScreenState extends State<TrellisScreen> {
         // print(value);
         trellisIdentityData.insert(0, value['post_data']);
         showToastMessage(context, "Record added successfully", true);
+        setState(() {
+          _isDataLoading = false;
+          identityController.text = "";
+        });
+        Navigator.of(context).pop();
+      }).catchError((e) {
+        showToastMessage(context, e.toString(), false);
+        setState(() {
+          _isDataLoading = false;
+        });
+      });
+    } else {
+      showToastMessage(context, "Add your identity in the field", false);
+    }
+  }
+
+  _updateTrellisIdentityData (int index,String responseID) {
+
+    if(identityController.text.isNotEmpty) {
+      setState(() {
+        _isDataLoading = true;
+      });
+      HTTPManager()
+          .trellisUpdateIdentity(TrellisUpdateIdentityRequestModel(
+          id: responseID, type: "identity", text: identityController.text))
+          .then((value) {
+        // print("Identity Success");
+        // print(value);
+        trellisIdentityData[index] = value['updated_data'];
+        showToastMessage(context, "Record updated successfully", true);
         setState(() {
           _isDataLoading = false;
           identityController.text = "";

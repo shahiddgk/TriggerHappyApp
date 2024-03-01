@@ -1,7 +1,8 @@
+// ignore_for_file: unused_field
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/PireScreens/widgets/PopMenuButton.dart';
 import 'package:flutter_quiz_app/Screens/Trellis/tellis_screen.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
@@ -13,7 +14,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../../Widgets/video_thumbnail_design.dart';
-import '../dashboard_tiles.dart';
+import '../PireScreens/widgets/AppBar.dart';
 import '../utill/userConstants.dart';
 import '../video_player.dart';
 
@@ -36,6 +37,8 @@ class _TrellisVideoScreenState extends State<TrellisVideoScreen> {
   String userType = "";
   bool _isDataLoading = true;
   late bool isPhone;
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   String urlFirst = "https://www.youtube.com/watch?v=GFqe2n4vnNU";
   String urlSecond = "https://www.youtube.com/watch?v=v6wVjS_w_6Q";
@@ -49,6 +52,9 @@ class _TrellisVideoScreenState extends State<TrellisVideoScreen> {
     });
     // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
 
     name = sharedPreferences.getString(UserConstants().userName)!;
     id = sharedPreferences.getString(UserConstants().userId)!;
@@ -86,20 +92,11 @@ class _TrellisVideoScreenState extends State<TrellisVideoScreen> {
   Widget build(BuildContext context) {
     getScreenDetails();
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Platform.isAndroid ? Icons.arrow_back_rounded : Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>const Dashboard()));
-          },
-        ),
-        title: Text(_isUserDataLoading ? "" : name),
-        actions:  [
-          PopMenuButton(false,false,id)
-        ],
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared),
       body: Container(
         color: AppColors.backgroundColor,
         width: MediaQuery.of(context).size.width,

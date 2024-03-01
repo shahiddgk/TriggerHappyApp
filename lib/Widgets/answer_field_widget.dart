@@ -41,13 +41,7 @@ class _AnswerFieldWidgetState extends State<AnswerFieldWidget> {
                 isValidated = true;
               });
               return "";
-            } else if(value.trim().length>widget.fieldMaxLength) {
-              setState(() {
-                errorMessage = "Maximum ${widget.fieldMaxLength} characters allowed";
-                isValidated = true;
-              });
-              return "Maximum ${widget.fieldMaxLength} characters allowed";
-            } else {
+            }  else {
               setState(() {
                 errorMessage = "";
                 isValidated = false;
@@ -56,7 +50,7 @@ class _AnswerFieldWidgetState extends State<AnswerFieldWidget> {
             }
           },
           maxLines: 7,
-          maxLength: widget.fieldMaxLength,
+          // maxLength: widget.fieldMaxLength,
           decoration: InputDecoration(
               disabledBorder:const OutlineInputBorder(
                   borderSide: BorderSide(
@@ -95,7 +89,7 @@ class _AnswerFieldWidgetState extends State<AnswerFieldWidget> {
               filled: true,
               // prefixIcon: const Icon(Icons.person),
               hintStyle: TextStyle(color: Colors.grey[800]),
-              hintText: "${widget.fieldMaxLength} characters or less",
+              hintText: "Please  write your answer here",
               fillColor: AppColors.hoverColor),
         ),
       ],

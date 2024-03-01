@@ -6,13 +6,14 @@ import '../../../Widgets/colors.dart';
 import '../../../Widgets/constants.dart';
 
 class NameField extends StatefulWidget {
-  NameField(this._NameFieldController,this.fieldName,this.maxLength,this.maxFieldLength,this.bottomSheet,{Key? key}) : super(key: key);
+  NameField(this._NameFieldController,this.fieldName,this.maxLength,this.maxFieldLength,this.bottomSheet,this.otherUserLoggedIn,{Key? key}) : super(key: key);
   // ignore: non_constant_identifier_names
   final TextEditingController _NameFieldController;
   int maxLength;
   String fieldName;
   bool bottomSheet;
   int maxFieldLength;
+  bool otherUserLoggedIn;
   @override
   // ignore: library_private_types_in_public_api
   _NameFieldState createState() => _NameFieldState();
@@ -35,7 +36,8 @@ class _NameFieldState extends State<NameField> {
           style: const TextStyle(fontSize: AppConstants.defaultFontSize),
           controller: widget._NameFieldController,
           maxLines: widget.maxLength,
-          maxLength:widget.maxLength != 1 ? widget.maxFieldLength : null,
+          readOnly: widget.otherUserLoggedIn,
+          maxLength:widget.maxLength != 1 ? widget.maxFieldLength != 0 ? widget.maxFieldLength : null: null,
           validator: (value) => value!.isEmpty ? "${widget.fieldName} is required" : null,
           decoration: InputDecoration(
             hoverColor: widget.bottomSheet ? AppColors.lightGreyColor: null,

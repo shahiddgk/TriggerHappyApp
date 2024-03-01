@@ -1,5 +1,5 @@
 
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
@@ -13,8 +13,11 @@ import '../../Widgets/colors.dart';
 import '../../Widgets/logo_widget_for_all_screens.dart';
 import '../../Widgets/option_mcq_widget.dart';
 import '../../model/reponse_model/post_reminder_list_response_model.dart';
+import '../../model/reponse_model/skipped_list_response_model.dart';
 import '../../network/http_manager.dart';
+import '../Payment/payment_screen.dart';
 import '../PireScreens/widgets/AppBar.dart';
+import '../Widgets/show_notification_pop_up.dart';
 import '../utill/userConstants.dart';
 
 class Posts extends StatefulWidget {
@@ -33,6 +36,7 @@ class _PostsState extends State<Posts> {
   String timeZone = "";
   String userType = "";
   bool _isLoading = true;
+  // bool _isLoading1 = true;
   bool _isDataLoading = false;
   bool _isUserDataLoading = false;
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -42,8 +46,10 @@ class _PostsState extends State<Posts> {
   String daysSelected = "Everyone";
   // String selectedValue = "P.I.R.E.";
   String errorMessage = "";
-
+  String userPremium = "";
   String selectedRadio = "repeat";
+
+  bool otherUserLoggedIn = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -108,6 +114,9 @@ class _PostsState extends State<Posts> {
 
   ];
 
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
+
   DateTime selectedDate = DateTime.now();
 
   Future<void> _selectDate(BuildContext context,TextEditingController controller) async {
@@ -133,15 +142,69 @@ class _PostsState extends State<Posts> {
     // print("Data getting called");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    name = sharedPreferences.getString(UserConstants().userName)!;
-    id = sharedPreferences.getString(UserConstants().userId)!;
-    email = sharedPreferences.getString(UserConstants().userEmail)!;
-    timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
-    userType = sharedPreferences.getString(UserConstants().userType)!;
+    badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+    badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
+    otherUserLoggedIn = sharedPreferences.getBool(UserConstants().otherUserLoggedIn)!;
+
+    if(otherUserLoggedIn) {
+
+      id = sharedPreferences.getString(UserConstants().otherUserId)!;
+      name = sharedPreferences.getString(UserConstants().otherUserName)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+    } else {
+      name = sharedPreferences.getString(UserConstants().userName)!;
+      id = sharedPreferences.getString(UserConstants().userId)!;
+      email = sharedPreferences.getString(UserConstants().userEmail)!;
+      timeZone = sharedPreferences.getString(UserConstants().timeZone)!;
+      userType = sharedPreferences.getString(UserConstants().userType)!;
+
+      userPremium = sharedPreferences.getString(UserConstants().userPremium)!;
+      _getSkippedReminderList();
+    }
+    _getPostReminderList();
     setState(() {
       _isUserDataLoading = false;
     });
-    _getPostReminderList();
+
+  }
+
+  String? formattedDate;
+  String? formattedTime;
+  late SkippedReminderNotification skippedReminderNotification;
+
+  _getSkippedReminderList() {
+    setState(() {
+      // sharedPreferences.setString("Score", "");
+      // _isLoading1 = true;
+    });
+    HTTPManager().getSkippedReminderListData(LogoutRequestModel(userId: id)).then((value) {
+      setState(() {
+        skippedReminderNotification = value;
+        // sharedPreferences.setString("Score", "");
+        // _isLoading1 = false;
+      });
+      print("SKIPPED REMINDER LIST");
+      print(value);
+
+      for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+        String title = "Hi $name. Did you....";
+        DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+        formattedDate = DateFormat('MM-dd-yy').format(DateTime.parse(skippedReminderNotification.result![i].createdAt.toString()));
+        formattedTime = DateFormat("hh:mm a").format(date);
+        showPopupDialogueForReminderGeneral(context,skippedReminderNotification.result![i].entityId.toString(),skippedReminderNotification.result![i].id.toString(),title,skippedReminderNotification.result![i].text.toString(),formattedDate!,formattedTime!);
+      }
+
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        // sharedPreferences.setString("Score", "");
+        // _isLoading1 = false;
+      });
+    });
   }
 
   showDeletePopup(String reminderId1,int index1) {
@@ -211,34 +274,51 @@ class _PostsState extends State<Posts> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar:_isUserDataLoading ? AppBarWidget().appBar(context,true,false,"","",true) : AppBarWidget().appBar(context,true,false,name,id,true),
+      appBar:AppBarWidget().appBarGeneralButtonsWithOtherUserLogged(
+          context,
+              () {
+            Navigator.of(context).pop();
+          }, true, true, true, id, true,true,badgeCount1,false,badgeCountShared,otherUserLoggedIn,name),
       floatingActionButton: Container(
         width: 60.0,
         height: 60.0,
         margin:const EdgeInsets.only(right: 10,bottom: 10),
-        child: FloatingActionButton(
-          onPressed: ()  async{
-            setState(() {
-              _dateController.text = "";
-              _titleController.text = "";
-              _endDateController.text = "";
-              isRepeat = true;
-              _scrollControllerHour =  FixedExtentScrollController(initialItem: 0);
-              _scrollControllerMin =  FixedExtentScrollController(initialItem: 0);
-              _scrollControllerAmPM =  FixedExtentScrollController(initialItem: 0);
-              selectedRadio = "repeat";
-              _weekdays = [
-                {"name" : "Sun", "Selected": true},
-                {"name" : "Mon", "Selected": true},
-                {"name" : "Tue", "Selected": true},
-                {"name" : "Wed", "Selected": true},
-                {"name" : "Thu", "Selected": true},
-                {"name" : "Fri", "Selected": true},
-                {"name" : "Sat", "Selected": true},];
-            });
-            reminderCreateBottomSheet(true,SingleAnswer(id: "0",userId: "0",dayList: "",date: "",time: "",status: "",timeType: ""),-1);
-          },
-          child: const Icon(Icons.add,color: AppColors.backgroundColor,size: 30,),
+        child: Visibility(
+          visible: !otherUserLoggedIn,
+          child: FloatingActionButton(
+            onPressed: ()  async{
+              setState(() {
+                _dateController.text = "";
+                _titleController.text = "";
+                _endDateController.text = "";
+                isRepeat = true;
+                _scrollControllerHour =  FixedExtentScrollController(initialItem: 0);
+                _scrollControllerMin =  FixedExtentScrollController(initialItem: 0);
+                _scrollControllerAmPM =  FixedExtentScrollController(initialItem: 0);
+                selectedRadio = "repeat";
+                _weekdays = [
+                  {"name" : "Sun", "Selected": true},
+                  {"name" : "Mon", "Selected": true},
+                  {"name" : "Tue", "Selected": true},
+                  {"name" : "Wed", "Selected": true},
+                  {"name" : "Thu", "Selected": true},
+                  {"name" : "Fri", "Selected": true},
+                  {"name" : "Sat", "Selected": true},];
+              });
+              if(userPremium == "no" && postReminderResponseListModel.singleAnswer!.length >= 2 ) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StripePayment(true)));
+              } else {
+                reminderCreateBottomSheet(true, SingleAnswer(id: "0",
+                    userId: "0",
+                    dayList: "",
+                    date: "",
+                    time: "",
+                    status: "",
+                    timeType: ""), -1);
+                }
+              },
+            child: const Icon(Icons.add,color: AppColors.backgroundColor,size: 30,),
+          ),
         ),
       ),
       body: Container(
@@ -283,7 +363,7 @@ class _PostsState extends State<Posts> {
                               ],
                             )
                         ),
-                      ) : postReminderResponseListModel.singleAnswer!.isEmpty ?  const Center(child: Text("No data available"),) : ListView.builder(
+                      ) : postReminderResponseListModel.singleAnswer!.isEmpty ?  const Center(child: Text("No reminder created"),) : ListView.builder(
                           itemCount: postReminderResponseListModel.singleAnswer!.length,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -396,8 +476,11 @@ class _PostsState extends State<Posts> {
 
                             return  GestureDetector(
                               onTap: () {
-                                reminderCreateBottomSheet(false,postReminderResponseListModel.singleAnswer![index],index);
-                              },
+                                if(!otherUserLoggedIn) {
+                                  reminderCreateBottomSheet(false,
+                                      postReminderResponseListModel
+                                          .singleAnswer![index], index);
+                                }},
                               child: Column(
                                 children: [
                                   Container(
@@ -447,6 +530,7 @@ class _PostsState extends State<Posts> {
                                             ),
                                           ),
                                         ),
+                                        if(!otherUserLoggedIn)
                                         Row(
                                           children: [
                                             IconButton(onPressed: (){
@@ -1285,7 +1369,7 @@ class _PostsState extends State<Posts> {
         time : value['data']['time'],
         timeType : value['data']['time_type'],
         status : value['data']['status'],
-        reminderType: value['post_data']['reminder_type'].toString(),
+        reminderType: value['data']['reminder_type'].toString(),
       );
       postReminderResponseListModel.singleAnswer![index] = singleAnswer;
       showToastMessage(context, "Status updated successfully", true);

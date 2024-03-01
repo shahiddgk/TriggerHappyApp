@@ -420,7 +420,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         Container(
                             margin:const EdgeInsets.only(top: 10),
-                            child: EmailField(_emailController)),
+                            child: EmailField(_emailController,"Type your email")),
                         if(!isTimeZoneLoading)
                         Visibility(
                           visible: !_isLogin,

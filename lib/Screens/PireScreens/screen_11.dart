@@ -1,8 +1,10 @@
+// ignore_for_file: unused_field
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_app/Screens/AuthScreens/change_password.dart';
 import 'package:flutter_quiz_app/Screens/PireScreens/screen_5.dart';
+import 'package:flutter_quiz_app/Screens/PireScreens/widgets/AppBar.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:flutter_quiz_app/Widgets/logo_widget_for_all_screens.dart';
 import 'package:flutter_quiz_app/Widgets/question_text_widget.dart';
@@ -14,7 +16,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../Widgets/video_player_in_pop_up.dart';
-import '../AuthScreens/login_screen.dart';
 
 // ignore: must_be_immutable
 class Screen11 extends StatefulWidget {
@@ -31,6 +32,8 @@ class _Screen11State extends State<Screen11> {
 
   late Timer _timer;
   int _start = 30;
+  int badgeCount1 = 0;
+  int badgeCountShared = 0;
 
   String name = "";
   String id = "";
@@ -70,6 +73,9 @@ class _Screen11State extends State<Screen11> {
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
+      badgeCount1 = sharedPreferences.getInt("BadgeCount")!;
+      badgeCountShared = sharedPreferences.getInt("BadgeShareResponseCount")!;
+
       name = sharedPreferences.getString("username")!;
       id = sharedPreferences.getString("userid")!;
       _isUserDataLoading = false;
@@ -87,29 +93,15 @@ class _Screen11State extends State<Screen11> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(!_isUserDataLoading ? name:""),
-        actions: [
-          IconButton(onPressed: (){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const ChangePassword()));
-          }, icon: const Icon(Icons.person,color: AppColors.textWhiteColor,)),
-          IconButton(onPressed: () async {
-            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-            setState(() {
-              sharedPreferences.setBool("user_logged_in",false);
-              googleSignIn.signOut();
-            });
-            // ignore: use_build_context_synchronously
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (BuildContext context) => const LoginPage()),
-                    (Route<dynamic> route) => false
-            );
-          }, icon: const Icon(Icons.logout,color: AppColors.textWhiteColor,))
-        ],
-      ),
+      appBar: AppBarWidget().appBarGeneralButtons(
+          context,
+              () {
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (BuildContext context) =>const Dashboard()),
+            //         (Route<dynamic> route) => false
+            // );
+          }, true, true, true, id, false,true,badgeCount1,false,badgeCountShared),
       bottomNavigationBar: Container(
         color: AppColors.backgroundColor,
         child: PriviousNextButtonWidget((){

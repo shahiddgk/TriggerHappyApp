@@ -2,7 +2,7 @@ import 'dart:ui';
 
 class AppColors {
  static const Color backgroundColor =  Color(0xFFFFFFFF);
- static const Color totalQuestionColor =  Color(0xfffdfb25);
+ static const Color totalQuestionColor =  Color(0xffe0e021);
  static const Color textWhiteColor =  Color(0xFF000000);
  static const Color selectedAnswerColor =  Color(0xFF08C729);
  static const Color containerBorder =  Color(0xFF000000);
@@ -11,6 +11,8 @@ class AppColors {
  static const Color radishHueColor = Color(0xFFb13330);
  static const Color primaryColor = Color(0xFF33aeb1);
  static const Color userActivityBgColor = Color(0xff33AEB3);
+ static const Color highlightColor = Color(0xffa8cacc);
+ static const Color connectionTypeTextColor = Color(0xff2a8e91);
  static const Color userActivityCardColor = Color(0xff93CBCD);
  static const Color warningYellowColor = Color(0xFFCDB599);
  static const Color footerBackgroundColor = Color(0xFFb133a5);
