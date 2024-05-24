@@ -453,46 +453,28 @@ void ladderBottomSheet(
     bool isEdit,
     BuildContext context,
     bool isGoals,
-    String heading, String type,
-    String initialValueForType1,
+    bool isChallenges,
+    String heading,
+    String initialValueForType,
     List itemsForType,
-    String initialValueForGoals1,
-    List itemsForGoals,
+    String initialValueForLadderType,
+    List itemsForLadderType,
+    String initialValueForMType,
+    List itemsForMType,
+    initialValueForGType,
+    List itemsForGType,
     Function onTap,
-    Function(String value) goalsValue,
+    Function(String value) ladderValue,
     Function(String value) typeValue,
     TextEditingController dateForGController,
     TextEditingController titleForGController,
     TextEditingController descriptionForGController) {
 
-  // bool isGoalsTabActive = true;
 
-  bool isChallenges = true;
 
-  String initialValueForMType = "Memories";
-  List itemsForMType = ["Memories","Achievements"];
 
-  String initialValueForMGoals = "Goals";
-  List itemsForGoals = <String>["Goals","Challenges"];
 
-  String initialValueForType = "Physical";
-  List itemsForType = ["Physical","Emotional","Relational","Work","Financial","Spiritual"];
 
-  if(isEdit) {
-    if(isGoals) {
-      initialValueForMGoals = initialValueForGoals1;
-      initialValueForType = initialValueForType1;
-
-      if(initialValueForMGoals == "Challenges") {
-        isChallenges = false;
-      } else {
-        isChallenges = true;
-      }
-    } else {
-      initialValueForMType = initialValueForType1;
-    }
-
-  }
 
   showModalBottomSheet(
       enableDrag: false,
@@ -503,6 +485,7 @@ void ladderBottomSheet(
       ) ,
       context: context,
       builder: (builder){
+
         return StatefulBuilder(
             builder: (BuildContext context,StateSetter setState) {
               return Padding(
@@ -536,152 +519,21 @@ void ladderBottomSheet(
                                 )
                               ],
                             ),
-                            Container(
-                              margin:const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                              child: isEdit ? Row(
-                                children: [
-                                  if(isGoals)
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-
-                                        print(isGoals);
-                                        setState(() {
-                                          // isGoalsTabActive = true;
-                                          isGoals = true;
-                                          sharedPreferences.setBool("IsGoals", true);
-                                        });
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        //width: MediaQuery.of(context).size.width/2,
-                                        padding:const EdgeInsets.symmetric(vertical: 10),
-                                        decoration: BoxDecoration(
-                                            color: isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-                                            border: Border.all(color: AppColors.primaryColor),
-                                            borderRadius:const BorderRadius.all(Radius.circular(30))),
-                                        child: Text("Goals/Challenges",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-                                      ),
-                                    ),
-                                  ),
-                                  if(!isGoals)
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                                        print(isGoals);
-                                        setState(() {
-                                          // isGoalsTabActive = false;
-                                          isGoals = false;
-                                          sharedPreferences.setBool("IsGoals", false);
-                                        });
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        // width: MediaQuery.of(context).size.width/2,
-                                        padding:const EdgeInsets.symmetric(vertical: 10),
-                                        decoration: BoxDecoration(
-                                            color: !isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-                                            border: Border.all(color: AppColors.primaryColor),
-                                            borderRadius:const BorderRadius.all(Radius.circular(30))),
-                                        child: Text("Memories/achievements",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ) : Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
-                                        print(isGoals);
-                                        setState(() {
-                                          // isGoalsTabActive = true;
-                                          isGoals = true;
-                                          sharedPreferences.setBool("IsGoals", true);
-                                        });
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        //width: MediaQuery.of(context).size.width/2,
-                                        padding:const EdgeInsets.symmetric(vertical: 10),
-                                        decoration: BoxDecoration(
-                                            color: isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-                                            border: Border.all(color: AppColors.primaryColor),
-                                            borderRadius:const BorderRadius.only(bottomLeft: Radius.circular(30),topLeft:Radius.circular(30), )),
-                                        child: Text("Goals/Challenges",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                                        print(isGoals);
-                                        setState(() {
-                                          // isGoalsTabActive = false;
-                                          isGoals = false;
-                                          sharedPreferences.setBool("IsGoals", false);
-                                        });
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        // width: MediaQuery.of(context).size.width/2,
-                                        padding:const EdgeInsets.symmetric(vertical: 10),
-                                        decoration: BoxDecoration(
-                                            color: !isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-                                            border: Border.all(color: AppColors.primaryColor),
-                                            borderRadius:const BorderRadius.only(bottomRight: Radius.circular(30),topRight:Radius.circular(30), )),
-                                        child: Text("Memories/achievements",maxLines: 1,style: TextStyle(fontSize:AppConstants.defaultFontSize,color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Text(
-                            //   type,
-                            //   style:const TextStyle(
-                            //       fontSize: AppConstants.defaultFontSize,
-                            //       fontWeight: FontWeight.normal,
-                            //       color: AppColors.primaryColor
-                            //   ),
-                            // ),
                             ListView(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               children: [
-                                DropDownField(isGoals ? initialValueForType : initialValueForMType, isGoals? itemsForType.map((item) {
-                              return  DropdownMenuItem(
-                                value: item.toString(),
-                                child: Text(item.toString()),
-                              );
-                            }).toList() : itemsForMType.map((item) {
+                                DropDownField(initialValueForLadderType, itemsForLadderType.map((item) {
                                   return  DropdownMenuItem(
                                     value: item.toString(),
                                     child: Text(item.toString()),
                                   );
-                                }).toList(), (value) {
-                                  // setState(() {
-                                  //   initialValueForType = value;
-                                  // });
-                                  print(value);
-                                  typeValue(value);
-                                }),
-
-                                Visibility(
-                                  visible: isGoals,
-                                  child: DropDownField(initialValueForMGoals, itemsForGoals.map((item) {
-                                    return  DropdownMenuItem(
-                                      value: item.toString(),
-                                      child: Text(item.toString()),
-                                    );
-                                  }).toList(), (value) {
+                                }).toList(), (value) async {
+                                  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                  sharedPreferences.setString('ladderValue', value);
+                                  ladderValue(value);
+                                  print('Ladder Type ===========> $value');
                                     if(value == "Challenges") {
                                       setState(() {
                                         isChallenges = false;
@@ -691,13 +543,35 @@ void ladderBottomSheet(
                                         isChallenges = true;
                                       });
                                     }
+                                  if(value == "Goals" || value == "Challenges") {
                                     setState(() {
-                                      initialValueForGoals1 = value;
+                                      isGoals = true;
                                     });
-                                    goalsValue(value);
+                                  } else {
+                                    setState(() {
+                                      isGoals = false;
+                                    });
                                   }
-                                  ),
+                                }
                                 ),
+
+
+                                Visibility(
+                                  visible : isGoals,
+                                  child: DropDownField(initialValueForType , itemsForType.map((item) {
+                                    return  DropdownMenuItem(
+                                      value: item.toString(),
+                                      child: Text(item.toString()),
+                                    );
+                                  }).toList(), (value) async {
+                                    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                    sharedPreferences.setString('typeValue', value);
+                                    typeValue(value);
+                                  }),
+                                ),
+
+
+
 
                                 Visibility(
                                     visible: isChallenges,
@@ -1477,7 +1351,7 @@ void sendConnectionBottomSheet(BuildContext context,Function(UsersSearchData val
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Request For:',style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.columnDetailsScreenFontSize,fontWeight: FontWeight.bold),),
+                        const Text('Request for someone to be your:',style: TextStyle(color: AppColors.primaryColor,fontSize: AppConstants.columnDetailsScreenFontSize,fontWeight: FontWeight.bold),),
                         Container(
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           child: OptionMcqAnswer(

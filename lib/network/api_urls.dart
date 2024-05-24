@@ -4,10 +4,12 @@ class ApplicationURLs {
 
   static const BASE_URL_FOR_TEST_PAYMENT = "https://staging.burgeon.app/api/";
 
+
   //Staging Base URL
   //    static const BASE_URL_APP = "https://staging.burgeon.app/api/";
   //Live Base URL
-   static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
+  // static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
+  static const BASE_URL_APP = "https://dashboard.burgeon.app/staging/api/";
   static const BASE_URL_FOR_MOBILE_IMAGES = "https://dashboard.burgeon.app/uploads/";
   // static const BASE_URL_FOR_IPAD_IMAGES = "https://dashboard.burgeon.app/uploads/ipad_tree/";
   static const stripeTokenUrl = "https://api.stripe.com/v1/tokens";

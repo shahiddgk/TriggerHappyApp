@@ -90,6 +90,7 @@ class TrellisLadderAchievementRequestModel {
   String? userId;
   String? type;
   String? option1;
+  String? option2;
   String? date;
   String? title;
   String? description;
@@ -99,6 +100,7 @@ class TrellisLadderAchievementRequestModel {
     this.userId,
     this.type,
     this.option1,
+    this.option2,
     this.date,
     this.title,
     this.description,
@@ -109,6 +111,7 @@ class TrellisLadderAchievementRequestModel {
     userId = json['user_id'];
     type = json['type'];
     option1 = json['option1'];
+    option2 = json['option2'];
     date = json['date'];
     title = json['text'];
     description = json['description'];
@@ -120,6 +123,7 @@ class TrellisLadderAchievementRequestModel {
     data['user_id'] = userId;
     data['type'] = type;
     data['option1'] = option1;
+    data['option2'] = option2;
     data['date'] = date;
     data['text'] = title;
     data['description'] = description;
@@ -132,6 +136,7 @@ class TrellisLadderAchievementUpdateRequestModel {
   String? ladderId;
   String? type;
   String? option1;
+  String? option2;
   String? date;
   String? title;
   String? description;
@@ -140,6 +145,7 @@ class TrellisLadderAchievementUpdateRequestModel {
     this.ladderId,
     this.type,
     this.option1,
+    this.option2,
     this.date,
     this.title,
     this.description
@@ -149,6 +155,7 @@ class TrellisLadderAchievementUpdateRequestModel {
     ladderId = json['id'];
     type = json['type'];
     option1 = json['option1'];
+    option2 = json['option2'];
     date = json['date'];
     title = json['text'];
     description = json['description'];
@@ -159,6 +166,7 @@ class TrellisLadderAchievementUpdateRequestModel {
     data['id'] = ladderId;
     data['type'] = type;
     data['option1'] = option1;
+    data['option2'] = option2;
     data['date'] = date;
     data['text'] = title;
     data['description'] = description;

@@ -86,8 +86,10 @@ dependencies:
   dropdown_search: ^5.0.6
   dropdown_button2: ^2.3.8
   badges: ^3.1.2
+  sign_in_with_apple: ^5.0.0
 
   flutter_chat_bubble: ^2.0.2
+  intl: ^0.18.1
 
 
 dev_dependencies:

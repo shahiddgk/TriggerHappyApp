@@ -56,6 +56,9 @@ class TrellisLadderDataModel {
 class TrellisLadderDataListModel {
   List<TrellisLadderDataModel> values = [];
 
+
+  int get length => values.length;
+
   TrellisLadderDataListModel() {
     values = [];
   }
