@@ -1019,18 +1019,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
 
                                       Row(
                                         children: [
-                                          const Text("Goals",style: TextStyle(
+                                          const Text("Future",style: TextStyle(
                                               fontSize: AppConstants.defaultFontSize,
                                               color: AppColors.primaryColor
                                           ),),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          IconButton(
-                                            onPressed: (){
-                                              bottomSheet(context,"Goals","Healthy goals lead to greater flourishing. Use S.M.A.R.T goals (Specific, Measurable, Attainable, Relevant, Timely) to ensure clarity and confirm accomplishment. Benchmarks are smaller goals. Remember the six major life areas when setting goals.","");
-                                            },
-                                            icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
+                                          // const SizedBox(
+                                          //   width: 10,
+                                          // ),
+                                          // IconButton(
+                                          //   onPressed: (){
+                                          //     bottomSheet(context,"Goals","Healthy goals lead to greater flourishing. Use S.M.A.R.T goals (Specific, Measurable, Attainable, Relevant, Timely) to ensure clarity and confirm accomplishment. Benchmarks are smaller goals. Remember the six major life areas when setting goals.","");
+                                          //   },
+                                          //   icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
                                         ],
                                       ),
 
@@ -1215,18 +1215,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          const Text("Challenges",style: TextStyle(
+                                          const Text("Present",style: TextStyle(
                                               fontSize: AppConstants.defaultFontSize,
                                               color: AppColors.primaryColor
                                           ),),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          IconButton(
-                                              onPressed: (){
-                                                bottomSheet(context,"Challenges","Challenges are obstacles or difficulties that arise while striving to achieve goals. They test one's resilience, problem-solving abilities, and determination. ","");
-                                              },
-                                              icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
+                                          // const SizedBox(
+                                          //   width: 10,
+                                          // ),
+                                          // IconButton(
+                                          //     onPressed: (){
+                                          //       bottomSheet(context,"Challenges","Challenges are obstacles or difficulties that arise while striving to achieve goals. They test one's resilience, problem-solving abilities, and determination. ","");
+                                          //     },
+                                          //     icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
                                         ],
                                       ),
 
@@ -1291,18 +1291,18 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          const Text("Memories",style: TextStyle(
+                                          const Text("Past",style: TextStyle(
                                               fontSize: AppConstants.defaultFontSize,
                                               color: AppColors.primaryColor
                                           ),),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          IconButton(
-                                              onPressed: (){
-                                                bottomSheet(context,"Memories","Memories are recollections of past experiences, whether joyful, sorrowful, or mundane. They shape our identity and influence our future actions and decisions.","");
-                                              },
-                                              icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
+                                          // const SizedBox(
+                                          //   width: 10,
+                                          // ),
+                                          // IconButton(
+                                          //     onPressed: (){
+                                          //       bottomSheet(context,"Memories","Memories are recollections of past experiences, whether joyful, sorrowful, or mundane. They shape our identity and influence our future actions and decisions.","");
+                                          //     },
+                                          //     icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
                                         ],
                                       ),
 
@@ -1310,8 +1310,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   ),
                                 ),
 
-                                trellisLadderDataForMemoriesFavourites.isEmpty ?const Text("") : Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                trellisLadderDataForMemoriesFavourites.isEmpty ? const SizedBox() : Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   child: ListView.builder(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
@@ -1359,36 +1359,8 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                   ),
                                 ),
 
-
-                                Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                         const Text("Achievements",style: TextStyle(
-                                              fontSize: AppConstants.defaultFontSize,
-                                              color: AppColors.primaryColor
-                                          ),),
-                                         const SizedBox(
-                                            width: 10,
-                                          ),
-                                          IconButton(
-                                            onPressed: (){
-                                              bottomSheet(context,"Achievements","Achievements are milestones or successes reached as a result of effort, skill, and perseverance. They represent the fulfillment of goals and are often celebrated as significant accomplishments.","");
-                                            },
-                                            icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
-                                        ],
-                                      ),
-
-                                    ],
-                                  ),
-                                ),
-
-                                trellisLadderDataForAchievementsFavourites.isEmpty ?const Text("") : Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                  trellisLadderDataForAchievementsFavourites.isEmpty ? const SizedBox() : Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   child: ListView.builder(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
@@ -1435,6 +1407,84 @@ class _TrellisScreenState extends State<TrellisScreen> {
                                       }
                                   ),
                                 ),
+                              
+
+
+                                // Container(
+                                //   margin: const EdgeInsets.symmetric(horizontal: 10,),
+                                //   child: Row(
+                                //     crossAxisAlignment: CrossAxisAlignment.center,
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       Row(
+                                //         children: [
+                                //          const Text("Achievements",style: TextStyle(
+                                //               fontSize: AppConstants.defaultFontSize,
+                                //               color: AppColors.primaryColor
+                                //           ),),
+                                //          const SizedBox(
+                                //             width: 10,
+                                //           ),
+                                //           IconButton(
+                                //             onPressed: (){
+                                //               bottomSheet(context,"Achievements","Achievements are milestones or successes reached as a result of effort, skill, and perseverance. They represent the fulfillment of goals and are often celebrated as significant accomplishments.","");
+                                //             },
+                                //             icon:const Icon(Icons.info_outline,size:20,color: AppColors.infoIconColor,)),
+                                //         ],
+                                //       ),
+
+                                //     ],
+                                //   ),
+                                // ),
+
+                                // trellisLadderDataForAchievementsFavourites.isEmpty ?const Text("") : Container(
+                                //   margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                //   child: ListView.builder(
+                                //       shrinkWrap: true,
+                                //       physics: const NeverScrollableScrollPhysics(),
+                                //       itemCount: trellisLadderDataForAchievementsFavourites.length >= 3 ? 3 : trellisLadderDataForAchievementsFavourites.length,
+                                //       itemBuilder:(context,index) {
+                                //         return GestureDetector(
+                                //           onTap: () {
+                                //             showDialog(
+                                //               context: context,
+                                //               builder: (BuildContext context) => _buildPopupDialog(context,"Achievements",trellisLadderDataForAchievementsFavourites[index],true),
+                                //             );
+                                //           },
+                                //           child: Container(
+                                //               margin:const EdgeInsets.symmetric(vertical: 5),
+                                //               decoration: BoxDecoration(
+                                //                   color: AppColors.backgroundColor,
+                                //                   borderRadius: BorderRadius.circular(10)
+                                //               ),
+                                //               padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5),
+                                //               child: Column(
+                                //                 children: [
+                                //                   Row(
+                                //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //                     children: [
+                                //                       Text("${trellisLadderDataForAchievementsFavourites[index].option2}",style:const TextStyle(color: AppColors.primaryColor,fontWeight: FontWeight.bold),),
+
+                                //                       if(!otherUserLoggedIn)
+                                //                       Row(
+                                //                         children: [
+                                //                           trellisLadderDataForAchievementsFavourites[index].favourite != 'no' ? Image.asset( "assets/like_full.png") : Image.asset( "assets/like_empty.png"),
+                                //                       IconButton(onPressed: () {
+                                //                         showDeletePopup( "achievements",trellisLadderDataForAchievementsFavourites[index].id.toString(),index,"");
+                                //                       }, icon: const Icon(Icons.delete,color: AppColors.redColor,),),
+                                //                         ],
+                                //                       )
+                                //                     ],
+                                //                   ),
+                                //                   Align(
+                                //                       alignment: Alignment.topLeft,
+                                //                       child: Text("${DateFormat('MM-dd-yy').format(DateTime.parse(trellisLadderDataForAchievementsFavourites[index].date.toString()))} | ${trellisLadderDataForAchievementsFavourites[index].text}"))
+                                //                 ],
+                                //               )),
+                                //         );
+                                //       }
+                                //   ),
+                                // ),
                               ],
                             ),
                           )
