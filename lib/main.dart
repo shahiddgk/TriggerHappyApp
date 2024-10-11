@@ -128,11 +128,12 @@ void _configureFirebase() async {
  String? body;
 
   await Firebase.initializeApp();
-  if (Platform.isIOS) {
-    await FirebaseMessaging.instance.requestPermission();
-  }
-  var token = await FirebaseMessaging.instance.getToken();
-  print("Device Token = $token");
+
+   FirebaseMessaging.instance.requestPermission().then((value) {
+     FirebaseMessaging.instance.getToken().then((token) {
+       print('FCM Token ===========> $token');
+     });
+   });
   // await Clipboard.setData(ClipboardData(text: token));
 
   FirebaseMessaging.instance.getInitialMessage().then((message) {

@@ -32,17 +32,23 @@ class StripePaymentRequestModel {
 
 class StripeCancelRequestModel {
   String? subscriptionId;
+  String? cancelReason;
+  String? planType;
 
-  StripeCancelRequestModel({this.subscriptionId});
+  StripeCancelRequestModel({this.subscriptionId,this.cancelReason, this.planType});
 
   StripeCancelRequestModel.fromJson(Map<String, dynamic> json) {
-    subscriptionId = json['subscription_id'] ;
+    subscriptionId = json['subscription_id'];
+    cancelReason = json['cancel_reason'];
+    planType = json['plan_type'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
 
     data['subscription_id'] = subscriptionId;
+    data['cancel_reason']   =  cancelReason ;
+    data['plan_type']   =  planType ;
 
     return data;
   }

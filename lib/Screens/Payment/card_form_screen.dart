@@ -630,11 +630,12 @@ class _CardFormScreenState extends State<CardFormScreen> {
         value['data']['stripe_customer_id'].toString(),
         value['data']['stripe_subscription_id'].toString(),
       );
-      if (widget.isUpgrade) {
-        _cancelSubscription();
-      } else {
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
-      }
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+      // if (widget.isUpgrade) {
+      //   _cancelSubscription();
+      // } else {
+      //   Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>const Dashboard()), (route) => false);
+      // }
       showToastMessage(context, "Subscription successful", true);
     }).catchError((e) {
       setState(() {

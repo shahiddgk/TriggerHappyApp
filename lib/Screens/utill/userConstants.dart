@@ -35,4 +35,5 @@ class TrellisScreenStatus {
   late String needsExpended = "needsExpended" ;
   late String identityExpended = "identityExpended" ;
   late String tribeExpended = "tribeExpended" ;
+  late String visionExpanded = "visionExpanded";
 }

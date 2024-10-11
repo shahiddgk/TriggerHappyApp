@@ -8,14 +8,17 @@ class Trellis_principle_data_model_class {
   String? empTruths;
   String? powerlessBelieves;
   bool? visibility;
+  String? favourite;
 
-  Trellis_principle_data_model_class(
-      {this.id,
+  Trellis_principle_data_model_class({
+        this.id,
         this.userId,
         this.type,
         this.empTruths,
         this.powerlessBelieves,
-        this.visibility});
+        this.visibility,
+        this.favourite,
+      });
 
   Trellis_principle_data_model_class.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -24,6 +27,7 @@ class Trellis_principle_data_model_class {
     empTruths = json['emp_truths'];
     powerlessBelieves = json['powerless_believes'];
     visibility = json['visibility'] ?? false ;
+    favourite = json['favourite'];
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +38,7 @@ class Trellis_principle_data_model_class {
     data['emp_truths'] = empTruths;
     data['powerless_believes'] = powerlessBelieves;
     data['visibility'] = visibility;
+    data['favourite'] = favourite;
     return data;
   }
 }

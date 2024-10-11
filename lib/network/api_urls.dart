@@ -6,16 +6,17 @@ class ApplicationURLs {
 
 
   //Staging Base URL
-  //    static const BASE_URL_APP = "https://staging.burgeon.app/api/";
+  // static const BASE_URL_APP = "https://dashboard.burgeon.app/staging/api/";
   //Live Base URL
-  static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
+  // static const BASE_URL_APP = "https://dashboard.burgeon.app/api/";
+  static const BASE_URL_APP = "https://dashboard.burgeon.app/apiv2/";
   static const BASE_URL_FOR_MOBILE_IMAGES = "https://dashboard.burgeon.app/uploads/";
   // static const BASE_URL_FOR_IPAD_IMAGES = "https://dashboard.burgeon.app/uploads/ipad_tree/";
   static const stripeTokenUrl = "https://api.stripe.com/v1/tokens";
   static const API_STRIPE_PAYMENT_URL = "${BASE_URL_APP}stripe_payment";
   static const API_STRIPE_CANCEL_SUBSCRIPTION_URL = "${BASE_URL_APP}subscription_cancel";
   static const API_SUBSCRIPTION_DETAILS_READ = "${BASE_URL_APP}subscription_details";
-
+  static const API_LEAVING_REASONS = "${BASE_URL_APP}leaving_reasons";
 
   //Stripe details key
   static const API_STRIPE_KEY_DETAILS = "${BASE_URL_APP}payment_settings";
@@ -56,12 +57,14 @@ class ApplicationURLs {
   static const API_TRIBE = "${BASE_URL_APP}tribe";
   static const API_TRELLIS_LADDER = "${BASE_URL_APP}ladder";
   static const API_TRELLIS_IDENTITY = "${BASE_URL_APP}identity";
+  static const API_TRELLIS_VISION = "${BASE_URL_APP}vision";
   static const API_TRELLIS_PRINCIPLES = "${BASE_URL_APP}principles";
   static const API_TRELLIS_READ = "${BASE_URL_APP}trellis_read";
   static const API_TRELLIS_DELETE = "${BASE_URL_APP}trellis_delete";
   static const API_LADDER_EDIT_RESPONSE = "${BASE_URL_APP}ladder_update";
   static const API_TRIBE_EDIT_RESPONSE = "${BASE_URL_APP}tribe_update";
   static const API_TRELLIS_UPDATE_IDENTITY = "${BASE_URL_APP}identity_update";
+  static const API_TRELLIS_UPDATE_VISION = "${BASE_URL_APP}vision_update";
   static const API_TRELLIS_UPDATE_PRINCIPLES = "${BASE_URL_APP}principles_update";
 
   static const API_TRELLIS_NEW_DATA_READ = "${BASE_URL_APP}new_tribe_read";
@@ -69,6 +72,12 @@ class ApplicationURLs {
   static const API_NEW_TRELLIS_TRIBE_INSERTION = "${BASE_URL_APP}new_tribe_insert";
 
   static const API_LADDER_FAVOURITE = "${BASE_URL_APP}add_fav_ladder";
+
+  static const API_IDENTITY_FAVOURITE = "${BASE_URL_APP}add_fav_identity";
+
+  static const API_PRINCIPLE_FAVOURITE = "${BASE_URL_APP}add_fav_principle";
+
+  // static const API_RHYTHMS_FAVOURITE = "${BASE_URL_APP}add_fav_rhythms";
 
 
 //Column Data

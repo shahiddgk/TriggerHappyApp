@@ -137,172 +137,6 @@ class LadderBottomSheet extends StatefulWidget {
   State<LadderBottomSheet> createState() => _LadderBottomSheetState();
 }
 
-// class MyBottomSheet extends StatefulWidget {
-//
-//   MyBottomSheet(
-//       this.isGoals,
-//       this.heading,
-//       this.type,
-//       this.initialValueForType,
-//       this.itemsForType,
-//       this.initialValueForGoals,
-//       this.itemsForGoals,
-//       this.onTap,
-//       this.goalsValue,
-//       this.typeValue,
-//       this.dateForGController,
-//       this.titleForGController,
-//       this.descriptionForGController,
-//       {Key? key}) : super(key: key);
-//
-//   bool isGoals;
-//   String heading;
-//   String type;
-//   String initialValueForType;
-//   List itemsForType;
-//   String initialValueForGoals;
-//   List itemsForGoals;
-//   Function onTap;
-//   Function(String value) goalsValue;
-//   Function(String value) typeValue;
-//   TextEditingController dateForGController;
-//   TextEditingController titleForGController;
-//   TextEditingController descriptionForGController;
-//
-//   @override
-//   _MyBottomSheetState createState() => _MyBottomSheetState();
-// }
-//
-// class _MyBottomSheetState extends State<MyBottomSheet> {
-//   bool isGoals = false;
-//
-//   toggleVisibility(bool value) {
-//     setState(() {
-//       isGoals = value;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return SingleChildScrollView(
-//       scrollDirection: Axis.vertical,
-//       child: Container(
-//         child: Column(
-//           children: [
-//             // ElevatedButton(
-//             //   onPressed: (){toggleVisibility(false);},
-//             //   child: Text('Toggle Visibility'),
-//             // ),
-//             Row(
-//               crossAxisAlignment: CrossAxisAlignment.center,
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   widget.heading,
-//                   style:const TextStyle(
-//                     fontSize: AppConstants.headingFontSize,
-//                     fontWeight: FontWeight.bold,
-//
-//                   ),
-//                 ),
-//                 IconButton(onPressed: (){
-//                   Navigator.of(context).pop();
-//                 },
-//                     icon:const Icon(Icons.cancel)
-//                 )
-//               ],
-//             ),
-//             Container(
-//               margin:const EdgeInsets.symmetric(horizontal: 10),
-//               child: Row(
-//                 children: [
-//                   Expanded(
-//                     child: GestureDetector(
-//                       onTap: () {
-//                         toggleVisibility(true);
-//                       },
-//                       child: Container(
-//                         alignment: Alignment.center,
-//                         //width: MediaQuery.of(context).size.width/2,
-//                         padding:const EdgeInsets.symmetric(vertical: 10),
-//                         decoration: BoxDecoration(
-//                             color: isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-//                             border: Border.all(color: AppColors.primaryColor),
-//                             borderRadius:const BorderRadius.only(bottomLeft: Radius.circular(30),topLeft:Radius.circular(30), )),
-//                         child: Text("Goals/Challenges",style: TextStyle(color: isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-//                       ),
-//                     ),
-//                   ),
-//                   Expanded(
-//                     child: GestureDetector(
-//                       onTap: (){toggleVisibility(false);},
-//                       child: Container(
-//                         alignment: Alignment.center,
-//                         // width: MediaQuery.of(context).size.width/2,
-//                         padding:const EdgeInsets.symmetric(vertical: 10),
-//                         decoration: BoxDecoration(
-//                             color: !isGoals ? AppColors.primaryColor : AppColors.backgroundColor,
-//                             border: Border.all(color: AppColors.primaryColor),
-//                             borderRadius:const BorderRadius.only(bottomRight: Radius.circular(30),topRight:Radius.circular(30), )),
-//                         child: Text("Memories/achievements",style: TextStyle(color: !isGoals ? AppColors.backgroundColor : AppColors.primaryColor),),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             DropDownField(widget.initialValueForType, widget.itemsForType.map((item) {
-//               return  DropdownMenuItem(
-//                 value: item.toString(),
-//                 child: Text(item.toString()),
-//               );
-//             }).toList(), (value) {
-//               // setState(() {
-//               //   initialValueForType = value;
-//               // });
-//               widget.typeValue(value);
-//             }),
-//             Visibility(
-//                 visible: isGoals,
-//                 child: DatePickerField(widget.dateForGController,"Select date",isGoals)),
-//
-//             Container(
-//                 margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-//                 child: NameField(widget.titleForGController,"title",1,70,true)),
-//             Container(
-//                 margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-//                 child: NameField(widget.descriptionForGController,"description",4,70,true)),
-//             SaveButtonWidgets( (){
-//               widget.onTap();
-//             }),
-//             // ListView(
-//             //   shrinkWrap: true,
-//             //   physics: const NeverScrollableScrollPhysics(),
-//             //   children: [
-//             //
-//             //
-//             //     // DropDownField(initialValueForGoals, itemsForGoals.map((item) {
-//             //     //   return  DropdownMenuItem(
-//             //     //     value: item.toString(),
-//             //     //     child: Text(item.toString()),
-//             //     //   );
-//             //     // }).toList(), (value) {
-//             //     //   setState(() {
-//             //     //     initialValueForGoals = value;
-//             //     //   });
-//             //     //   goalsValue(value);
-//             //     // }
-//             //     // ),
-//             //
-//             //
-//             //   ],
-//             // ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class _LadderBottomSheetState extends State<LadderBottomSheet> {
 
@@ -449,6 +283,168 @@ class _LadderBottomSheetState extends State<LadderBottomSheet> {
 }
 
 
+void visionBottomSheet(
+    BuildContext context,
+    String heading,
+    TextEditingController visionController,
+    TextEditingController relationalVisionController,
+    TextEditingController emotionalVisionController,
+    TextEditingController physicalVisionController,
+    TextEditingController workVisionController,
+    TextEditingController financialVisionController,
+    TextEditingController spiritualVisionController,
+    Function() onTap,
+
+    ){
+
+
+  showModalBottomSheet(
+      enableDrag: false,
+      isDismissible: true,
+      isScrollControlled: true,
+      shape:const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight: Radius.circular(20.0),topLeft: Radius.circular(20.0))
+      ) ,
+      context: context,
+      builder: (builder){
+
+        return StatefulBuilder(
+            builder: (BuildContext context,StateSetter setState) {
+              return Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: SingleChildScrollView(
+                  child: SafeArea(
+                    child: Container(
+                        color: AppColors.backgroundColor,
+                        padding:const EdgeInsets.only(top: 10,left: 10,right: 10,bottom: 40),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  heading,
+                                  style:const TextStyle(
+                                    fontSize: AppConstants.headingFontSize,
+                                    fontWeight: FontWeight.bold,
+
+                                  ),
+                                ),
+                                IconButton(onPressed: (){
+                                  Navigator.of(context).pop();
+                                },
+                                    icon:const Icon(Icons.cancel)
+                                )
+                              ],
+                            ),
+
+                            Container(
+                                margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
+                                child: NameField(visionController,"your one sentence headstone",1,140,true,false)),
+
+                            const Text(
+                              "Obituary (1-2 sentences per section)",
+                              style:const TextStyle(
+                                fontSize: AppConstants.defaultFontSize,
+                                fontWeight: FontWeight.bold,
+
+                              ),
+                            ),
+
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Physical Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(physicalVisionController,"Physical Vision",1,300,true,false)),
+
+
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Relational Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(relationalVisionController,"Relational Vision",1,300,true,false)),
+
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Emotional Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(emotionalVisionController,"Emotional Vision",1,300,true,false)),
+
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Work Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(workVisionController,"Work Vision",1,300,true,false)),
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Financial Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(financialVisionController,"Financial Vision",1,300,true,false)),
+                            Container(
+                              margin:const EdgeInsets.only(top: 5,left: 10,right: 5),
+                              child: const Text(
+                                "Spiritual Vision",style: TextStyle(
+                                  fontSize: AppConstants.defaultFontSize,
+                                  color: AppColors.primaryColor),
+                              ),
+                            ),
+                            Container(
+                                margin:const EdgeInsets.only(left: 5,right: 5,bottom: 5),
+                                child: NameField(spiritualVisionController,"Spiritual Vision",1,300,true,false)),
+
+
+                            SaveButtonWidgets( (){
+                              onTap();
+                            }),
+
+                          ],
+                        )
+                    ),
+                  ),
+                ),
+              );
+            }
+        );
+
+      }
+  );
+}
+
+
 void ladderBottomSheet(
     bool isEdit,
     BuildContext context,
@@ -469,12 +465,6 @@ void ladderBottomSheet(
     TextEditingController dateForGController,
     TextEditingController titleForGController,
     TextEditingController descriptionForGController) {
-
-
-
-
-
-
 
   showModalBottomSheet(
       enableDrag: false,
@@ -579,7 +569,7 @@ void ladderBottomSheet(
 
                                 Container(
                                     margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
-                                    child: NameField(titleForGController,"title",1,70,true,false)),
+                                    child: NameField(titleForGController,"title",1,40,true,false)),
                                 Container(
                                     margin:const EdgeInsets.only(top: 5,left: 5,right: 5,bottom: 5),
                                     child: NameField(descriptionForGController,"description",4,0,true,false)),
@@ -837,120 +827,6 @@ void tribeBottomSheet(BuildContext context,String selected,bool isEdit,String he
   );
 }
 
-// class TribeBottomSheet extends StatefulWidget {
-//   const TribeBottomSheet({Key? key}) : super(key: key);
-//
-//   @override
-//   _TribeBottomSheetState createState() => _TribeBottomSheetState();
-// }
-//
-// class _TribeBottomSheetState extends State<TribeBottomSheet> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.only(
-//           bottom: MediaQuery.of(context).viewInsets.bottom),
-//       child: SingleChildScrollView(
-//         child: SafeArea(
-//           child: Container(
-//               padding:const EdgeInsets.only(top: 10,left: 10,right: 10,bottom: 40),
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       Text(
-//                         heading,
-//                         style:const TextStyle(
-//                           fontSize: AppConstants.headingFontSize,
-//                           fontWeight: FontWeight.bold,
-//
-//                         ),
-//                       ),
-//                       IconButton(onPressed: (){
-//                         Navigator.of(context).pop();
-//                       },
-//                           icon:const Icon(Icons.cancel)
-//                       )
-//                     ],
-//                   ),
-//                   Row(
-//                     mainAxisSize: MainAxisSize.min,
-//                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     children: [
-//                       GestureDetector(
-//                         onTap:() {
-//                           setState((){
-//                             isMentor = true;
-//                             isPeer = false;
-//                             isMentee = false;
-//                           });
-//                         },
-//                         child: Container(
-//                           padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-//                           decoration: BoxDecoration(
-//                             color: isMentor ? AppColors.primaryColor : AppColors.lightGreyColor,
-//                             borderRadius: BorderRadius.circular(10),
-//                           ),
-//                           child: const Text("Mentor",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-//                         ),
-//                       ),
-//                       GestureDetector(
-//                         onTap:() {
-//                           setState((){
-//                             isMentor = false;
-//                             isPeer = true;
-//                             isMentee = false;
-//                           });
-//                         },
-//                         child: Container(
-//                           padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-//                           decoration: BoxDecoration(
-//                             color: isPeer ? AppColors.primaryColor : AppColors.lightGreyColor,
-//                             borderRadius: BorderRadius.circular(10),
-//                           ),
-//                           child: const Text("Peer",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-//                         ),
-//                       ),
-//                       GestureDetector(
-//                         onTap:() {
-//                           setState((){
-//                             isMentor = false;
-//                             isPeer = false;
-//                             isMentee = true;
-//                           });
-//                         },
-//                         child: Container(
-//                           padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-//                           decoration: BoxDecoration(
-//                             color: isMentee ? AppColors.primaryColor : AppColors.lightGreyColor,
-//                             borderRadius: BorderRadius.circular(10),
-//                           ),
-//                           child: const Text("Mentee",style: TextStyle(fontSize: AppConstants.defaultFontSize),),
-//                         ),
-//                       )
-//                     ],
-//                   ),
-//                   Visibility(
-//                       visible: isMentor,
-//                       child: isMentorField),
-//                   Visibility(
-//                       visible: isPeer,
-//                       child: isPeerField),
-//                   Visibility(
-//                       visible: isMentee,
-//                       child: isMenteeField),
-//                 ],
-//               )
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 showModuleListPopUp(BuildContext context, Function(List<String> value) selectedList,List<String> selected1) {
   bool isPhone;

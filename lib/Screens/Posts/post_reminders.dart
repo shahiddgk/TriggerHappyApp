@@ -1,12 +1,12 @@
 
 // ignore_for_file: avoid_print, unused_field
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Widgets/constants.dart';
 import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/model/request_model/post_request_model.dart';
+import 'package:interval_time_picker/interval_time_picker.dart' as TimePicker;
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -1044,11 +1044,14 @@ class _PostsState extends State<Posts> {
                           child: TextFormField(
                             controller: _reminderTimeController,
                             onTap: () async {
-                              final pickedTime = await showTimePicker(
-                                helpText: 'Select Reminder Time',
-                                context: context,
-                                initialEntryMode: TimePickerEntryMode.inputOnly,
-                                initialTime: TimeOfDay(hour: selectedReminderTime.hour, minute: selectedReminderTime.minute),
+                              final pickedTime = await TimePicker.showIntervalTimePicker(
+                                  context: context,
+                                  helpText: 'Select Remainder Time',
+                                  interval: 15,
+                                  visibleStep: TimePicker.VisibleStep.fifteenths,
+                                  errorInvalidText: 'Enter a valid time(15 minutes interval)',
+                                  initialEntryMode: TimePicker.TimePickerEntryMode.dialOnly,
+                                  initialTime: TimeOfDay(hour: selectedReminderTime.hour, minute: selectedReminderTime.minute)
                               );
 
                               if(pickedTime != null){

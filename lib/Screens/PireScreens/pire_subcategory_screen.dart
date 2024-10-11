@@ -258,7 +258,7 @@ class _PireCategoryScreenState extends State<PireCategoryScreen> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Center(
-                                child: Text("P.I.R.E. Negative",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
+                                child: Text("P.I.R.E. Challenge",textAlign: TextAlign.center,style: TextStyle(fontSize: AppConstants.headingFontSize),),
                               ),
                             ),
                           )

@@ -3,9 +3,13 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:credit_card_form/credit_card_form.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_quiz_app/Screens/Trellis/widgets/dropdown_field.dart';
 import 'package:flutter_quiz_app/Screens/Widgets/toast_message.dart';
 import 'package:flutter_quiz_app/Screens/utill/userConstants.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
+import 'package:flutter_quiz_app/model/reponse_model/leaving_reason_response_model.dart';
+import 'package:flutter_quiz_app/model/request_model/logout_user_request.dart';
 import 'package:flutter_quiz_app/model/request_model/stripe_request_payment_model.dart';
 import 'package:flutter_quiz_app/network/http_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -48,6 +52,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
   final TextEditingController _expMonthController = TextEditingController();
   final TextEditingController _expYearController = TextEditingController();
   final TextEditingController _cvcController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
   Map<String, dynamic>? paymentIntent;
   bool isLoading = false;
 
@@ -266,7 +271,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(height: 2.0),
+                  const SizedBox(height: 20.0),
                   if(isFreeButton)
                   const Text(
                     'Free',
@@ -285,6 +290,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         fontWeight: FontWeight.normal,
                       ),
                     ),
+                    
                   if(isAnnualButton)
                     const Text(
                       'Annual',
@@ -303,7 +309,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                  SizedBox(height: MediaQuery.of(context).size.height/25),
+                  SizedBox(height: MediaQuery.of(context).size.height/20),
                   Visibility(
                       visible: userPremium == "no" && isFreeButton,
                       child: const Text(
@@ -583,7 +589,6 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                   //       )
                   //   ),
                   // ),
-                  const  SizedBox(height: 16.0),
                   if(!isFreeButton)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -620,7 +625,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         } else if (isMonthlyButton && userPremiumType == "year") {
                           _cancelSubscription("Monthly");
                         } else {
-                          _cancelSubscription("");
+                          showCancelSubscriptionDialog();
                         }
                       }
                       },
@@ -634,6 +639,7 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
                         ? const Text('Cancel Subscription',style: TextStyle(color: AppColors.backgroundColor),)
                         : const Text('Upgrade Now',style: TextStyle(color: AppColors.backgroundColor),),
                   ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -664,9 +670,17 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
         isLoading = true;
       });
 
-      HTTPManager().cancelSubscription(
-          StripeCancelRequestModel(subscriptionId: userSubscriptionId)).then((
-          value) {
+      String planType = 'unknown';
+
+      if(userPremiumType  == 'year'){
+        planType = 'yearly';
+      }else if(userPremiumType == 'month'){
+        planType = 'monthly';
+      }else if(userPremiumType == 'day'){
+        planType = 'daily';
+      }
+
+      HTTPManager().cancelSubscription(StripeCancelRequestModel(subscriptionId: userSubscriptionId,cancelReason: _reasonController.text.trim(), planType: planType)).then((value) {
         print("subscription cancel type::$subscriptionType");
         UserStatePrefrence().setAnswerText(
           true,
@@ -708,6 +722,181 @@ class _StripePaymentState extends State<StripePayment> with SingleTickerProvider
         print(e);
       });
     }
+  }
+  
+  showCancelSubscriptionDialog(){
+
+
+    setState(() {
+      isLoading = true;
+    });
+
+    HTTPManager().getLeavingReasons(LogoutRequestModel(userId: id)).then((value) {
+
+      setState(() {
+        isLoading = false;
+      });
+
+      List<Reasons> leavingReasons = [];
+
+      String initialReasonValue = '';
+
+      leavingReasons = value.reasons ?? [];
+      initialReasonValue = leavingReasons[0].reason ?? '';
+
+
+
+
+
+      String errorMessage = '';
+
+      bool showTextField = false;
+
+
+
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Dialog(
+                backgroundColor: AppColors.naqFieldColor,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child:Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/sad-face.png', height: 80,width: 80,),
+                      const SizedBox(height: 10),
+                      Text('We are sad you are leaving', style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(width: 10),
+                          Text('Tell us, Why?', style: TextStyle(fontSize: 14))
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      DropDownField(
+                          initialReasonValue,
+                          leavingReasons.map((item) {
+                            return  DropdownMenuItem(
+                              value: item.reason.toString(),
+                              child: Text(item.reason.toString()),
+                            );
+                          }).toList(), (value) {
+
+                        setState((){
+                          initialReasonValue = value;
+                          if(value == 'Other'){
+                            showTextField = true;
+                            _reasonController.text = '';
+                          }else{
+                            showTextField = false;
+                            errorMessage = '';
+                            _reasonController.text = value;
+                          }
+                        });
+                      }),
+                      const SizedBox(height: 10),
+                      if(showTextField)
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.grey.shade300),
+                            color: AppColors.lightGreyColor,
+
+                          ),
+                          child: TextFormField(
+                            controller: _reasonController,
+                            style: TextStyle(fontSize: 14),
+                            onChanged: (value) {
+                              if(value.trim().isNotEmpty){
+                                setState((){
+                                  errorMessage = '';
+                                });
+                              }
+                            },
+                            textInputAction: TextInputAction.done,
+                            validator: (value) {
+                              if(value!.trim().isEmpty){
+                                print('Helloo =========>');
+                                setState((){
+                                  errorMessage = 'Please write reason you\'re leaving';
+                                });
+
+                              }
+                              return null;
+                            },
+                            maxLines: 5,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(100), // Limit to 100 characters
+                            ],
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                              border: InputBorder.none,
+                              hintText: 'Please write reason here',
+
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      if(errorMessage != '')
+                        Text(errorMessage,style: const TextStyle(color: AppColors.redColor,fontSize: 13),),
+
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 100),
+                          backgroundColor: AppColors.primaryColor,
+                        ),
+                        onPressed: (){
+                          if(initialReasonValue == 'Other' && _reasonController.text.trim().isEmpty){
+                            setState((){
+                              errorMessage = 'Please write reason you\'re leaving';
+                            });
+                          }else {
+                            Navigator.of(context).pop();
+                            _cancelSubscription("");
+
+                          }
+
+                        },
+                        child: const Text('Proceed',style: TextStyle(color: AppColors.backgroundColor),),
+                      )
+
+
+
+
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },);
+
+
+
+
+    }).catchError((e){
+      setState(() {
+        isLoading = false;
+      });
+      print(e);
+    });
+
+
+
+
   }
 
   // _createCardToke(String cardNumber1,int expMonth1,int expYear1,String cvc1,String publishableKey1) {

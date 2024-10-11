@@ -290,12 +290,12 @@ class _SplashScreenState extends State<SplashScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)
+                            borderRadius: BorderRadius.circular(10),
                         ),
                         minimumSize: Size(MediaQuery.of(context).size.width/2, 40), // Set the minimum width and height
                         padding: EdgeInsets.zero, // Remove any default padding
                       ),
-                      child:const Text("Tap to Proceed",style: TextStyle(color: AppColors.textWhiteColor),),),
+                      child:const Text("Tap to Proceed",style: TextStyle(color: Colors.white),),),
                   )
                 ],
               ),

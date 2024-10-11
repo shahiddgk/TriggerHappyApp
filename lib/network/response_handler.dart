@@ -26,6 +26,7 @@ class ResponseHandler {
     var responseJson;
     try {
       final response = await http.post(url, body: params, headers: head).timeout(const Duration(seconds: 45));
+      print('Response =====> ${response.body}');
       responseJson = json.decode(response.body.toString());
       // ignore: avoid_print
       print(responseJson);

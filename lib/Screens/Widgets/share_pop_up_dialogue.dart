@@ -47,112 +47,114 @@ showThumbsUpDialogue(BuildContext context,AnimationController animationControlle
               width: dialogWidth,
               child: Column(
                 children: [
-                  Container(
-                    margin:const EdgeInsets.only(bottom: 5),
-                    decoration: const BoxDecoration(color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(150),topRight: Radius.circular(150))
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.topCenter,
-                    child:  const Text("Coaches Opinion",style: TextStyle(color:AppColors.hoverColor,fontSize: AppConstants.headingFontSize,fontWeight: FontWeight.bold),),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            PopUpConnectionListItem(
-                              showStars : true,showOnlineIcon: true,
-                              userItemTap: (){},
-                              imageUrl:"https://trueincrease.com/wp-content/uploads/2023/02/Aaron-Brown-Bio-Headshot-2023-300x300.jpg",
-                              userName: "Aron Brown",connectionType: "Coach",stars:"5",
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        CardFormScreen("",false,true,"96",responseId,responseType)));
-                              },
-                              child: FadeTransition(
-                                opacity: animationController,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 5),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.primaryColor,
-                                      borderRadius: BorderRadius.circular(8)
-                                  ),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(" Pay 25 \$ ",style: TextStyle(color: AppColors.hoverColor,fontSize: AppConstants.headingFontSize),),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const VerticalDivider(),
-                      // SizedBox(height: MediaQuery.of(context).size.height/6, child: const VerticalDivider(color: AppColors.primaryColor)),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            PopUpConnectionListItem(
-                              showStars : true,showOnlineIcon: true,
-                              userItemTap: (){},
-                              imageUrl:"https://trueincrease.com/wp-content/uploads/2023/02/Chris-Williams-Bio-Headshot-2023-300x300.jpg",
-                              userName: "Chris Williams",connectionType: "Coach",stars:"5",
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        CardFormScreen("",false,true,"95",responseId.toString(),responseType)));
-                              },
-                              child: FadeTransition(
-                                opacity: animationController,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 5),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.primaryColor,
-                                      borderRadius: BorderRadius.circular(8)
-                                  ),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(" Pay 25 \$ ",style: TextStyle(color: AppColors.hoverColor,fontSize: AppConstants.headingFontSize),),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(color: AppColors.primaryColor,),
+                  // Container(
+                  //   margin:const EdgeInsets.only(bottom: 5),
+                  //   decoration: const BoxDecoration(color: AppColors.primaryColor,
+                  //       borderRadius: BorderRadius.only(topLeft: Radius.circular(150),topRight: Radius.circular(150))
+                  //   ),
+                  //   width: MediaQuery.of(context).size.width,
+                  //   alignment: Alignment.topCenter,
+                  //   child:  const Text("Coaches Opinion",style: TextStyle(color:AppColors.hoverColor,fontSize: AppConstants.headingFontSize,fontWeight: FontWeight.bold),),
+                  // ),
+                  // Row(
+                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Expanded(
+                  //       child: Column(
+                  //         children: [
+                  //           PopUpConnectionListItem(
+                  //             showStars : true,showOnlineIcon: true,
+                  //             userItemTap: (){},
+                  //             imageUrl:"https://trueincrease.com/wp-content/uploads/2023/02/Aaron-Brown-Bio-Headshot-2023-300x300.jpg",
+                  //             userName: "Aron Brown",connectionType: "Coach",stars:"5",
+                  //           ),
+                  //           InkWell(
+                  //             onTap: () {
+                  //               Navigator.of(context).push(MaterialPageRoute(
+                  //                   builder: (context) =>
+                  //                       CardFormScreen("",false,true,"96",responseId,responseType)));
+                  //             },
+                  //             child: FadeTransition(
+                  //               opacity: animationController,
+                  //               child: Container(
+                  //                 margin: const EdgeInsets.symmetric(vertical: 5),
+                  //                 decoration: BoxDecoration(
+                  //                     color: AppColors.primaryColor,
+                  //                     borderRadius: BorderRadius.circular(8)
+                  //                 ),
+                  //                 child: Container(
+                  //                   alignment: Alignment.center,
+                  //                   child: const Row(
+                  //                     mainAxisAlignment: MainAxisAlignment.center,
+                  //                     children: [
+                  //                       Text(" Pay 25 \$ ",style: TextStyle(color: AppColors.hoverColor,fontSize: AppConstants.headingFontSize),),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //     const VerticalDivider(),
+                  //     // SizedBox(height: MediaQuery.of(context).size.height/6, child: const VerticalDivider(color: AppColors.primaryColor)),
+                  //     Expanded(
+                  //       child: Column(
+                  //         children: [
+                  //           PopUpConnectionListItem(
+                  //             showStars : true,showOnlineIcon: true,
+                  //             userItemTap: (){},
+                  //             imageUrl:"https://trueincrease.com/wp-content/uploads/2023/02/Chris-Williams-Bio-Headshot-2023-300x300.jpg",
+                  //             userName: "Chris Williams",connectionType: "Coach",stars:"5",
+                  //           ),
+                  //           InkWell(
+                  //             onTap: () {
+                  //               Navigator.of(context).push(MaterialPageRoute(
+                  //                   builder: (context) =>
+                  //                       CardFormScreen("",false,true,"95",responseId.toString(),responseType)));
+                  //             },
+                  //             child: FadeTransition(
+                  //               opacity: animationController,
+                  //               child: Container(
+                  //                 margin: const EdgeInsets.symmetric(vertical: 5),
+                  //                 decoration: BoxDecoration(
+                  //                     color: AppColors.primaryColor,
+                  //                     borderRadius: BorderRadius.circular(8)
+                  //                 ),
+                  //                 child: Container(
+                  //                   alignment: Alignment.center,
+                  //                   child: const Row(
+                  //                     mainAxisAlignment: MainAxisAlignment.center,
+                  //                     children: [
+                  //                       Text(" Pay 25 \$ ",style: TextStyle(color: AppColors.hoverColor,fontSize: AppConstants.headingFontSize),),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // const Divider(color: AppColors.primaryColor,),
                   Expanded(
                       child:Column(
                         children: [
                           Container(
-                            margin:const EdgeInsets.symmetric(vertical: 3),
-                            decoration: const BoxDecoration(color: AppColors.primaryColor,
+                            // margin:const EdgeInsets.symmetric(vertical: 3),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(25),topRight: Radius.circular(25))
                             ),
                             width: MediaQuery.of(context).size.width,
                             alignment: Alignment.topCenter,
                             child:  const Text("Search your connections",style: TextStyle(color:AppColors.hoverColor,fontSize: AppConstants.headingFontSize,fontWeight: FontWeight.bold),),
                           ),
-                          const SizedBox(height: 2,),
+                          const SizedBox(height: 5),
                           SearchTextField((value) {
                             setState(() {
                               if(value.isEmpty) {

@@ -154,7 +154,7 @@ class _ShareCustomAlertDialogueState extends State<ShareCustomAlertDialogue>  wi
             Column(
               children: [
                 Visibility(
-                  visible: !widget.isModule,
+                  visible: false,
                   child: Column(
                     children: [
                       Container(
@@ -255,16 +255,18 @@ class _ShareCustomAlertDialogueState extends State<ShareCustomAlertDialogue>  wi
                   ),
                 ),
                 Container(
-                  margin:const EdgeInsets.symmetric(vertical: 3),
+                  // margin:const EdgeInsets.symmetric(vertical: 3),
                   decoration: BoxDecoration(color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular( widget.isModule ? 150 : 0),topRight: Radius.circular(widget.isModule ? 150 : 0),)
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(25),topRight: Radius.circular(25)),
+                      // borderRadius: BorderRadius.only(topLeft: Radius.circular( widget.isModule ? 150 : 0),topRight: Radius.circular(widget.isModule ? 150 : 0),)
+
                   ),
                   width: MediaQuery.of(context).size.width,
                   alignment: Alignment.topCenter,
                   child:  const Text("Search your connections",style: TextStyle(color:AppColors.hoverColor,fontSize: AppConstants.headingFontSize,fontWeight: FontWeight.bold),),
                 ),
                 // HeadingWithButtonRow("Search you connections",(){},false),
-                const SizedBox(height: 2,),
+                const SizedBox(height: 5),
                 SearchTextField((value) {
                   setState(() {
                     if(value.isEmpty) {
