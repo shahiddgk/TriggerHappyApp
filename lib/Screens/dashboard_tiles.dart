@@ -144,13 +144,12 @@ class _DashboardState extends State<Dashboard> {
             ),
             actions: [
               // ignore: deprecated_member_use
-              TextButton(
-                child:const Text('No'),
-                onPressed: () {
-                  // Invoke the remind me later callback
-                  onRemindMeLaterPressed();
-                },
-              ),
+              // TextButton(
+              //   child:const Text('No'),
+              //   onPressed: () {
+              //     onRemindMeLaterPressed();
+              //   },
+              // ),
               // ignore: deprecated_member_use
               TextButton(
                 child:const Text('Update Now'),

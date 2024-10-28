@@ -529,7 +529,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
         print("Payment Token");
         print(value);
 
-        _sendPaymentForCoaches(id,value.toString(),widget.shareType,widget.recieverId,widget.entityId);
+        _sendPaymentForCoaches(id,value.toString(),widget.shareType,widget.recieverId,email,widget.entityId);
 
       }).catchError((e) {
         final jsonData = jsonDecode(e.toString());
@@ -548,9 +548,9 @@ class _CardFormScreenState extends State<CardFormScreen> {
     }
   }
 
-  _sendPaymentForCoaches(String userId1,String token1,String type1,String recieverId1,String entityId1) {
+  _sendPaymentForCoaches(String userId1,String token1,String type1,String recieverId1, String email,String entityId1) {
 
-    HTTPManager().sendSagePaymentForCoach(SageCoachesPayment(userId: userId1, token: token1, type: type1,recieverId: recieverId1, entityId: entityId1)).then((value) {
+   HTTPManager().sendSagePaymentForCoach(SageCoachesPayment(userId: userId1, token: token1, type: type1,recieverId: recieverId1, email: email  ,entityId: entityId1)).then((value) {
 
       setState(() {
         isLoading = false;
