@@ -1,12 +1,10 @@
 // ignore_for_file: avoid_print, avoid_function_literals_in_foreach_calls, depend_on_referenced_packages, unused_local_variable
 
-
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_quiz_app/Widgets/colors.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,28 +17,87 @@ import 'model/request_model/logout_user_request.dart';
 import 'model/request_model/post_request_model.dart';
 import 'network/http_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Size mq = MediaQuery.of(NavigationService.navigatorKey.currentContext!).size;
 
-// import 'package:awesome_notifications/awesome_notifications.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  await setupFlutterNotifications();
+  showFlutterNotification(message);
+  print('Handling a background message ${message.messageId}');
+}
+
+
+late AndroidNotificationChannel channel;
+
+bool isFlutterLocalNotificationsInitialized = false;
+
+Future<void> setupFlutterNotifications() async {
+  if (isFlutterLocalNotificationsInitialized) {
+    return;
+  }
+
+
+  channel = const AndroidNotificationChannel(
+    'burgeon', // id
+    'burgeon-channel', // title
+    description: 'This channel is used for important notifications.', // description
+    importance: Importance.high,
+  );
+
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
+  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(alert: true, badge: true, sound: true);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  isFlutterLocalNotificationsInitialized = true;
+}
+
+void showFlutterNotification(RemoteMessage message) {
+  print('Show Flutter Notification ================>');
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+
+  if (notification != null && android != null && !kIsWeb) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          icon: '@mipmap/ic_launcher',
+        ),
+      ),
+    );
+  }
+}
+
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 Future<void> main() async {
 
-  // AwesomeNotifications().initialize(null, [
-  //   NotificationChannel(
-  //       channelKey: "Burgeon_Reminder_Channel",
-  //       channelName: "Burgeon Reminder",
-  //       channelDescription: "Notification For Reminder",
-  //     importance: NotificationImportance.Max,
-  //     defaultColor: AppColors.primaryColor,
-  //     ledColor: AppColors.backgroundColor,
-  //     channelShowBadge: true,
-  //     defaultRingtoneType: DefaultRingtoneType.Notification
-  //   )]);
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  if (!kIsWeb) {
+    await setupFlutterNotifications();
+  }
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   _configureFirebase();
+
 
  // NotificationService().initNotification();
   //tz.initializeTimeZones();
@@ -127,7 +184,6 @@ void _configureFirebase() async {
  String? title;
  String? body;
 
-  await Firebase.initializeApp();
 
    FirebaseMessaging.instance.requestPermission().then((value) {
      FirebaseMessaging.instance.getToken().then((token) {
@@ -158,7 +214,8 @@ void _configureFirebase() async {
     }
   });
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     if (message.notification != null) {
       // Handle the notification message here
@@ -682,16 +739,7 @@ showPopupDialogueForReminder(String notificationId,String title,String descripti
 }
 
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
-  print('Got a message whilst in the background!');
-
-  debugPrint('Message data: ${message.data}');
-
-  if (message.notification != null) {
-
-  }
-}
 
 class MyApp extends StatelessWidget {
    MyApp({Key? key}) : super(key: key);
