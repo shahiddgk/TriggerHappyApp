@@ -1160,6 +1160,8 @@ class HTTPManager {
     // ignore: avoid_print
     print(url);
 
+    print('Request Body ========> ${reminderNotificationForSnoozeRequestModel.toJson()}');
+
     final response =
     await _handler.post(Uri.parse(url),reminderNotificationForSnoozeRequestModel.toJson());
     // PostReminderResponseListModel postReminderResponseListModel = PostReminderResponseListModel.fromJson(response);

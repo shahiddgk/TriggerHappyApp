@@ -40,7 +40,7 @@ class _PostsState extends State<Posts> {
   // bool _isLoading1 = true;
   bool _isDataLoading = false;
   bool _isUserDataLoading = false;
-  TimeOfDay selectedTime = TimeOfDay.now();
+  // TimeOfDay selectedTime = TimeOfDay.now();
   bool switchValue = false;
   bool expansionValue = false;
   bool isRepeat = true;
@@ -58,9 +58,11 @@ class _PostsState extends State<Posts> {
   final TextEditingController _reminderTimeController = TextEditingController();
   final categoryController = TextEditingController();
 
+  DateTime selectedReminderTime = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day);
+
   final _formKey = GlobalKey<FormState>();
 
-  DateTime selectedReminderTime= DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day);
+
 
   late PostReminderResponseListModel postReminderResponseListModel;
   List <String> dateList = <String>[];
@@ -295,6 +297,8 @@ class _PostsState extends State<Posts> {
                 _dateController.text = "";
                 _titleController.text = "";
                 _endDateController.text = "";
+                _reminderTimeController.text = "";
+                selectedReminderTime = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day);
                 isRepeat = true;
                 _scrollControllerHour =  FixedExtentScrollController(initialItem: 0);
                 _scrollControllerMin =  FixedExtentScrollController(initialItem: 0);
@@ -752,6 +756,8 @@ class _PostsState extends State<Posts> {
     bool isFriAvailable = false;
     bool isSatAvailable = false;
 
+
+
     if(!isEditReminder) {
       DateTime endDate;
       String formattedEndDate = "";
@@ -772,6 +778,12 @@ class _PostsState extends State<Posts> {
       }
       DateTime time = DateFormat("hh:mm").parse(singleAnswer.time!);
       String formattedDate = DateFormat('MM-dd-yy').format(date);
+      print('Single Answer Time =======> ${singleAnswer.time}');
+
+      DateTime reminderTime = DateFormat("hh:mm a").parse('${singleAnswer.time} ${singleAnswer.timeType}');
+      selectedReminderTime = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day, reminderTime.hour, reminderTime.minute);
+      _reminderTimeController.text = DateFormat('hh:mm a').format(selectedReminderTime);
+
       // Format the date as desired
       // String formattedTime = DateFormat.jm().format(dateTime); // Format the time as desired
 

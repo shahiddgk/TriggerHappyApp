@@ -26,6 +26,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   await setupFlutterNotifications();
   showFlutterNotification(message);
+
   print('Handling a background message ${message.messageId}');
 }
 
@@ -123,48 +124,47 @@ class AppLifecycleObserver with WidgetsBindingObserver {
 
     if (state == AppLifecycleState.resumed) {
 
-        // HTTPManager()
-        //     .getSkippedReminderListData(LogoutRequestModel(userId: id))
-        //     .then((value) {
-        //   skippedReminderNotification = value;
-        //   // sharedPreferences.setString("Score", "");
-        //   _isLoading2 = false;
-        //
-        //   print("SKIPPED REMINDER LIST");
-        //   print(value);
-        //
-        //   // if (!_notificationHandled("1")) {
-        //   //   _showPopUpDialogue(
-        //   //       1,
-        //   //       "1",
-        //   //       "title",
-        //   //       "skippedReminderNotification.result![i].text.toString()",
-        //   //       "formattedDate!",
-        //   //       "formattedTime!");
-        //   // }
-        //
-        //   for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
-        //
-        //     if (!_notificationHandled(skippedReminderNotification.result![i].id.toString())) {
-        //       String title = "Hi $name. Did you....";
-        //       DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
-        //       formattedDate = DateFormat('MM-dd-yy').format(date);
-        //       formattedTime = DateFormat("hh:mm a").format(date);
-        //       _showPopUpDialogue(1,
-        //           skippedReminderNotification.result![i].id.toString(),
-        //           title,
-        //           skippedReminderNotification.result![i].text.toString(),
-        //           formattedDate!,
-        //           formattedTime!
-        //       );
-        //     }
-        //   }
-        // }).catchError((e) {
-        //   print(e);
-        //
-        //   // sharedPreferences.setString("Score", "");
-        //   _isLoading2 = false;
-        // });
+        HTTPManager()
+            .getSkippedReminderListData(LogoutRequestModel(userId: id))
+            .then((value) {
+          skippedReminderNotification = value;
+          // sharedPreferences.setString("Score", "");
+
+          print("SKIPPED REMINDER LIST");
+          print(value);
+
+          // if (!_notificationHandled("1")) {
+          //   _showPopUpDialogue(
+          //       1,
+          //       "1",
+          //       "title",
+          //       "skippedReminderNotification.result![i].text.toString()",
+          //       "formattedDate!",
+          //       "formattedTime!");
+          // }
+
+          for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+
+            if (!_notificationHandled(skippedReminderNotification.result![i].entityId.toString())) {
+              String title = "Hi $name. Did you....";
+              DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+              formattedDate = DateFormat('MM-dd-yy').format(date);
+              formattedTime = DateFormat("hh:mm a").format(date);
+              _showPopUpDialogue(1,
+                  skippedReminderNotification.result![i].entityId.toString(),
+                  skippedReminderNotification.result![i].id.toString(),
+                  title,
+                  skippedReminderNotification.result![i].text.toString(),
+                  formattedDate!,
+                  formattedTime!
+              );
+            }
+          }
+        }).catchError((e) {
+          print(e);
+
+          // sharedPreferences.setString("Score", "");
+        });
       print("App is back in the foreground");
     } else if(state == AppLifecycleState.paused) {
       // App is back in the background
@@ -180,6 +180,7 @@ void _configureFirebase() async {
  String? formattedDate;
  String? formattedTime;
  String? entityId;
+ String? updateId;
  String? type;
  String? title;
  String? body;
@@ -201,14 +202,13 @@ void _configureFirebase() async {
         type = message.data['type'].toString();
 
       if (type != "welcome_notification") {
-
         DateTime date = DateTime.parse(message.data['date_time'].toString());
          formattedDate = DateFormat('MM-dd-yy').format(date);
          formattedTime = DateFormat("hh:mm a").format(date);
         title = message.notification!.title ?? 'Notification';
         body = message.notification!.body ?? 'You have a new notification';
         entityId = message.data['entity_id'].toString();
-        _showPopUpDialogue(6, entityId, title,body, formattedDate, formattedTime);
+        // _showPopUpDialogue(6, entityId, title,body, formattedDate, formattedTime);
       }
       // handle accordingly
     }
@@ -216,7 +216,7 @@ void _configureFirebase() async {
 
 
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     if (message.notification != null) {
       // Handle the notification message here
       // For example, show a dialog
@@ -229,21 +229,69 @@ void _configureFirebase() async {
       String type = message.data['type'].toString();
 
       if (type != "welcome_notification") {
+        late SkippedReminderNotification skippedReminderNotification;
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        String name = sharedPreferences.getString(UserConstants().userName)!;
+        String id = sharedPreferences.getString(UserConstants().userId)!;
         DateTime date = DateTime.parse(message.data['date_time'].toString());
         formattedDate = DateFormat('MM-dd-yy').format(date);
         formattedTime = DateFormat("hh:mm a").format(date);
         title = message.notification!.title ?? 'Notification';
         body = message.notification!.body ?? 'You have a new notification';
         entityId = message.data['entity_id'].toString();
-        if (!_notificationHandled(entityId!)) {
-          _showPopUpDialogue(
-              1,
-              entityId,
-              title,
-              body,
-              formattedDate,
-              formattedTime);
-        }
+        updateId = message.data['update_id'].toString();
+
+        HTTPManager()
+            .getSkippedReminderListData(LogoutRequestModel(userId: id))
+            .then((value) {
+          skippedReminderNotification = value;
+          // sharedPreferences.setString("Score", "");
+
+          print("SKIPPED REMINDER LIST");
+          print(value);
+
+          // if (!_notificationHandled("1")) {
+          //   _showPopUpDialogue(
+          //       1,
+          //       "1",
+          //       "title",
+          //       "skippedReminderNotification.result![i].text.toString()",
+          //       "formattedDate!",
+          //       "formattedTime!");
+          // }
+
+          for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
+
+            if (!_notificationHandled(skippedReminderNotification.result![i].entityId.toString())) {
+              String title = "Hi $name. Did you....";
+              DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
+              formattedDate = DateFormat('MM-dd-yy').format(date);
+              formattedTime = DateFormat("hh:mm a").format(date);
+              _showPopUpDialogue(1,
+                  skippedReminderNotification.result![i].entityId.toString(),
+                  skippedReminderNotification.result![i].id.toString(),
+                  title,
+                  skippedReminderNotification.result![i].text.toString(),
+                  formattedDate!,
+                  formattedTime!
+              );
+            }
+          }
+        }).catchError((e) {
+          print(e);
+        sharedPreferences.setString("Score", "");
+        });
+
+        // if (!_notificationHandled(entityId!)) {
+          // _showPopUpDialogue(
+          //     1,
+          //     entityId,
+          //     updateId,
+          //     title,
+          //     body,
+          //     formattedDate,
+          //     formattedTime);
+        // }
       }
     }
   });
@@ -274,15 +322,18 @@ void _configureFirebase() async {
         title = message.notification!.title ?? 'Notification';
         body = message.notification!.body ?? 'You have a new notification';
         entityId = message.data['entity_id'].toString();
+        updateId = message.data['update_id'].toString();
 
         // if (!_notificationHandled(entityId!)) {
         //   _showPopUpDialogue(
         //       1,
         //       entityId,
+        //       updateId,
         //       title,
         //       body,
         //       formattedDate,
-        //       formattedTime);
+        //       formattedTime
+        //   );
         // }
 
 
@@ -307,12 +358,13 @@ void _configureFirebase() async {
 
           for(int i = 0; i<skippedReminderNotification.result!.length; i++) {
 
-            if (!_notificationHandled(skippedReminderNotification.result![i].id.toString())) {
+            if (!_notificationHandled(skippedReminderNotification.result![i].entityId.toString())) {
               String title = "Hi $name. Did you....";
               DateTime date = DateTime.parse(skippedReminderNotification.result![i].dateTime.toString());
               formattedDate = DateFormat('MM-dd-yy').format(date);
               formattedTime = DateFormat("hh:mm a").format(date);
               _showPopUpDialogue(1,
+                  skippedReminderNotification.result![i].entityId.toString(),
                   skippedReminderNotification.result![i].id.toString(),
                   title,
                   skippedReminderNotification.result![i].text.toString(),
@@ -323,7 +375,6 @@ void _configureFirebase() async {
           }
         }).catchError((e) {
           print(e);
-
           // sharedPreferences.setString("Score", "");
         });
 
@@ -339,11 +390,11 @@ bool _notificationHandled(String entityId1) {
   return _handledNotificationIds.contains(entityId1);
 }
 
-_showPopUpDialogue(int seconds,String? entityId1,String? title1,String? body1,String? formattedDate1,String? formattedTime1) {
+_showPopUpDialogue(int seconds,String? entityId1,String? updateId,String? title1,String? body1,String? formattedDate1,String? formattedTime1) {
   _handledNotificationIds.add(entityId1!);
   Future.delayed(Duration(seconds: seconds)).then((value) {
       print(value);
-      showPopupDialogueForReminder(entityId1, title1!, body1!,true,formattedDate1!,formattedTime1!);
+      showPopupDialogueForReminder(entityId1, updateId!,title1!, body1!,true,formattedDate1!,formattedTime1!);
     });
   // if(notificationTapped) {
   //   showPopupDialogueForReminder(entityId1!, title1!, body1!,true,formattedDate1!,formattedTime1!);
@@ -533,7 +584,7 @@ Future<bool> _onWillPopForAlert() async {
   return false;
 }
 
-showPopupDialogueForReminder(String notificationId,String title,String description,bool onAppOpen,String date,String time) {
+showPopupDialogueForReminder(String notificationId,String updateId,String title,String description,bool onAppOpen,String date,String time) {
   bool isDataLoading = false;
   bool isYesDataLoading = false;
   bool isNoDataLoading = false;
@@ -705,22 +756,22 @@ showPopupDialogueForReminder(String notificationId,String title,String descripti
                                 setState(() {
                                   isDataLoading = true;
                                 });
-                                // HTTPManager().postReminderSnoozeData(ReminderNotificationForSnoozeRequestModel(notificationId: notificationId,snooze: "yes")).then((value) {
-                                //   setState(() {
-                                //     isDataLoading = false;
-                                //   });
-                                //   _handledNotificationIds.remove(notificationId);
-                                //   print("Set of IDs After Snooze");
-                                //   print(_handledNotificationIds);
-                                //   showToastMessage(context, "Reminder Snoozed!", true);
-                                //   Navigator.of(context).pop();
-                                //
-                                // }).catchError((e) {
-                                //   setState(() {
-                                //     isDataLoading = false;
-                                //   });
-                                //   showToastMessage(context, e.toString(), false);
-                                // });
+                                HTTPManager().postReminderSnoozeData(ReminderNotificationForSnoozeRequestModel(notificationId: notificationId, updateId: updateId)).then((value) {
+                                  setState(() {
+                                    isDataLoading = false;
+                                  });
+                                  _handledNotificationIds.remove(notificationId);
+                                  print("Set of IDs After Snooze");
+                                  print(_handledNotificationIds);
+                                  showToastMessage(context, "Reminder Snoozed!", true);
+                                  Navigator.of(context).pop();
+
+                                }).catchError((e) {
+                                  setState(() {
+                                    isDataLoading = false;
+                                  });
+                                  showToastMessage(context, e.toString(), false);
+                                });
                               }, child:isDataLoading ? const SizedBox(
                                   height: 15,
                                   width: 15,
